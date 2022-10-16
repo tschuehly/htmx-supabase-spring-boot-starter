@@ -1,0 +1,63 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <title>Supabase Auth</title>
+</head>
+<body>
+<h1>
+    Index
+</h1>
+
+<a href="/account">Account Page</a>
+
+<h2 th:text="${#authentication }">
+    Sign In
+</h2>
+<h2 th:text="${#authorization}">
+    Sign In
+</h2>
+<div sec:authorize="hasRole('ROLE_ANONYMOUS')">
+    <form>
+        <label>Email:
+            <input type="text" name="email"/>
+        </label>
+        <label>Password:
+            <input type="password" name="password"/>
+        </label>
+        <button hx-post="/api/user/login">Submit</button>
+    </form>
+
+    <h2>
+        Register
+    </h2>
+    <form>
+        <label>Email:
+            <input type="text" name="email"/>
+        </label>
+        <label>Password:
+            <input type="password" name="password"/>
+        </label>
+        <button hx-post="/api/user/register">Submit</button>
+    </form>
+
+</div>
+
+
+<a href="https://eyxbhhammxxopyqgwvej.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
+
+</body>
+<div sec:authorize="!hasRole('ROLE_ANONYMOUS')">
+    <h2>
+        <button hx-get="/api/user/logout">Logout</button>
+    </h2>
+</div>
+<script>
+    if (window.location.hash.startsWith("#access_token")) {
+        htmx.ajax('POST', '/api/user/jwt', {target: '#body', swap: 'outerHTML'})
+            .then(window.location.hash = "")
+    }
+</script>
+</html>

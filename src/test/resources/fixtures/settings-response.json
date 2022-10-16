@@ -1,0 +1,14 @@
+{
+  "external": {
+    "bitbucket": false,
+    "github": false,
+    "gitlab": false,
+    "google": false,
+    "facebook": false,
+    "email": true,
+    "saml": false
+  },
+  "external_labels": {},
+  "disable_signup": false,
+  "autoconfirm": true
+}

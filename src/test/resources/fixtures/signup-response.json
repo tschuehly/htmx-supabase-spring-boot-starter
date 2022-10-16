@@ -1,0 +1,30 @@
+{
+  "id": "455bb335-8310-4abc-b247-b1f61b09272c",
+  "aud": "authenticated",
+  "role": "authenticated",
+  "email": "foo@example.com",
+  "phone": "",
+  "confirmation_sent_at": "2022-10-14T22:13:49.155447226Z",
+  "app_metadata": {
+    "provider": "email",
+    "providers": [
+      "email"
+    ]
+  },
+  "user_metadata": {},
+  "identities": [
+    {
+      "id": "455bb335-8310-4abc-b247-b1f61b09272c",
+      "user_id": "455bb335-8310-4abc-b247-b1f61b09272c",
+      "identity_data": {
+        "sub": "455bb335-8310-4abc-b247-b1f61b09272c"
+      },
+      "provider": "email",
+      "last_sign_in_at": "2022-10-14T22:13:49.153935441Z",
+      "created_at": "2022-10-14T22:13:49.153972Z",
+      "updated_at": "2022-10-14T22:13:49.153975Z"
+    }
+  ],
+  "created_at": "2022-10-14T22:13:49.150059Z",
+  "updated_at": "2022-10-14T22:13:49.520685Z"
+}

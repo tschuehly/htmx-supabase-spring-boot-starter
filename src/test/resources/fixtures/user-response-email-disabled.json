@@ -1,0 +1,38 @@
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "nGAyjPONelHS6XG-asAsnQ",
+  "user": {
+    "id": "b04343d0-8164-4c92-9aaa-cdbbb9188358",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "foo@bar.com",
+    "email_confirmed_at": "2022-02-09T10:36:38.750745355Z",
+    "phone": "",
+    "confirmation_sent_at": "2022-02-09T10:34:22.105331Z",
+    "last_sign_in_at": "2022-02-09T10:36:38.754228834Z",
+    "app_metadata": {
+      "provider": "email",
+      "providers": [
+        "email"
+      ]
+    },
+    "user_metadata": {},
+    "identities": [
+      {
+        "id": "b04343d0-8164-4c92-9aaa-cdbbb9188358",
+        "user_id": "b04343d0-8164-4c92-9aaa-cdbbb9188358",
+        "identity_data": {
+          "sub": "b04343d0-8164-4c92-9aaa-cdbbb9188358"
+        },
+        "provider": "email",
+        "last_sign_in_at": "2022-02-08T22:25:10.211158Z",
+        "created_at": "2022-02-08T22:25:10.211215Z",
+        "updated_at": "2022-02-08T22:25:10.211219Z"
+      }
+    ],
+    "created_at": "2022-02-08T22:25:10.207882Z",
+    "updated_at": "2022-02-09T10:36:38.756078Z"
+  }
+}

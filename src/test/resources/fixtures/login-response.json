@@ -1,0 +1,39 @@
+{
+  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwic3ViIjoiZjgwMmMzYmItMjIzZS00M2E2LWJiYTAtNWFlNjA5NGYwZDkxIiwiZW1haWwiOiJmaXJzdC5sYXN0QGV4YW1wbGUuY29tIiwiYXBwX21ldGFkYXRhIjoie1xuICAgICAgICAgICAgICAgICAgXCJwcm92aWRlclwiOiBcImVtYWlsXCIsXG4gICAgICAgICAgICAgICAgICBcInByb3ZpZGVyc1wiOiBbXG4gICAgICAgICAgICAgICAgICAgIFwiZW1haWxcIlxuICAgICAgICAgICAgICAgICAgXVxuICAgICAgICAgICAgICAgIH0ifQ.VRxN271KulPW6uKD9JUmr1pg7jC00LUTG2gUGgXIMdA",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "refresh_token": "UsMf4YHXXduDA4tDjO1zZA",
+  "user": {
+    "id": "f802c3bb-223e-43a6-bba0-5ae6094f0d91",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "thomas.schuehly@outlook.com",
+    "email_confirmed_at": "2022-10-14T07:27:34.750707Z",
+    "phone": "",
+    "confirmation_sent_at": "2022-10-14T07:27:06.691377Z",
+    "confirmed_at": "2022-10-14T07:27:34.750707Z",
+    "last_sign_in_at": "2022-10-14T22:53:43.333484484Z",
+    "app_metadata": {
+      "provider": "email",
+      "providers": [
+        "email"
+      ]
+    },
+    "user_metadata": {},
+    "identities": [
+      {
+        "id": "f802c3bb-223e-43a6-bba0-5ae6094f0d91",
+        "user_id": "f802c3bb-223e-43a6-bba0-5ae6094f0d91",
+        "identity_data": {
+          "sub": "f802c3bb-223e-43a6-bba0-5ae6094f0d91"
+        },
+        "provider": "email",
+        "last_sign_in_at": "2022-10-14T07:27:06.689269Z",
+        "created_at": "2022-10-14T07:27:06.689308Z",
+        "updated_at": "2022-10-14T07:27:06.689311Z"
+      }
+    ],
+    "created_at": "2022-10-14T07:27:06.684506Z",
+    "updated_at": "2022-10-14T22:53:43.335165Z"
+  }
+}

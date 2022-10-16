@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+Logged user: <span th:text="${#authentication.principal.id}"></span>
+<body>
+<h1>You are authenticated</h1>
+</body>
+</html>

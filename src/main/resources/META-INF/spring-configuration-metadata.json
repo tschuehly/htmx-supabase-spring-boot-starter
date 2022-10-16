@@ -1,0 +1,36 @@
+{
+  "groups": [
+    {
+      "name": "supabase",
+      "type": "io.supabase.supabasespringbootstarter.config.SupabaseProperties",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "supabase.projectId",
+      "type": "java.lang.String",
+      "description": "The project id of your supabase project you can find that as Reference ID in your project settings or in the url https://app.supabase.com/project/$projectId",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.databasePassword",
+      "type": "java.lang.String",
+      "description": "The password you provided when creating the supabase project on supabase.com",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.anonKey",
+      "type": "java.lang.String",
+      "description": "The anon project api key, found at Project settings - API",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.jwtSecret",
+      "type": "java.lang.String",
+      "description": "The JWT secret, found at Project settings - API ",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    }
+  ],
+  "hints": []
+}
