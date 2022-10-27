@@ -15,7 +15,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
-	jcenter()
+	mavenn("https://jitpack.io")
 }
 
 dependencies {
@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("com.auth0:java-jwt:4.1.0")
-	implementation("io.supabase:gotrue-kt:0.4.0")
+	implementation("com.github.tschuehly:gotrue-kt:c77ef5f395")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
