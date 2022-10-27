@@ -33,6 +33,17 @@ import org.springframework.util.StringUtils
         "supabase.anonKey=asljkhdas",
         "supabase.databasePassword=kaskjsad",
         "supabase.jwtSecret=VhLI85yN/oF3Eu95epgHOeg/iRIGiJtk2PWyCyCdORRuVVW90wToyJcJXZcHuHZ2dh7qVgH0UMjqbq1gGMF6JQ==",
+        "supabase.public.get[0]=/",
+        "supabase.public.get[1]=/logout",
+        "supabase.public.get[2]=/login",
+        "supabase.public.get[3]=/error",
+        "supabase.public.post[0]=/api/user/register",
+        "supabase.public.post[1]=/api/user/login",
+        "supabase.public.post[2]=/api/user/jwt",
+        "supabase.roles.get.user[0]=/", //TODO: User based Authoriization
+        "supabase.roles.get.user[1]=/logout",
+        "supabase.roles.get.user[2]=/login",
+        "supabase.roles.get.user[3]=/error",
         "debug=org.springframework.security"],
 )
 class SupabaseIntegrationTest() {

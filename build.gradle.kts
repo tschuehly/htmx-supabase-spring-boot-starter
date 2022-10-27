@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "2.7.4"
 	id("io.spring.dependency-management") version "1.0.14.RELEASE"
+	id("maven-publish")
 	kotlin("jvm") version "1.7.10"
 	kotlin("plugin.spring") version "1.7.10"
 	kotlin("plugin.jpa") version "1.7.10"
@@ -51,7 +52,41 @@ tasks.withType<Test> {
 }
 
 tasks {
-	bootJar{
+	bootJar {
 		enabled = false
 	}
 }
+
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
+
+//
+//publishing{
+//	publications {
+//		create<MavenPublication>("Maven") {
+//			from(components["java"])
+//		}
+//		withType<MavenPublication> {
+//			pom {
+//				packaging = "jar"
+//				name.set("supabase-spring-boot-starter")
+//				description.set("Supabase Spring Boot Starter")
+//				licenses {
+//					license {
+//						name.set("MIT license")
+//						url.set("https://opensource.org/licenses/MIT")
+//					}
+//				}
+//				developers {
+//					developer {
+//						name.set("Thomas Schuehly")
+//						email.set("thomas.schuehly@outlook.com")
+//					}
+//				}
+//			}
+//		}
+//	}
+//}

@@ -3,8 +3,8 @@ package io.supabase.supabasespringbootstarter.config
 import io.supabase.gotrue.GoTrueClient
 import io.supabase.gotrue.types.GoTrueTokenResponse
 import io.supabase.supabasespringbootstarter.controller.SupabaseUserController
-import io.supabase.supabasespringbootstarter.security.SpringSecurityConfig
 import io.supabase.supabasespringbootstarter.security.SupabaseAccessDeniedHandler
+import io.supabase.supabasespringbootstarter.security.SupabaseSecurityConfig
 import io.supabase.supabasespringbootstarter.service.SupabaseUserService
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Import
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
 @ComponentScan("io.supabase.supabasespringbootstarter")
-@Import(SpringSecurityConfig::class)
+@Import(SupabaseSecurityConfig::class)
 class SupabaseAutoConfiguration(
     val supabaseProperties: SupabaseProperties,
 ) {

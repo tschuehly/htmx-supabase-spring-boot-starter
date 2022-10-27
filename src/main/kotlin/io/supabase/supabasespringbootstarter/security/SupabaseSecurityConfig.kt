@@ -1,5 +1,6 @@
 package io.supabase.supabasespringbootstarter.security
 
+import io.supabase.supabasespringbootstarter.config.SupabaseProperties
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
@@ -13,8 +14,9 @@ import org.springframework.security.web.access.ExceptionTranslationFilter
 
 @Configuration
 @EnableWebSecurity(debug = false)
-class SpringSecurityConfig(
-    val accessDeniedHandler: SupabaseAccessDeniedHandler
+class SupabaseSecurityConfig(
+    val accessDeniedHandler: SupabaseAccessDeniedHandler,
+    val supabaseProperties: SupabaseProperties
 ) {
     @Bean
     @ConditionalOnMissingBean
@@ -23,8 +25,8 @@ class SpringSecurityConfig(
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .csrf().disable()
             .authorizeRequests()
-            .antMatchers(HttpMethod.GET, "/", "/logout", "/login", "/error").permitAll()
-            .antMatchers(HttpMethod.POST, "/api/user/register", "/api/user/login", "/api/user/jwt").permitAll()
+            .antMatchers(HttpMethod.GET, *supabaseProperties.public.get).permitAll()
+            .antMatchers(HttpMethod.POST, *supabaseProperties.public.post).permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().accessDeniedHandler(accessDeniedHandler).and()

@@ -1,6 +1,7 @@
 package io.supabase.supabasespringbootstarter.security
 
 import com.auth0.jwt.exceptions.TokenExpiredException
+import io.supabase.supabasespringbootstarter.config.SupabaseProperties
 import io.supabase.supabasespringbootstarter.service.SupabaseUserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,19 +16,16 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class SupabaseJwtFilter(
-    private val supabaseUserService: SupabaseUserService
+    private val supabaseUserService: SupabaseUserService,
+    private val supabaseProperties: SupabaseProperties
 
 ) : HttpFilter() {
     val publicPath = antPathsMatcher(
-        "/",
-        "/api/user/login",
-        "/api/user/register",
-        "/api/user/jwt",
-        "/",
-        "/logout",
-        "/login",
-        "/error"
-    ) // TODO: Externalize Configuration
+        *supabaseProperties.public.get,
+        *supabaseProperties.public.post,
+        *supabaseProperties.public.put,
+        *supabaseProperties.public.delete,
+    )
     val springSecurityPaths = antPathsMatcher("/error")
     val jwtLogger: Logger = LoggerFactory.getLogger(SupabaseJwtFilter::class.java)
 
