@@ -15,7 +15,7 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
-	mavenn("https://jitpack.io")
+	maven("https://jitpack.io")
 }
 
 dependencies {
@@ -64,29 +64,32 @@ java {
 
 
 //
-//publishing{
-//	publications {
-//		create<MavenPublication>("Maven") {
-//			from(components["java"])
-//		}
-//		withType<MavenPublication> {
-//			pom {
-//				packaging = "jar"
-//				name.set("supabase-spring-boot-starter")
-//				description.set("Supabase Spring Boot Starter")
-//				licenses {
-//					license {
-//						name.set("MIT license")
-//						url.set("https://opensource.org/licenses/MIT")
-//					}
-//				}
-//				developers {
-//					developer {
-//						name.set("Thomas Schuehly")
-//						email.set("thomas.schuehly@outlook.com")
-//					}
-//				}
-//			}
-//		}
-//	}
-//}
+publishing{
+	publications {
+
+		create<MavenPublication>("Maven") {
+			from(components["java"])
+			groupId = "com.github.tschuehly"
+			artifactId = "supabase-spring-boot-starter"
+		}
+		withType<MavenPublication> {
+			pom {
+				packaging = "jar"
+				name.set("supabase-spring-boot-starter")
+				description.set("Supabase Spring Boot Starter")
+				licenses {
+					license {
+						name.set("MIT license")
+						url.set("https://opensource.org/licenses/MIT")
+					}
+				}
+				developers {
+					developer {
+						name.set("Thomas Schuehly")
+						email.set("thomas.schuehly@outlook.com")
+					}
+				}
+			}
+		}
+	}
+}
