@@ -7,7 +7,6 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import io.supabase.gotrue.GoTrueClient
 import io.supabase.gotrue.types.GoTrueTokenResponse
-import io.supabase.supabasespringbootstarter.service.SupabaseUserService
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.AfterEach
@@ -40,16 +39,10 @@ import org.springframework.util.StringUtils
         "supabase.public.post[0]=/api/user/register",
         "supabase.public.post[1]=/api/user/login",
         "supabase.public.post[2]=/api/user/jwt",
-        "supabase.roles.get.user[0]=/", //TODO: User based Authoriization
-        "supabase.roles.get.user[1]=/logout",
-        "supabase.roles.get.user[2]=/login",
-        "supabase.roles.get.user[3]=/error",
+        "supabase.roles.admin.get[0]=/", //TODO: User based Authoriization
         "debug=org.springframework.security"],
 )
 class SupabaseIntegrationTest() {
-
-    @Autowired
-    lateinit var supabaseUserService: SupabaseUserService
 
     @Autowired
     lateinit var supabaseGoTrueClient: GoTrueClient<SupabaseUser, GoTrueTokenResponse>
@@ -98,6 +91,22 @@ class SupabaseIntegrationTest() {
             "http://localhost:$port/account", HttpMethod.GET, HttpEntity(null, null), String::class.java
         )
         then(accountResponse.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+    }
+
+    @Test
+    fun `Unauthorized User can access public sites`(){
+        val indexResponse : ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port",HttpMethod.GET, HttpEntity(null, null), String::class.java
+        )
+        then(indexResponse.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
+    @Test
+    fun `Normal user cannot access admin page`(){
+        val adminResponse : ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/admin",HttpMethod.GET, HttpEntity(null, null), String::class.java
+        )
+        then(adminResponse.statusCode).isEqualTo(<y>.OK)
     }
 
     @Test

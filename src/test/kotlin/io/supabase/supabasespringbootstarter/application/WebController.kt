@@ -10,6 +10,9 @@ class WebController {
     @GetMapping("/")
     fun index() = "index"
 
+    @GetMapping("/admin")
+    fun admin() = "admin"
+
     @GetMapping("/account")
     fun manager(): String {
 

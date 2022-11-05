@@ -21,13 +21,13 @@ class SupabaseProperties {
         var put: Array<String> = arrayOf()
     }
 
-    val roles = Roles()
+    lateinit var roles : Map<String, Role>
 
-    class Roles {
-        lateinit var get: Map<String, List<String>>
-        lateinit var post: Map<String, Array<String>>
-        lateinit var delete: Map<String, Array<String>>
-        lateinit var put: Map<String, Array<String>>
+    class Role {
+        var get: Array<String> = arrayOf()
+        var post: Array<String> = arrayOf()
+        var delete: Array<String> = arrayOf()
+        var put: Array<String> = arrayOf()
 
     }
 }

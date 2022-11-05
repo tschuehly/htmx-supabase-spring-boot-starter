@@ -89,10 +89,11 @@ class SupabaseUserService(
         response.setHeader("HX-Redirect", "/account")
     }
 
-    fun setAuthentication(jwt: String) {
+    fun setAuthentication(jwt: String): SupabaseAuthenticationToken {
         val decodedJWT = JWT
             .require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build().verify(jwt).claims
-        SecurityContextHolder.getContext().authentication = SupabaseAuthenticationToken(
+
+        return  SupabaseAuthenticationToken(
             SupabaseUser(decodedJWT)
         )
     }
