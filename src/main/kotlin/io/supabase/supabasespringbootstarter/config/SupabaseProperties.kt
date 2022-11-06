@@ -21,7 +21,7 @@ class SupabaseProperties {
         var put: Array<String> = arrayOf()
     }
 
-    lateinit var roles : Map<String, Role>
+    val roles : MutableMap<String, Role> = mutableMapOf()
 
     class Role {
         var get: Array<String> = arrayOf()

@@ -76,6 +76,13 @@ class SupabaseUserService(
         }
     }
 
+    fun setRoles(userId: String, request: HttpServletRequest, roles: List<String>?){
+        request.cookies?.find { it.name == "JWT" }?.let {
+            val roleArray = roles ?: listOf()
+            supabaseGoTrueClient.updateUserAppMetadata(it.value,userId, mapOf("roles" to roleArray))
+        }
+    }
+
     private fun setCookies(
         response: HttpServletResponse,
         accessToken: String

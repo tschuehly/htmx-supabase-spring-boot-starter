@@ -29,7 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("com.auth0:java-jwt:4.1.0")
-	implementation("com.github.tschuehly:gotrue-kt:c77ef5f395")
+	implementation("com.github.tschuehly:gotrue-kt:659f8c6757")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 

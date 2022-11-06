@@ -47,5 +47,17 @@ class SupabaseUserController(
         supabaseUserService.logout(request, response)
     }
 
+    @PutMapping("/setRoles/{userId}")
+    @ResponseBody
+    fun setRoles(
+        @RequestParam
+        roles: List<String>?,
+        request: HttpServletRequest,
+        @PathVariable
+        userId: String,
+    ) {
+        supabaseUserService.setRoles(userId,request, roles)
+    }
+
 
 }
