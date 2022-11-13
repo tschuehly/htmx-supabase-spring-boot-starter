@@ -1,8 +1,10 @@
 package io.supabase.supabasespringbootstarter.controller
 
 import io.supabase.supabasespringbootstarter.service.SupabaseUserService
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -38,8 +40,8 @@ class SupabaseUserController(
     }
 
     @PostMapping("/jwt")
-    fun authorizeWithJWT(request: HttpServletRequest, response: HttpServletResponse) {
-        supabaseUserService.authorizeWithJWT(request, response)
+    fun authorizeWithJwtOrResetPassword(request: HttpServletRequest, response: HttpServletResponse) {
+        supabaseUserService.authorizeWithJwtOrResetPassword(request, response)
     }
 
     @GetMapping("/logout")
@@ -47,17 +49,37 @@ class SupabaseUserController(
         supabaseUserService.logout(request, response)
     }
 
-    @PutMapping("/setRoles/{userId}")
+    @PutMapping("/setRoles")
     @ResponseBody
     fun setRoles(
         @RequestParam
         roles: List<String>?,
         request: HttpServletRequest,
-        @PathVariable
+        @RequestParam
         userId: String,
     ) {
-        supabaseUserService.setRoles(userId,request, roles)
+        if (userId == "") {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "UserId required")
+        }
+        supabaseUserService.setRoles(userId, request, roles)
     }
 
+    @PostMapping("/sendPasswordResetEmail")
+    @ResponseBody
+    fun sendPasswordResetEmail(
+        @RequestParam
+        email: String
+    ) {
+        supabaseUserService.sendPasswordResetEmail(email)
+    }
 
+    @PostMapping("/updatePassword")
+    @ResponseBody
+    fun updatePassword(
+        request: HttpServletRequest,
+        @RequestParam
+        password: String
+    ) {
+        supabaseUserService.updatePassword(request, password)
+    }
 }

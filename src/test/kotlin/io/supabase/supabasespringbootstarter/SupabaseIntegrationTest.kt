@@ -96,17 +96,25 @@ class SupabaseIntegrationTest() {
     @Test
     fun `Unauthorized User can access public sites`(){
         val indexResponse : ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port",HttpMethod.GET, HttpEntity(null, null), String::class.java
+            "http://localhost:$port", HttpMethod.GET, HttpEntity(null, null), String::class.java
         )
         then(indexResponse.statusCode).isEqualTo(HttpStatus.OK)
     }
 
     @Test
-    fun `Normal user cannot access admin page`(){
-        val adminResponse : ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port/admin",HttpMethod.GET, HttpEntity(null, null), String::class.java
+    fun `Normal user cannot access admin page`() {
+        val adminResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/admin", HttpMethod.GET, HttpEntity(null, null), String::class.java
         )
-        then(adminResponse.statusCode).isEqualTo(<y>.OK)
+        then(adminResponse.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
+    @Test
+    fun `Can add Role to User`() {
+        val userResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/api/user/addRole", HttpMethod.GET, HttpEntity(null, null), String::class.java
+
+        )
     }
 
     @Test

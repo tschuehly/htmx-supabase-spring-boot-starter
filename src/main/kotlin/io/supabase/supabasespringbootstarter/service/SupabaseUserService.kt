@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.supabase.gotrue.GoTrueClient
 import io.supabase.gotrue.http.GoTrueHttpException
 import io.supabase.gotrue.types.GoTrueTokenResponse
+import io.supabase.gotrue.types.GoTrueUserAttributes
 import io.supabase.supabasespringbootstarter.config.SupabaseProperties
 import io.supabase.supabasespringbootstarter.exception.InvalidLoginCredentials
 import io.supabase.supabasespringbootstarter.exception.UserAlreadyRegisteredException
@@ -55,15 +56,18 @@ class SupabaseUserService(
         return response
     }
 
-    fun authorizeWithJWT(
+    fun authorizeWithJwtOrResetPassword(
         request: HttpServletRequest,
         response: HttpServletResponse
     ): HttpServletResponse {
-        if (request.getHeader("HX-Current-URL") != null) {
-            val accessToken = request.getHeader("HX-Current-URL")
-                .substringBefore("&").substringAfter("#access_token=")
+        val header: String? = request.getHeader("HX-Current-URL")
+        if (header != null) {
+            val accessToken = header.substringBefore("&").substringAfter("#access_token=")
             setAuthentication(accessToken)
             setCookies(response, accessToken)
+            if (header.contains("type=recovery")) {
+                response.setHeader("HX-Redirect", "/updatePassword")
+            }
         }
         return response
     }
@@ -100,8 +104,24 @@ class SupabaseUserService(
         val decodedJWT = JWT
             .require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build().verify(jwt).claims
 
-        return  SupabaseAuthenticationToken(
+        return SupabaseAuthenticationToken(
             SupabaseUser(decodedJWT)
         )
+    }
+
+    fun sendPasswordResetEmail(email: String) {
+        supabaseGoTrueClient.resetPasswordForEmail(email)
+    }
+
+    fun updatePassword(request: HttpServletRequest, password: String) {
+        request.cookies?.find { it.name == "JWT" }?.let {
+            supabaseGoTrueClient.updateUser(
+                it.value,
+                attributes = GoTrueUserAttributes(
+                    password = password
+                )
+
+            )
+        }
     }
 }
