@@ -1,5 +1,6 @@
 package io.supabase.supabasespringbootstarter.controller
 
+import io.supabase.supabasespringbootstarter.exception.UserNeedsToConfirmEmail
 import io.supabase.supabasespringbootstarter.service.SupabaseUserService
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
@@ -22,7 +23,8 @@ class SupabaseUserController(
         val email = credentials["email"]
         val password = credentials["password"]
         if (email != null && password != null) {
-            supabaseUserService.registerWithEmail(email, password, response)
+            val user = supabaseUserService.registerWithEmail(email, password, response)
+            throw UserNeedsToConfirmEmail("User with the mail ${user.email} needs to confirm signup")
         }
     }
 

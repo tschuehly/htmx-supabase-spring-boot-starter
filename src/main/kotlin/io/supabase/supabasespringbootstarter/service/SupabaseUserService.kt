@@ -25,9 +25,9 @@ class SupabaseUserService(
     val supabaseGoTrueClient: GoTrueClient<SupabaseUser, GoTrueTokenResponse>
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserService::class.java)
-    fun registerWithEmail(email: String, password: String, response: HttpServletResponse): HttpServletResponse {
+    fun registerWithEmail(email: String, password: String, response: HttpServletResponse): SupabaseUser {
         try {
-            supabaseGoTrueClient.signUpWithEmail(email, password)
+            return supabaseGoTrueClient.signUpWithEmail(email, password)
         } catch (e: GoTrueHttpException) {
             if (e.data?.contains("User already registered") == true) {
                 throw UserAlreadyRegisteredException("User: ${email} already registered", e)
@@ -36,7 +36,7 @@ class SupabaseUserService(
                 throw e
             }
         }
-        return response
+
     }
 
     fun login(
@@ -48,7 +48,7 @@ class SupabaseUserService(
         } catch (e: GoTrueHttpException) {
             if (e.data?.contains("Invalid login credentials") == true) {
                 throw InvalidLoginCredentialsException(
-                    "${username} either does not exist or has tried to login with the wrong passsword",
+                    "$username either does not exist or has tried to login with the wrong password",
                     e
                 )
             } else {
