@@ -7,7 +7,7 @@ import io.supabase.gotrue.http.GoTrueHttpException
 import io.supabase.gotrue.types.GoTrueTokenResponse
 import io.supabase.gotrue.types.GoTrueUserAttributes
 import io.supabase.supabasespringbootstarter.config.SupabaseProperties
-import io.supabase.supabasespringbootstarter.exception.InvalidLoginCredentials
+import io.supabase.supabasespringbootstarter.exception.InvalidLoginCredentialsException
 import io.supabase.supabasespringbootstarter.exception.UserAlreadyRegisteredException
 import io.supabase.supabasespringbootstarter.security.SupabaseAuthenticationToken
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
@@ -47,7 +47,10 @@ class SupabaseUserService(
             setCookies(response, resp.accessToken)
         } catch (e: GoTrueHttpException) {
             if (e.data?.contains("Invalid login credentials") == true) {
-                throw InvalidLoginCredentials("User: ${username} already registered", e)
+                throw InvalidLoginCredentialsException(
+                    "${username} either does not exist or has tried to login with the wrong passsword",
+                    e
+                )
             } else {
                 logger.error(e.data)
                 throw e
@@ -75,7 +78,11 @@ class SupabaseUserService(
     fun logout(request: HttpServletRequest, response: HttpServletResponse) {
         SecurityContextHolder.getContext().authentication = null
         request.cookies?.find { it.name == "JWT" }?.let {
-            response.setHeader("Set-Cookie", "JWT=${it}; Secure; HttpOnly; Path=/;Max-Age=0;")
+            var cookieString = "JWT=${it.value}; HttpOnly; Path=/;Max-Age=0;"
+            if (supabaseProperties.sslOnly) {
+                cookieString += "Secure;"
+            }
+            response.setHeader("Set-Cookie", cookieString)
             response.setHeader("HX-Redirect", "/")
         }
     }
@@ -92,12 +99,12 @@ class SupabaseUserService(
         accessToken: String
     ) {
         response.addCookie(Cookie("JWT", accessToken).also {
-            it.secure = true
+            it.secure = supabaseProperties.sslOnly
             it.isHttpOnly = true
             it.path = "/"
             it.maxAge = 6000
         })
-        response.setHeader("HX-Redirect", "/account")
+        response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
     }
 
     fun setAuthentication(jwt: String): SupabaseAuthenticationToken {

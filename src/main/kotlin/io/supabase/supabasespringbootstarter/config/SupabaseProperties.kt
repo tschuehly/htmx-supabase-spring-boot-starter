@@ -12,6 +12,8 @@ class SupabaseProperties {
     lateinit var databasePassword: String
     lateinit var anonKey: String
     lateinit var jwtSecret: String
+    lateinit var successfulLoginRedirectPage: String
+    var sslOnly: Boolean = true
     val public = Public()
 
     class Public {
@@ -21,7 +23,7 @@ class SupabaseProperties {
         var put: Array<String> = arrayOf()
     }
 
-    val roles : MutableMap<String, Role> = mutableMapOf()
+    val roles: MutableMap<String, Role> = mutableMapOf()
 
     class Role {
         var get: Array<String> = arrayOf()
