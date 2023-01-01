@@ -9,6 +9,7 @@ import io.supabase.gotrue.types.GoTrueUserAttributes
 import io.supabase.supabasespringbootstarter.config.SupabaseProperties
 import io.supabase.supabasespringbootstarter.exception.InvalidLoginCredentialsException
 import io.supabase.supabasespringbootstarter.exception.UserAlreadyRegisteredException
+import io.supabase.supabasespringbootstarter.exception.UserNeedsToConfirmEmailBeforeLoginException
 import io.supabase.supabasespringbootstarter.security.SupabaseAuthenticationToken
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
 import org.slf4j.Logger
@@ -51,6 +52,8 @@ class SupabaseUserService(
                     "$username either does not exist or has tried to login with the wrong password",
                     e
                 )
+            } else if(e.data?.contains("Email not confirmed") == true){
+                throw UserNeedsToConfirmEmailBeforeLoginException("$username needs to confirm email before he can login")
             } else {
                 logger.error(e.data)
                 throw e
