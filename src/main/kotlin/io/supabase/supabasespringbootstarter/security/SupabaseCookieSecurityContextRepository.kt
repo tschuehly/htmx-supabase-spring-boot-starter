@@ -20,7 +20,7 @@ class SupabaseCookieSecurityContextRepository(
         val context = SecurityContextHolder.createEmptyContext()
         if(jwtCookie != null){
             try {
-                context.authentication = supabaseUserService.setAuthentication(jwtCookie.value)
+                context.authentication = supabaseUserService.getAuthenticationToken(jwtCookie.value)
             } catch (e: TokenExpiredException) {
 
                 jwtCookie.maxAge = 0

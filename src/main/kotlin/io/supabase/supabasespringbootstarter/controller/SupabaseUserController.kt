@@ -72,7 +72,7 @@ class SupabaseUserController(
         @RequestParam
         email: String
     ) {
-        supabaseUserService.sendPasswordResetEmail(email)
+        supabaseUserService.sendPasswordRecoveryEmail(email)
     }
 
     @PostMapping("/updatePassword")

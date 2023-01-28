@@ -7,9 +7,7 @@ import io.supabase.gotrue.http.GoTrueHttpException
 import io.supabase.gotrue.types.GoTrueTokenResponse
 import io.supabase.gotrue.types.GoTrueUserAttributes
 import io.supabase.supabasespringbootstarter.config.SupabaseProperties
-import io.supabase.supabasespringbootstarter.exception.InvalidLoginCredentialsException
-import io.supabase.supabasespringbootstarter.exception.UserAlreadyRegisteredException
-import io.supabase.supabasespringbootstarter.exception.UserNeedsToConfirmEmailBeforeLoginException
+import io.supabase.supabasespringbootstarter.exception.*
 import io.supabase.supabasespringbootstarter.security.SupabaseAuthenticationToken
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
 import org.slf4j.Logger
@@ -69,10 +67,10 @@ class SupabaseUserService(
         val header: String? = request.getHeader("HX-Current-URL")
         if (header != null) {
             val accessToken = header.substringBefore("&").substringAfter("#access_token=")
-            setAuthentication(accessToken)
+            getAuthenticationToken(accessToken)
             setCookies(response, accessToken)
             if (header.contains("type=recovery")) {
-                response.setHeader("HX-Redirect", "/updatePassword")
+                response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
             }
         }
         return response
@@ -110,7 +108,7 @@ class SupabaseUserService(
         response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
     }
 
-    fun setAuthentication(jwt: String): SupabaseAuthenticationToken {
+    fun getAuthenticationToken(jwt: String): SupabaseAuthenticationToken {
         val decodedJWT = JWT
             .require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build().verify(jwt).claims
 
@@ -119,19 +117,21 @@ class SupabaseUserService(
         )
     }
 
-    fun sendPasswordResetEmail(email: String) {
+    fun sendPasswordRecoveryEmail(email: String) {
         supabaseGoTrueClient.resetPasswordForEmail(email)
+        throw PasswordRecoveryEmailSent("User with $email has requested a password recovery email")
     }
 
     fun updatePassword(request: HttpServletRequest, password: String) {
-        request.cookies?.find { it.name == "JWT" }?.let {
+        request.cookies?.find { it.name == "JWT" }?.let { cookie ->
             supabaseGoTrueClient.updateUser(
-                it.value,
+                cookie.value,
                 attributes = GoTrueUserAttributes(
                     password = password
                 )
-
             )
+            val user = getAuthenticationToken(jwt = cookie.value).getSupabaseUser()
+            throw SuccessfulPasswordUpdate(" User with the mail: ${user.email} updated his password successfully")
         }
     }
 }

@@ -37,6 +37,7 @@ class SupabaseSecurityConfig(
         http
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .csrf().disable()
+            .headers().frameOptions().sameOrigin().and()
             .securityContext().securityContextRepository(cookieSecurityContextRepository).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()

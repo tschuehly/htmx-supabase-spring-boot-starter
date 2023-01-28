@@ -13,6 +13,7 @@ class SupabaseProperties {
     lateinit var anonKey: String
     lateinit var jwtSecret: String
     lateinit var successfulLoginRedirectPage: String
+    lateinit var passwordRecoveryPage: String
     var sslOnly: Boolean = true
     val public = Public()
 
