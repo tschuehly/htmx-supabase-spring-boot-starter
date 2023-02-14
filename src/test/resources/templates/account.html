@@ -4,10 +4,31 @@
       lang="de">
 <head>
     <meta charset="UTF-8">
+
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <title>Title</title>
 </head>
-Logged user: <span th:text="${#authentication.principal.id}"></span>
+Logged user: <span th:text="${#authentication.name}"></span>
 <body>
 <h1>You are authenticated</h1>
+<div sec:authorize="hasRole('ROLE_ADMIN')">
+    <a href="/admin">Admin Page</a>
+
+</div>
+<form>
+    <label>User Id
+        <input name="userId" type="text">
+    </label>
+    <label>Admin Role
+        <input name="roles" type="checkbox" value="admin"/>
+    </label>
+    <label>User Role
+        <input name="roles" type="checkbox" value="user"/>
+    </label>
+    <button hx-put="/api/user/setRoles" hx-target="#response">Submit</button>
+</form>
+<div id="response">
+
+</div>
 </body>
 </html>

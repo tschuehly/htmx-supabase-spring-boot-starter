@@ -19,4 +19,7 @@ class WebController {
         println(SecurityContextHolder.getContext().authentication)
         return "account"
     }
+
+    @GetMapping("/recover-password")
+    fun recoverPassword() = "updatePassword"
 }

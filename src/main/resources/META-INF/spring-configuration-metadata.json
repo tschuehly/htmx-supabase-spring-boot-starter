@@ -26,6 +26,60 @@
       "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
     },
     {
+      "name": "supabase.successfulLoginRedirectPage",
+      "type": "java.lang.String",
+      "description": "The Path where you want to redirect your User after successfully login in",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.passwordRecoveryPage",
+      "type": "java.lang.String",
+      "description": "The Path where a User gets redirected to change their password",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.sslOnly",
+      "type": "java.lang.String",
+      "description": "Sets the HTTP Cookie as Secure; Set False for local development. Set True for Production.",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.public",
+      "type": "io.supabase.supabasespringbootstarter.config.SupabaseProperties.Public",
+      "description": "You can list here all public paths under the respective HTTP Methods",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.public",
+      "type": "java.lang.Array",
+      "description": "You can list here all public paths under the respective HTTP Methods",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.public.get",
+      "type": "java.lang.Array",
+      "description": "You can list here all public paths that should be accessible by GET HTTP Method",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.public.post",
+      "type": "java.lang.Array",
+      "description": "You can list here all public paths that should be accessible by POST HTTP Method",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.public.delete",
+      "type": "java.lang.Array",
+      "description": "You can list here all public paths that should be accessible by DELETE HTTP Method",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.public.put",
+      "type": "java.lang.Array",
+      "description": "You can list here all public paths that should be accessible by PUT HTTP Method",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
       "name": "supabase.jwtSecret",
       "type": "java.lang.String",
       "description": "The JWT secret, found at Project settings - API ",

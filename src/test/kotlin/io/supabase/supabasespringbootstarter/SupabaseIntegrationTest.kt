@@ -32,6 +32,8 @@ import org.springframework.util.StringUtils
         "supabase.anonKey=asljkhdas",
         "supabase.databasePassword=kaskjsad",
         "supabase.jwtSecret=VhLI85yN/oF3Eu95epgHOeg/iRIGiJtk2PWyCyCdORRuVVW90wToyJcJXZcHuHZ2dh7qVgH0UMjqbq1gGMF6JQ==",
+        "supabase.successfulLoginRedirectPage=/",
+        "supabase.passwordRecoveryPage=/recover-password",
         "supabase.public.get[0]=/",
         "supabase.public.get[1]=/logout",
         "supabase.public.get[2]=/login",
@@ -39,7 +41,7 @@ import org.springframework.util.StringUtils
         "supabase.public.post[0]=/api/user/register",
         "supabase.public.post[1]=/api/user/login",
         "supabase.public.post[2]=/api/user/jwt",
-        "supabase.roles.admin.get[0]=/", //TODO: User based Authoriization
+        "supabase.roles.admin.get[0]=/admin", //TODO: User based Authoriization
         "debug=org.springframework.security"],
 )
 class SupabaseIntegrationTest() {
@@ -106,7 +108,7 @@ class SupabaseIntegrationTest() {
         val adminResponse: ResponseEntity<String> = restTemplate.exchange(
             "http://localhost:$port/admin", HttpMethod.GET, HttpEntity(null, null), String::class.java
         )
-        then(adminResponse.statusCode).isEqualTo(HttpStatus.OK)
+        then(adminResponse.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
 
     @Test

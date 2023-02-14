@@ -12,7 +12,7 @@ import java.util.*
 class SupabaseUser(
     val id: UUID,
     val email: String,
-    val phone: String,
+    val phone: String?,
     val userMetadata: MutableMap<String, String>
 ) {
 
@@ -20,21 +20,24 @@ class SupabaseUser(
     var provider: String = ""
 
     @JsonSetter("roles")
-    fun setRoles(appMetadata: String){
-        val roleArray =  mapper.readTree(appMetadata).get("roles")?.toString()
-        roleArray?.let {
-            this.roles = mapper.readValue(
-                it, object : TypeReference<Array<String>>() {}
-            )
+    fun setRoles(claimsMap: Map<String, Claim>){
+        claimsMap["app_metadata"].toString()?.let { appMetadata ->
+
+            mapper.readTree(appMetadata).get("roles")?.toString()?.let {
+                this.roles = mapper.readValue(
+                    it, object : TypeReference<Array<String>>() {}
+                )
+            }
         }
 
     }
 
     @JsonSetter("provider")
-    fun setProviderFromAppMetadata(appMetadata: String){
-        this.provider = mapper.readValue(
-            mapper.readTree(appMetadata).get("provider").toString(), String::class.java
-        )
+    fun setProviderFromAppMetadata(claimsMap: Map<String, Claim>){
+        claimsMap["app_metadata"].toString()?.let { appMetadata ->
+            this.provider = mapper.readTree(appMetadata).get("provider")?.toString() ?: ""
+        }
+
     }
 
     override fun toString(): String {
@@ -47,17 +50,18 @@ class SupabaseUser(
     }
 
     constructor(claimsMap: Map<String, Claim>) : this(
-        UUID.fromString(claimsMap["sub"]?.asString() ?: throw Error("Invalid Sub")),
-        claimsMap["email"].toString(),
-        claimsMap["phone"].toString(),
-
-        mapper.readValue(
-            claimsMap["user_metadata"].toString(), object : TypeReference<MutableMap<String, String>>() {}
-        )
+        id = UUID.fromString(claimsMap["sub"]?.asString() ?: throw Error("Invalid Sub")),
+        email = claimsMap["email"]?.toString() ?: throw Error("No Email provided"),
+        phone = claimsMap["phone"]?.toString(),
+        userMetadata = claimsMap["user_metadata"]?.let {
+            mapper.readValue(
+                claimsMap["user_metadata"].toString(), object : TypeReference<MutableMap<String, String>>() {}
+            )
+        } ?: mutableMapOf()
 
     ){
-        setRoles(claimsMap["app_metadata"].toString())
-        setProviderFromAppMetadata(claimsMap["app_metadata"].toString())
+        setRoles(claimsMap)
+        setProviderFromAppMetadata(claimsMap)
 
     }
 }
