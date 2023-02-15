@@ -7,7 +7,10 @@ import org.springframework.context.annotation.PropertySource
 @Configuration
 @ConfigurationProperties("supabase")
 @PropertySource("classpath:application-supabase.properties")
-class SupabaseProperties {
+class SupabaseProperties(
+
+) {
+    // TODO: How to do @NotNull Validation in Kotlin
     lateinit var projectId: String
     lateinit var databasePassword: String
     lateinit var anonKey: String

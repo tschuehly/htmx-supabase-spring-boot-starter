@@ -10,8 +10,8 @@ import java.util.*
 
 
 class SupabaseUser(
-    val id: UUID,
-    val email: String,
+    val id: UUID?,
+    val email: String?,
     val phone: String?,
     val userMetadata: MutableMap<String, String>
 ) {
@@ -50,8 +50,10 @@ class SupabaseUser(
     }
 
     constructor(claimsMap: Map<String, Claim>) : this(
-        id = UUID.fromString(claimsMap["sub"]?.asString() ?: throw Error("Invalid Sub")),
-        email = claimsMap["email"]?.toString() ?: throw Error("No Email provided"),
+        id = claimsMap["sub"]?.let {
+            UUID.fromString(it.asString())
+        },
+        email = claimsMap["email"]?.toString(),
         phone = claimsMap["phone"]?.toString(),
         userMetadata = claimsMap["user_metadata"]?.let {
             mapper.readValue(
