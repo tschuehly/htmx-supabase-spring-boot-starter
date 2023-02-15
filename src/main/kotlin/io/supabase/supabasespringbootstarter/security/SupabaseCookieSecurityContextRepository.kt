@@ -30,8 +30,6 @@ class SupabaseCookieSecurityContextRepository(
         return context
     }
 
-
-
     override fun saveContext(context: SecurityContext, request: HttpServletRequest, response: HttpServletResponse) {
         // We do not save the context
     }

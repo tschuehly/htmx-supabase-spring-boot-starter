@@ -10,11 +10,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.AccessDeniedHandler
 
 @Configuration
 @EnableWebSecurity(debug = false)
 class SupabaseSecurityConfig(
-    val accessDeniedHandler: SupabaseAccessDeniedHandler,
     val supabaseProperties: SupabaseProperties,
     val cookieSecurityContextRepository: SupabaseCookieSecurityContextRepository
 ) {
@@ -47,8 +47,13 @@ class SupabaseSecurityConfig(
             .antMatchers(HttpMethod.PUT, *supabaseProperties.public.put).permitAll()
             .anyRequest().authenticated()
             .and()
-            .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+            .exceptionHandling().accessDeniedHandler(accessDeniedHandler())
         return http.build()
+    }
+
+    @Bean
+    fun accessDeniedHandler(): AccessDeniedHandler {
+        return SupabaseAccessDeniedHandler()
     }
 
 

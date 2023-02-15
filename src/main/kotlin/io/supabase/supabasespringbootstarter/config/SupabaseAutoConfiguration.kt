@@ -3,7 +3,6 @@ package io.supabase.supabasespringbootstarter.config
 import io.supabase.gotrue.GoTrueClient
 import io.supabase.gotrue.types.GoTrueTokenResponse
 import io.supabase.supabasespringbootstarter.controller.SupabaseUserController
-import io.supabase.supabasespringbootstarter.security.SupabaseAccessDeniedHandler
 import io.supabase.supabasespringbootstarter.security.SupabaseSecurityConfig
 import io.supabase.supabasespringbootstarter.service.SupabaseUserService
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
@@ -41,11 +40,6 @@ class SupabaseAutoConfiguration(
             url = "https://${supabaseProperties.projectId}.supabase.co/auth/v1",
             headers = mapOf("apiKey" to supabaseProperties.anonKey)
         )
-    }
-
-    @Bean
-    fun supabaseAccessDeniedHandler(): SupabaseAccessDeniedHandler {
-        return SupabaseAccessDeniedHandler()
     }
 
 

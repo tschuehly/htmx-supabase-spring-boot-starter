@@ -11,7 +11,8 @@ class SupabaseAccessDeniedHandler : AccessDeniedHandler {
         response: HttpServletResponse,
         accessDeniedException: AccessDeniedException
     ) {
-        response.sendRedirect("/403")
+        // TODO: Does not work yet
+        response.sendRedirect("/notAuthenticated")
     }
 
 }
