@@ -84,6 +84,18 @@
       "type": "java.lang.String",
       "description": "The JWT secret, found at Project settings - API ",
       "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.unauthenticatedPage",
+      "type": "java.lang.String",
+      "description": "The Page the User will get redirected to when he is not logged in and tries to access a non public resource",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.unauthorizedPage",
+      "type": "java.lang.String",
+      "description": "The Page the User will get redirected to when a logged in User doesn't have the right to access a resource",
+      "sourceType": "io.supabase.supabasespringbootstarter.config.SupabaseProperties"
     }
   ],
   "hints": []

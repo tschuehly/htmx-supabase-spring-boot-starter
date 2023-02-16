@@ -46,12 +46,16 @@ class SupabaseUserService(
             setCookies(response, resp.accessToken)
         } catch (e: GoTrueHttpException) {
             if (e.data?.contains("Invalid login credentials") == true) {
+                val msg = "$username either does not exist or has tried to login with the wrong password"
+                logger.debug(msg)
                 throw InvalidLoginCredentialsException(
-                    "$username either does not exist or has tried to login with the wrong password",
+                    msg,
                     e
                 )
-            } else if(e.data?.contains("Email not confirmed") == true){
-                throw UserNeedsToConfirmEmailBeforeLoginException("$username needs to confirm email before he can login")
+            } else if (e.data?.contains("Email not confirmed") == true) {
+                val msg = "$username needs to confirm email before he can login"
+                logger.debug(msg)
+                throw UserNeedsToConfirmEmailBeforeLoginException(msg)
             } else {
                 logger.error(e.data)
                 throw e
@@ -67,9 +71,10 @@ class SupabaseUserService(
         val header: String? = request.getHeader("HX-Current-URL")
         if (header != null) {
             val accessToken = header.substringBefore("&").substringAfter("#access_token=")
-            getAuthenticationToken(accessToken)
+            val authenticationToken = getAuthenticationToken(accessToken)
             setCookies(response, accessToken)
             if (header.contains("type=recovery")) {
+                logger.debug("User: ${authenticationToken.getSupabaseUser().email} is trying to reset his password")
                 response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
             }
         }
@@ -84,14 +89,15 @@ class SupabaseUserService(
                 cookieString += "Secure;"
             }
             response.setHeader("Set-Cookie", cookieString)
-            response.setHeader("HX-Redirect", "/")
+            response.setHeader("HX-Redirect", "/") // TODO: Introduce Redirect Header or HTXM / JSON Switch
         }
     }
 
     fun setRoles(userId: String, request: HttpServletRequest, roles: List<String>?){
         request.cookies?.find { it.name == "JWT" }?.let {
             val roleArray = roles ?: listOf()
-            supabaseGoTrueClient.updateUserAppMetadata(it.value,userId, mapOf("roles" to roleArray))
+            supabaseGoTrueClient.updateUserAppMetadata(it.value, userId, mapOf("roles" to roleArray))
+            logger.debug("The roles of the user with id $userId were updated to $roleArray")
         }
     }
 
@@ -131,7 +137,9 @@ class SupabaseUserService(
                 )
             )
             val user = getAuthenticationToken(jwt = cookie.value).getSupabaseUser()
-            throw SuccessfulPasswordUpdate(" User with the mail: ${user.email} updated his password successfully")
+            val msg = "User with the mail: ${user.email} updated his password successfully"
+            logger.debug(msg)
+            throw SuccessfulPasswordUpdate(msg)
         }
     }
 }

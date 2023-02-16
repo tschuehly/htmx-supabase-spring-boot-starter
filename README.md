@@ -14,6 +14,10 @@ Supabase gives us access to two important things for free:
 - Integration with htmx
 - Role Based Access Control
 
+## Known Issues:
+
+Access Denied
+
 ## Initial Setup:
 
 Go to [supabase.com](https://app.supabase.com/sign-up) and sign up for an account.

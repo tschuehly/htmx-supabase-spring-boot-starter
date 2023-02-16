@@ -2,6 +2,8 @@ package io.supabase.supabasespringbootstarter.controller
 
 import io.supabase.supabasespringbootstarter.exception.SuccessfulRegistrationConfirmationEmailSentException
 import io.supabase.supabasespringbootstarter.service.SupabaseUserService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -12,8 +14,9 @@ import javax.servlet.http.HttpServletResponse
 @Controller
 @RequestMapping("api/user")
 class SupabaseUserController(
-    val supabaseUserService: SupabaseUserService
+    val supabaseUserService: SupabaseUserService,
 ) {
+    val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
     @PostMapping("/register")
     fun register(
         @RequestParam credentials: Map<String, String>,
@@ -23,8 +26,10 @@ class SupabaseUserController(
         val email = credentials["email"]
         val password = credentials["password"]
         if (email != null && password != null) {
-            val user = supabaseUserService.registerWithEmail(email, password, response)
-            throw SuccessfulRegistrationConfirmationEmailSentException("User with the mail ${user.email} successully registered, Confirmation Mail sent")
+            logger.debug("User with the email $email is trying to register")
+            val user = supabaseUserService.registerWithEmail(email.trim(), password.trim(), response)
+            logger.debug("User with the mail ${user.email} successfully registered, Confirmation Mail sent")
+            throw SuccessfulRegistrationConfirmationEmailSentException("User with the mail ${user.email} successfully registered, Confirmation Mail sent")
         }
     }
 
@@ -37,7 +42,9 @@ class SupabaseUserController(
         val email = credentials["email"]
         val password = credentials["password"]
         if (email != null && password != null) {
-            supabaseUserService.login(email, password, response)
+            logger.debug("User with the email $email is trying to login")
+            supabaseUserService.login(email.trim(), password.trim(), response)
+            logger.debug("User: $email successfully logged in")
         }
     }
 
@@ -72,6 +79,7 @@ class SupabaseUserController(
         @RequestParam
         email: String
     ) {
+        logger.debug("User with the email $email requested a password reset")
         supabaseUserService.sendPasswordRecoveryEmail(email)
     }
 

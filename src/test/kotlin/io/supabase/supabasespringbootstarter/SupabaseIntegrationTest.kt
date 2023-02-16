@@ -115,7 +115,6 @@ class SupabaseIntegrationTest() {
     fun `Can add Role to User`() {
         val userResponse: ResponseEntity<String> = restTemplate.exchange(
             "http://localhost:$port/api/user/addRole", HttpMethod.GET, HttpEntity(null, null), String::class.java
-
         )
     }
 
@@ -145,7 +144,7 @@ class SupabaseIntegrationTest() {
         then(
             StringUtils.trimAllWhitespace(accountResponse.body!!)
         )
-            .isEqualTo("""<!DOCTYPEhtml><htmlxmlns="http://www.w3.org/1999/xhtml"lang="de"><head><metacharset="UTF-8"><title>Title</title></head>Loggeduser:<span>f802c3bb-223e-43a6-bba0-5ae6094f0d91</span><body><h1>Youareauthenticated</h1></body></html>""")
+            .isEqualTo("""<!DOCTYPEhtml><htmlxmlns="http://www.w3.org/1999/xhtml"lang="de"><head><metacharset="UTF-8"><scriptsrc="https://unpkg.com/htmx.org@1.6.1"></script><title>Title</title></head>Loggeduser:<span>SupabaseUser(id=f802c3bb-223e-43a6-bba0-5ae6094f0d91,email=&#39;&quot;first.last@example.com&quot;&#39;,phone=&#39;null&#39;,userMetadata={},roles=[],provider=&#39;&#39;)</span><body><h1>Youareauthenticated</h1><form><label>UserId<inputname="userId"type="text"></label><label>AdminRole<inputname="roles"type="checkbox"value="admin"/></label><label>UserRole<inputname="roles"type="checkbox"value="user"/></label><buttonhx-put="/api/user/setRoles"hx-target="#response">Submit</button></form><divid="response"></div></body></html>""")
     }
 
     @Test
