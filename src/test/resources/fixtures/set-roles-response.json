@@ -1,0 +1,37 @@
+{
+  "id": "54a12619-cee3-4856-a854-bad14d4639ed",
+  "aud": "authenticated",
+  "role": "service_role",
+  "email": "tschuehly@outlook.com",
+  "email_confirmed_at": "2023-02-18T15:35:08.347535Z",
+  "phone": "",
+  "confirmation_sent_at": "2023-02-18T15:33:53.106227Z",
+  "confirmed_at": "2023-02-18T15:35:08.347535Z",
+  "last_sign_in_at": "2023-02-18T22:24:37.187055Z",
+  "app_metadata": {
+    "provider": "email",
+    "providers": [
+      "email"
+    ],
+    "roles": [
+      "user"
+    ]
+  },
+  "user_metadata": {},
+  "identities": [
+    {
+      "id": "54a12619-cee3-4856-a854-bad14d4639ed",
+      "user_id": "54a12619-cee3-4856-a854-bad14d4639ed",
+      "identity_data": {
+        "email": "tschuehly@outlook.com",
+        "sub": "54a12619-cee3-4856-a854-bad14d4639ed"
+      },
+      "provider": "email",
+      "last_sign_in_at": "2023-02-18T15:33:53.102094Z",
+      "created_at": "2023-02-18T15:33:53.102132Z",
+      "updated_at": "2023-02-18T15:33:53.102132Z"
+    }
+  ],
+  "created_at": "2023-02-18T15:33:53.094444Z",
+  "updated_at": "2023-02-18T22:24:45.207207Z"
+}

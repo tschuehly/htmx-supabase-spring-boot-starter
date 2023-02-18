@@ -19,8 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity(debug = false)
 class SupabaseSecurityConfig(
     val supabaseJwtFilter: SupabaseJwtFilter,
-    val supabaseProperties: SupabaseProperties,
-    val cookieSecurityContextRepository: SupabaseCookieSecurityContextRepository
+    val supabaseProperties: SupabaseProperties
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseSecurityConfig::class.java)
 
@@ -56,10 +55,8 @@ class SupabaseSecurityConfig(
             .frameOptions()
             .sameOrigin()
             .and()
-//            .authenticationProvider(authenticationProvider())
             .addFilterBefore(supabaseJwtFilter, UsernamePasswordAuthenticationFilter::class.java)
             .securityContext()
-            .securityContextRepository(cookieSecurityContextRepository)
             .and()
             .authorizeRequests()
             .and()
@@ -78,9 +75,5 @@ class SupabaseSecurityConfig(
     fun supabaseAuthenticationEntryPoint(): AuthenticationEntryPoint {
         return SupabaseAuthenticationEntryPoint(supabaseProperties)
     }
-//    @Bean TODO: Is this needed?
-//    fun authenticationProvider(): AuthenticationProvider {
-//        return SupabaseAuthenticationProvider()
-//    }
 
 }

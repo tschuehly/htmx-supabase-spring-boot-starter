@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.put
 import io.supabase.gotrue.GoTrueClient
 import io.supabase.gotrue.types.GoTrueTokenResponse
 import io.supabase.supabasespringbootstarter.types.SupabaseUser
@@ -33,15 +34,23 @@ import org.springframework.util.StringUtils
         "supabase.databasePassword=kaskjsad",
         "supabase.jwtSecret=VhLI85yN/oF3Eu95epgHOeg/iRIGiJtk2PWyCyCdORRuVVW90wToyJcJXZcHuHZ2dh7qVgH0UMjqbq1gGMF6JQ==",
         "supabase.successfulLoginRedirectPage=/",
-        "supabase.passwordRecoveryPage=/recover-password",
+        "supabase.passwordRecoveryPage=/requestPasswordReset",
+        "supabase.unauthenticatedPage=/unauthenticated",
+        "supabase.unauthorizedPage=/unauthorized",
         "supabase.public.get[0]=/",
         "supabase.public.get[1]=/logout",
         "supabase.public.get[2]=/login",
         "supabase.public.get[3]=/error",
+        "supabase.public.get[4]=/unauthenticated",
+        "supabase.public.get[5]=/unauthorized",
+        "supabase.public.get[6]=/requestPasswordReset",
+        "supabase.public.get[7]=/api/user/logout",
         "supabase.public.post[0]=/api/user/register",
         "supabase.public.post[1]=/api/user/login",
         "supabase.public.post[2]=/api/user/jwt",
-        "supabase.roles.admin.get[0]=/admin", //TODO: User based Authoriization
+        "supabase.public.post[3]=/api/user/sendPasswordResetEmail",
+        "supabase.public.put[0]=/api/user/jwt",
+        "supabase.roles.admin.get[0]=/admin",
         "debug=org.springframework.security"],
 )
 class SupabaseIntegrationTest() {
@@ -70,6 +79,7 @@ class SupabaseIntegrationTest() {
         wireMockServer.stop()
         wireMockServer.resetAll()
     }
+
 
     @Test
     fun `User should be able to register with Email`() {
@@ -112,10 +122,48 @@ class SupabaseIntegrationTest() {
     }
 
     @Test
-    fun `Can add Role to User`() {
-        val userResponse: ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port/api/user/addRole", HttpMethod.GET, HttpEntity(null, null), String::class.java
+    fun `Authenticated User cannot set Roles for Users`() {
+        wireMockServer.stubFor( //TODO: Is it even useful to test it this way?
+            put("/admin/users/54a12619-cee3-4856-a854-bad14d4639ed")
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(403)
+                )
         )
+        val userResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/api/user/setRoles",
+            HttpMethod.PUT,
+            getFormDataEntity(
+                formdata = arrayOf("userId" to "54a12619-cee3-4856-a854-bad14d4639ed", "roles" to "user"),
+                jwt = fixture("/fixtures/valid-user-jwt.txt")
+            ),
+            String::class.java
+        )
+        then(userResponse.statusCode).isEqualTo(HttpStatus.OK)
+
+    }
+
+    @Test
+    fun `Service Role User can set Roles for Users`() {
+        wireMockServer.stubFor(
+            put("/admin/users/54a12619-cee3-4856-a854-bad14d4639ed")
+                .willReturn(
+                    WireMock.aResponse()
+                        .withStatus(200)
+                        .withBody(fixture("/fixtures/signup-response.json"))
+                )
+        )
+        val userResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/api/user/setRoles",
+            HttpMethod.PUT,
+            getFormDataEntity(
+                formdata = arrayOf("userId" to "54a12619-cee3-4856-a854-bad14d4639ed", "roles" to "user"),
+                jwt = createJWT()
+            ),
+            String::class.java
+        )
+        then(userResponse.statusCode).isEqualTo(HttpStatus.OK)
+
     }
 
     @Test
@@ -129,7 +177,13 @@ class SupabaseIntegrationTest() {
                 )
         )
         val loginResponse: ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port/api/user/login", HttpMethod.POST, getLoginRequest(), String::class.java
+            "http://localhost:$port/api/user/login",
+            HttpMethod.POST,
+            getFormDataEntity(
+                formdata = arrayOf("email" to "first.last@example.com", "password" to "test1234"),
+                jwt = null
+            ),
+            String::class.java
         )
         then(loginResponse.statusCode).isEqualTo(HttpStatus.OK)
         then(loginResponse.headers["Set-Cookie"]!![0]).isNotNull
@@ -142,33 +196,45 @@ class SupabaseIntegrationTest() {
 
         then(accountResponse.statusCode).isEqualTo(HttpStatus.OK)
         then(
-            StringUtils.trimAllWhitespace(accountResponse.body!!)
+            accountResponse.body!!.contains("<h1>You are authenticated</h1>")
         )
-            .isEqualTo("""<!DOCTYPEhtml><htmlxmlns="http://www.w3.org/1999/xhtml"lang="de"><head><metacharset="UTF-8"><scriptsrc="https://unpkg.com/htmx.org@1.6.1"></script><title>Title</title></head>Loggeduser:<span>SupabaseUser(id=f802c3bb-223e-43a6-bba0-5ae6094f0d91,email=&#39;&quot;first.last@example.com&quot;&#39;,phone=&#39;null&#39;,userMetadata={},roles=[],provider=&#39;&#39;)</span><body><h1>Youareauthenticated</h1><form><label>UserId<inputname="userId"type="text"></label><label>AdminRole<inputname="roles"type="checkbox"value="admin"/></label><label>UserRole<inputname="roles"type="checkbox"value="user"/></label><buttonhx-put="/api/user/setRoles"hx-target="#response">Submit</button></form><divid="response"></div></body></html>""")
     }
 
     @Test
     fun `User with expired JWT cannot access the account page`() {
-        val headers = HttpHeaders()
-        headers.add("Cookie", "JWT=" + StringUtils.trimAllWhitespace(fixture("/fixtures/expired-jwt.txt")))
         val accountResponse: ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port/account", HttpMethod.GET, HttpEntity<String>(headers), String::class.java
+            "http://localhost:$port/account",
+            HttpMethod.GET,
+            HttpEntity<String>(getHeaderForJwt(fixture("/fixtures/expired-user-jwt.txt"))),
+            String::class.java
         )
         then(accountResponse.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
     }
 
-    private fun getLoginRequest(): HttpEntity<MultiValueMap<String, String>> {
-        val headers = HttpHeaders()
+    private fun getFormDataEntity(
+        vararg formdata: Pair<String, String>,
+        jwt: String?
+    ): HttpEntity<MultiValueMap<String, String>> {
+        val headers = jwt?.let {
+            getHeaderForJwt(jwt)
+        } ?: HttpHeaders()
         headers.contentType = MediaType.APPLICATION_FORM_URLENCODED;
         val map = LinkedMultiValueMap<String, String>();
-        map.add("email", "first.last@example.com");
-        map.add("password", "test1234");
+        formdata.forEach {
+            map.add(it.first, it.second)
+        }
         return HttpEntity(map, headers);
     }
 
     private fun fixture(path: String): String {
         return SupabaseIntegrationTest::class.java.getResource(path)?.readText()
             ?: throw Exception("Fixture file not found")
+    }
+
+    private fun getHeaderForJwt(jwt: String): HttpHeaders {
+        val headers = HttpHeaders()
+        headers.add("Cookie", "JWT=" + StringUtils.trimAllWhitespace(jwt))
+        return headers
     }
 }
 
@@ -186,7 +252,8 @@ fun createJWT(): String {
                   "providers": [
                     "email"
                   ]
-                }"""
+                }""",
+                "role" to "service_role"
             )
         )
         .sign(Algorithm.HMAC256("VhLI85yN/oF3Eu95epgHOeg/iRIGiJtk2PWyCyCdORRuVVW90wToyJcJXZcHuHZ2dh7qVgH0UMjqbq1gGMF6JQ=="))

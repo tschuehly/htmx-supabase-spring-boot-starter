@@ -115,11 +115,11 @@ class SupabaseUserService(
     }
 
     fun getAuthenticationToken(jwt: String): SupabaseAuthenticationToken {
-        val decodedJWT = JWT
+        val jwtClaims = JWT
             .require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build().verify(jwt).claims
 
         return SupabaseAuthenticationToken(
-            SupabaseUser(decodedJWT)
+            SupabaseUser(jwtClaims)
         )
     }
 
