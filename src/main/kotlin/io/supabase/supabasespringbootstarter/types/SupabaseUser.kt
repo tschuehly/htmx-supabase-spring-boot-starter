@@ -20,7 +20,7 @@ class SupabaseUser(
     var provider: String = ""
 
     @JsonSetter("roles")
-    fun setRoles(claimsMap: Map<String, Claim>){
+    fun setRoles(claimsMap: Map<String, Claim>) {
         claimsMap["app_metadata"].toString()?.let { appMetadata ->
 
             mapper.readTree(appMetadata).get("roles")?.toString()?.let {
@@ -33,7 +33,7 @@ class SupabaseUser(
     }
 
     @JsonSetter("provider")
-    fun setProviderFromAppMetadata(claimsMap: Map<String, Claim>){
+    fun setProviderFromAppMetadata(claimsMap: Map<String, Claim>) {
         claimsMap["app_metadata"].toString()?.let { appMetadata ->
             this.provider = mapper.readTree(appMetadata).get("provider")?.toString() ?: ""
         }
@@ -61,7 +61,7 @@ class SupabaseUser(
             )
         } ?: mutableMapOf()
 
-    ){
+    ) {
         setRoles(claimsMap)
         setProviderFromAppMetadata(claimsMap)
 

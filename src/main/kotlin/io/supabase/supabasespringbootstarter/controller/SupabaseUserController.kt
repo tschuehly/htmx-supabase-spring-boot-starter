@@ -17,6 +17,7 @@ class SupabaseUserController(
     val supabaseUserService: SupabaseUserService,
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
+
     @PostMapping("/register")
     fun register(
         @RequestParam credentials: Map<String, String>,

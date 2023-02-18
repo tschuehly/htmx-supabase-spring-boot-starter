@@ -18,7 +18,7 @@ class SupabaseCookieSecurityContextRepository(
     override fun loadContext(requestResponseHolder: HttpRequestResponseHolder): SecurityContext {
         val jwtCookie = requestResponseHolder.request.cookies?.find { it.name == "JWT" }
         val context = SecurityContextHolder.createEmptyContext()
-        if(jwtCookie != null){
+        if (jwtCookie != null) {
             try {
                 context.authentication = supabaseUserService.getAuthenticationToken(jwtCookie.value)
             } catch (e: TokenExpiredException) {

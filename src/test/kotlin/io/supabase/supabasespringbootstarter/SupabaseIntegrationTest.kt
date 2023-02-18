@@ -96,8 +96,8 @@ class SupabaseIntegrationTest() {
     }
 
     @Test
-    fun `Unauthorized User can access public sites`(){
-        val indexResponse : ResponseEntity<String> = restTemplate.exchange(
+    fun `Unauthorized User can access public sites`() {
+        val indexResponse: ResponseEntity<String> = restTemplate.exchange(
             "http://localhost:$port", HttpMethod.GET, HttpEntity(null, null), String::class.java
         )
         then(indexResponse.statusCode).isEqualTo(HttpStatus.OK)

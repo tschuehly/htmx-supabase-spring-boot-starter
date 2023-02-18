@@ -6,13 +6,13 @@ integrate [Supabase](https://supabase.com/) into their Project.
 Supabase gives us access to two important things for free:
 
 - Hosted Postgres Server with 500 MB Database Storage
-- Integrated GoTrue Api for Authentication/Authorization up to 50.000 MAU
+- Integrated GoTrue API for Authentication/Authorization of up to 50.000 Monthly Active Users
 
 ## Features of supabase-spring-boot-starter
 
 - Spring Security Configuration with application.yaml/properties
 - Integration with htmx
-- Role Based Access Control
+- Role-Based Access Control
 
 ## Known Issues:
 
@@ -56,9 +56,9 @@ variables.
 
 You need to set the Site URL and the Redirect URL in your supabase dashboard as well.
 You can find them at Authentication -> URL Configuration.
-If you didn't mess with the ``server.port`` property you should set it to: `http://localhost:8080`
+If you didn't mess with the ``server.port`` property you should set it to `http://localhost:8080`
 
-Now you can get started with integrating the Authentication. The Supabase Postgres Database is automatically configured
+Now you can get started with integrating Authentication. The Supabase Postgres Database is automatically configured
 for you.
 
 ## Configuring Public Authorization
@@ -93,8 +93,8 @@ to [AJAX](https://htmx.org/docs#ajax), [CSS Transitions](https://htmx.org/docs#c
 and [Server Sent Events](https://htmx.org/docs#sse) directly in HTML,
 using [attributes](https://htmx.org/reference#attributes)
 
-You need to add this little script snippet to your index page. This will authenticate with the api after logging in with
-Google / confirming your email
+You need to add this little script snippet to your index page. This will authenticate with the API after logging in with
+Google / confirm your email
 
 ````html
 <script>
@@ -156,7 +156,7 @@ If you configured Google you can just insert a link to log in with Google
 </h2>
 ````
 
-## Role based access control
+## Role-based access control
 
 When you want to use Role Based Access Control you need to be able to set roles for a user but there are two ways to do
 that:
@@ -164,7 +164,7 @@ that:
 ### service role JWT
 
 When you go to your supabase project in the Project Settings -> API section you can find the service_role secret. With
-this secret you can set the role for any user. This way you can control user roles directly from your backend.
+this secret, you can set the role for any user. This way you can control user roles directly from your backend.
 
 Here is an example curl request:
 
@@ -192,7 +192,7 @@ select *
 from auth.users;
 ````
 
-After executing this sql, this account has the ability to set the roles of other users.
+After executing this SQL, this account can set the roles of other users.
 
 ````html
 

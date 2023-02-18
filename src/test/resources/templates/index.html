@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
@@ -22,10 +22,10 @@
 <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
     <form>
         <label>Email:
-            <input type="text" name="email"/>
+            <input name="email" type="text"/>
         </label>
         <label>Password:
-            <input type="password" name="password"/>
+            <input name="password" type="password"/>
         </label>
         <button hx-post="/api/user/login">Submit</button>
     </form>
@@ -35,10 +35,10 @@
     </h2>
     <form>
         <label>Email:
-            <input type="text" name="email"/>
+            <input name="email" type="text"/>
         </label>
         <label>Password:
-            <input type="password" name="password"/>
+            <input name="password" type="password"/>
         </label>
         <button hx-post="/api/user/register">Submit</button>
     </form>

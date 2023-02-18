@@ -19,8 +19,6 @@ class SupabaseProperties(
     val public: Public = Public()
 ) {
 
-
-    // TODO: How to do @NotNull Validation in Kotlin
     init {
         require(projectId != null) { "You need to specify the property: projectId in your application.yaml" }
         require(databasePassword != null) { "You need to specify the property: databasePassword in your application.yaml" }
