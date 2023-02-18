@@ -54,6 +54,10 @@ supabase:
 ``anonKey``, ``databasePassword`` and ``jwtSecret`` are sensitive properties, you should set these with environment
 variables.
 
+You need to set the Site URL and the Redirect URL in your supabase dashboard as well.
+You can find them at Authentication -> URL Configuration.
+If you didn't mess with the ``server.port`` property you should set it to: `http://localhost:8080`
+
 Now you can get started with integrating the Authentication. The Supabase Postgres Database is automatically configured
 for you.
 
@@ -138,7 +142,7 @@ You need to configure each social provider in your supabase dashboard at Authent
 
 #### Google
 
-If you configured Google you can just insert a link to login with Google
+If you configured Google you can just insert a link to log in with Google
 
 ````html
 <a href="https://<projectId>.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
@@ -152,9 +156,7 @@ If you configured Google you can just insert a link to login with Google
 </h2>
 ````
 
-## basic usage as JSON API
-
-## role based access control
+## Role based access control
 
 When you want to use Role Based Access Control you need to be able to set roles for a user but there are two ways to do
 that:
@@ -190,5 +192,23 @@ select *
 from auth.users;
 ````
 
+After executing this sql, this account has the ability to set the roles of other users.
+
+````html
+
+<form>
+    <label>User Id
+        <input name="userId" type="text">
+    </label>
+    <label>Admin Role
+        <input name="roles" type="checkbox" value="admin"/>
+    </label>
+    <label>User Role
+        <input name="roles" type="checkbox" value="user"/>
+    </label>
+    <button hx-put="/api/user/setRoles">Submit</button>
+</form>
+
+````
 
 
