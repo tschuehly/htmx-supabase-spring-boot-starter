@@ -47,7 +47,9 @@ supabase:
   databasePassword: ${SUPABASE_DATABASE_PW}
   jwtSecret: ${SUPABASE_JWT_SECRET}
   successfulLoginRedirectPage: "/account"
-  passwordRecoveryPage: "/requestPasswordReset"
+  passwordRecoveryPage: /updatePassword
+  unauthenticatedPage: /unauthenticated
+  unauthorizedPage: /unauthorizedPage
   sslOnly: false
 `````
 
@@ -77,6 +79,8 @@ supabase:
       - "/favicon.ico"
       - "/error"
       - "/resetPassword"
+      - "/unauthenticated"
+      - "/unauthorized"
     post:
       - "/api/user/register"
       - "/api/user/login"
