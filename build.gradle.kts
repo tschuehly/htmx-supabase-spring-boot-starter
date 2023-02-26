@@ -73,7 +73,7 @@ publishing{
 
 		create<MavenPublication>("Maven") {
 			from(components["java"])
-			groupId = "com.github.tschuehly"
+			groupId = "de.github.tschuehly"
 			artifactId = "supabase-spring-boot-starter"
 		}
 		withType<MavenPublication> {
