@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.7.8"
-	id("io.spring.dependency-management") version "1.0.15.RELEASE"
+	id("org.springframework.boot") version "3.0.3"
+	id("io.spring.dependency-management") version "1.1.0"
 	id("maven-publish")
-	kotlin("jvm") version "1.7.10"
-	kotlin("plugin.spring") version "1.7.10"
-	kotlin("plugin.jpa") version "1.7.10"
+	kotlin("jvm") version "1.7.22"
+	kotlin("plugin.spring") version "1.7.22"
+	kotlin("plugin.jpa") version "1.7.22"
 }
 
 group = "io.supabase"
@@ -23,7 +23,7 @@ dependencies {
     implementation("org.springframework:spring-context-support")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0-rc2")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
@@ -35,7 +35,7 @@ dependencies {
 
 	runtimeOnly("org.postgresql:postgresql")
 
-	testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
+	testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.github.tomakehurst:wiremock-jre8:2.34.0")
 }

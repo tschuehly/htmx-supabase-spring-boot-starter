@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=io.supabase.supabasespringbootstarter.config.SupabaseAutoConfiguration

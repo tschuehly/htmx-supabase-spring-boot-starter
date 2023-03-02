@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
@@ -27,47 +28,66 @@ class SupabaseSecurityConfig(
     @ConditionalOnMissingBean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         supabaseProperties.roles.forEach { (role, paths) ->
-            paths.get.forEach { logger.info("Path: $it with Method GET is secured with Expression: hasRole('$role')") }
-            paths.post.forEach { logger.info("Path: $it with Method POST is secured with Expression: hasRole('$role')") }
-            paths.delete.forEach { logger.info("Path: $it with Method DELETE is secured with Expression: hasRole('$role')") }
-            paths.put.forEach { logger.info("Path: $it with Method PUT is secured with Expression: hasRole('$role')") }
+            http.invoke {
+                authorizeHttpRequests {
+                    paths.get.forEach { path ->
+                        logger.info("Path: $path with Method GET is secured with Expression: hasRole('$role')")
+                        authorize(path, hasRole("${role.uppercase()}"))
+                    }
 
-            http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, *paths.get).access("hasRole('${role.uppercase()}')")
-                .antMatchers(HttpMethod.POST, *paths.post).access("hasRole('${role.uppercase()}')")
-                .antMatchers(HttpMethod.DELETE, *paths.delete).access("hasRole('${role.uppercase()}')")
-                .antMatchers(HttpMethod.PUT, *paths.put).access("hasRole('${role.uppercase()}')")
+                    paths.post.forEach { path ->
+                        logger.info("Path: $path with Method POST is secured with Expression: hasRole('$role')")
+                        authorize(path, hasRole("${role.uppercase()}"))
+                    }
+                    paths.delete.forEach { path ->
+                        logger.info("Path: $path with Method DELETE is secured with Expression: hasRole('$role')")
+                        authorize(path, hasRole("${role.uppercase()}"))
+                    }
+                    paths.put.forEach { path ->
+                        logger.info("Path: $path with Method PUT is secured with Expression: hasRole('$role')")
+                        authorize(path, hasRole("${role.uppercase()}"))
+                    }
+                }
+            }
         }
-        http.authorizeRequests()
-            .antMatchers(HttpMethod.GET, *supabaseProperties.public.get).permitAll()
-            .antMatchers(HttpMethod.POST, *supabaseProperties.public.post).permitAll()
-            .antMatchers(HttpMethod.DELETE, *supabaseProperties.public.delete).permitAll()
-            .antMatchers(HttpMethod.PUT, *supabaseProperties.public.put).permitAll()
-            .anyRequest().authenticated()
+        http.invoke {
+            authorizeHttpRequests {
+                supabaseProperties.public.get.forEach { path ->
+                    logger.info("Path: $path with Method GET is public")
+                    authorize(HttpMethod.GET, path, permitAll)
+                }
+                supabaseProperties.public.post.forEach { path ->
+                    logger.info("Path: $path with Method POST is public")
+                    authorize(HttpMethod.POST, path, permitAll)
+                }
+                supabaseProperties.public.delete.forEach { path ->
+                    logger.info("Path: $path with Method DELETE is public")
+                    authorize(HttpMethod.DELETE, path, permitAll)
+                }
+                supabaseProperties.public.put.forEach { path ->
+                    logger.info("Path: $path with Method PUT is public")
+                    authorize(HttpMethod.PUT, path, permitAll)
+                }
 
-        http
-            .sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .csrf()
-            .disable()
-            .headers()
-            .frameOptions()
-            .sameOrigin()
-            .and()
-            .addFilterBefore(supabaseJwtFilter, UsernamePasswordAuthenticationFilter::class.java)
-            .securityContext()
-            .and()
-            .authorizeRequests()
-            .and()
-            .exceptionHandling()
-            .authenticationEntryPoint(supabaseAuthenticationEntryPoint())
-            .accessDeniedHandler(accessDeniedHandler())
+                authorize(anyRequest,authenticated)
+            }
+            sessionManagement {
+                sessionCreationPolicy = SessionCreationPolicy.STATELESS
+            }
+            csrf { disable() }
+            headers { frameOptions { sameOrigin } }
+            addFilterBefore<UsernamePasswordAuthenticationFilter>(supabaseJwtFilter)
+            exceptionHandling {
+                authenticationEntryPoint = supabaseAuthenticationEntryPoint()
+                accessDeniedHandler = supabaseAccessDeniedHandler()
+            }
+        }
+
         return http.build()
     }
 
     @Bean
-    fun accessDeniedHandler(): AccessDeniedHandler {
+    fun supabaseAccessDeniedHandler(): AccessDeniedHandler {
         return SupabaseAccessDeniedHandler(supabaseProperties)
     }
 
