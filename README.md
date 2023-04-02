@@ -1,4 +1,4 @@
-# Supabase Spring Boot Starter
+# Supabase Security Spring Boot Starter
 
 This Spring Starter is aimed at Developers that want to simplify Spring Security and
 integrate [Supabase](https://supabase.com/) into their Project.
@@ -8,7 +8,7 @@ Supabase gives us access to two important things for free:
 - Hosted Postgres Server with 500 MB Database Storage
 - Integrated GoTrue API for Authentication/Authorization of up to 50.000 Monthly Active Users
 
-## Features of supabase-spring-boot-starter
+## Features of supabase-security-spring-boot-starter
 
 - Spring Security Configuration with application.yaml/properties
 - Integration with htmx
