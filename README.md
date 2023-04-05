@@ -38,7 +38,7 @@ dependencies {
 ````
 
 Go to your Spring App and configure your application.yaml/properties.
-You can find them at Project Settings -> API
+You can find them at Project Settings -> API or `https://app.supabase.com/project/yourProjectId/settings/api`
 
 `````yaml
 supabase:
