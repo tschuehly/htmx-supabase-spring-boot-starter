@@ -26,21 +26,18 @@ Create a new Supabase project. Save your database password for later.
 Go to [start.spring.io](https://start.spring.io/) and create a new Spring Boot project.
 
 Include the dependency in your build.gradle.kts. You can look up the newest version
-on [jitpack.io](https://jitpack.io/#tschuehly/supabase-spring-boot-starter)
+on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/supabase-security-spring-boot-starter)
 
 ````kotlin
-repositories {
-    maven("https://jitpack.io")
-}
 dependencies {
-    implementation("com.github.tschuehly:supabase-spring-boot-starter:75b3c6299a")
+    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.2.0")
 }
 ````
 
 Go to your Spring App and configure your application.yaml/properties.
 You can find them at Project Settings -> API or `https://app.supabase.com/project/yourProjectId/settings/api`
 
-`````yaml
+```yaml
 supabase:
   projectId: yourProjectId
   anonKey: ${SUPABASE_ANON_KEY}
@@ -51,7 +48,7 @@ supabase:
   unauthenticatedPage: /unauthenticated
   unauthorizedPage: /unauthorizedPage
   sslOnly: false
-`````
+```
 
 ``anonKey``, ``databasePassword`` and ``jwtSecret`` are sensitive properties, you should set these with environment
 variables.
@@ -68,7 +65,7 @@ for you.
 You can configure public accessible paths in your application.yaml with the property `supabase.public`. You can
 configure access for get,post,put,delete
 
-````yaml
+```yaml
 supabase:
   public:
     get:
@@ -86,7 +83,7 @@ supabase:
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
-````
+```
 
 ## Basic Usage with HTMX
 
