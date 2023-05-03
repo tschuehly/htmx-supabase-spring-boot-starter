@@ -1,0 +1,29 @@
+supabase:
+  projectId: "yourProjectId"
+  anonKey: "supabaseAnonKey"
+  databasePassword: "supabaseDatabasePassword"
+  jwtSecret: "VhLI85yN/oF3Eu95epgHOeg/iRIGiJtk2PWyCyCdORRuVVW90wToyJcJXZcHuHZ2dh7qVgH0UMjqbq1gGMF6JQ=="
+  successfulLoginRedirectPage: "/"
+  passwordRecoveryPage: "/requestPasswordReset"
+  unauthenticatedPage: "/unauthenticated"
+  unauthorizedPage: "/unauthorized"
+  sslOnly: false
+  public:
+    get:
+      - "/"
+      - "/logout"
+      - "/login"
+      - "/error"
+      - "/unauthenticated"
+      - "/unauthorized"
+      - "/requestPasswordReset"
+      - "/api/user/logout"
+    post:
+      - "/api/user/register"
+      - "/api/user/login"
+      - "/api/user/jwt"
+      - "/api/user/sendPasswordResetEmail"
+    roles:
+      admin:
+        get:
+          - "/admin"
