@@ -71,7 +71,7 @@ class SupabaseUserController(
         if (userId == "") {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "UserId required")
         }
-        supabaseUserService.setRoles(userId, request, roles)
+        supabaseUserService.setRolesWithRequest(request, userId, roles)
     }
 
     @PostMapping("/sendPasswordResetEmail")

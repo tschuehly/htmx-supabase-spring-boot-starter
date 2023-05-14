@@ -93,13 +93,18 @@ class SupabaseUserService(
         }
     }
 
-    fun setRoles(userId: String, request: HttpServletRequest, roles: List<String>?) {
+    fun setRolesWithRequest(request: HttpServletRequest, userId: String, roles: List<String>?) {
         request.cookies?.find { it.name == "JWT" }?.let {
-            val roleArray = roles ?: listOf()
-            supabaseGoTrueClient.updateUserAppMetadata(it.value, userId, mapOf("roles" to roleArray))
-            logger.debug("The roles of the user with id $userId were updated to $roleArray")
+            setRoles(it.value,userId,roles)
         }
     }
+
+    fun setRoles(serviceRoleJWT: String, userId: String,roles: List<String>?){
+        val roleArray = roles ?: listOf()
+        supabaseGoTrueClient.updateUserAppMetadata(serviceRoleJWT, userId, mapOf("roles" to roleArray))
+        logger.debug("The roles of the user with id $userId were updated to $roleArray")
+    }
+
 
     private fun setCookies(
         response: HttpServletResponse,
