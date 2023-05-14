@@ -159,15 +159,29 @@ If you configured Google you can just insert a link to log in with Google
 
 ## Role-based access control
 
-When you want to use Role Based Access Control you need to be able to set roles for a user but there are two ways to do
-that:
+You can create a role-based access control configuration right inside your application.yaml:
+
+```yaml
+supabase:
+  roles:
+    admin:
+      get:
+        - "/admin/**"
+    user:
+      post:
+        - "/user-feature-1/**"
+```
+
+With this configuration users with the Authority ROLE_ADMIN can access any endpoints under the /admin/** path, and any user with the Authority ROLE_USER can create POST request to the endpoints under the /user-feature-1/** path.
+
+You need to be able to set roles for a user but there are two ways to do that:
 
 ### service role JWT
 
 When you go to your supabase project in the Project Settings -> API section you can find the service_role secret. With
 this secret, you can set the role for any user. This way you can control user roles directly from your backend.
 
-Here is an example curl request:
+Here is an example curl request that sets the role of the user with the id: `381c6358-22dd-4681-81e3-c79846117511` to `USER`
 
 ````shell
 curl -X PUT --location "http://localhost:8080/api/user/setRoles" \
@@ -193,7 +207,7 @@ select *
 from auth.users;
 ````
 
-After executing this SQL, this account can set the roles of other users.
+After executing this SQL, this account can set the roles of other users with this form:
 
 ````html
 
