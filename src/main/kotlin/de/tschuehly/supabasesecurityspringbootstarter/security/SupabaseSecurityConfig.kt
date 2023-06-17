@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -19,33 +21,36 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity(debug = false)
 class SupabaseSecurityConfig(
-    val supabaseJwtFilter: SupabaseJwtFilter,
     val supabaseProperties: SupabaseProperties
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseSecurityConfig::class.java)
 
     @Bean
     @ConditionalOnMissingBean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    fun filterChain(
+        http: HttpSecurity,
+        supabaseJwtFilter: SupabaseJwtFilter,
+        supabaseAuthenticationManager: AuthenticationManager
+    ): SecurityFilterChain {
         supabaseProperties.roles.forEach { (role, paths) ->
             http.invoke {
                 authorizeHttpRequests {
                     paths.get.forEach { path ->
                         logger.info("Path: $path with Method GET is secured with Expression: hasRole('$role')")
-                        authorize(path, hasRole("${role.uppercase()}"))
+                        authorize(path, hasRole(role.uppercase()))
                     }
 
                     paths.post.forEach { path ->
                         logger.info("Path: $path with Method POST is secured with Expression: hasRole('$role')")
-                        authorize(path, hasRole("${role.uppercase()}"))
+                        authorize(path, hasRole(role.uppercase()))
                     }
                     paths.delete.forEach { path ->
                         logger.info("Path: $path with Method DELETE is secured with Expression: hasRole('$role')")
-                        authorize(path, hasRole("${role.uppercase()}"))
+                        authorize(path, hasRole(role.uppercase()))
                     }
                     paths.put.forEach { path ->
                         logger.info("Path: $path with Method PUT is secured with Expression: hasRole('$role')")
-                        authorize(path, hasRole("${role.uppercase()}"))
+                        authorize(path, hasRole(role.uppercase()))
                     }
                 }
             }
@@ -69,13 +74,18 @@ class SupabaseSecurityConfig(
                     authorize(HttpMethod.PUT, path, permitAll)
                 }
 
-                authorize(anyRequest,authenticated)
+                authorize(anyRequest, authenticated)
             }
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
             csrf { disable() }
-            headers { frameOptions { sameOrigin } }
+            headers {
+                frameOptions {
+                    sameOrigin
+                }
+            }
+            authenticationManager = supabaseAuthenticationManager
             addFilterBefore<UsernamePasswordAuthenticationFilter>(supabaseJwtFilter)
             exceptionHandling {
                 authenticationEntryPoint = supabaseAuthenticationEntryPoint()
@@ -94,6 +104,24 @@ class SupabaseSecurityConfig(
     @Bean
     fun supabaseAuthenticationEntryPoint(): AuthenticationEntryPoint {
         return SupabaseAuthenticationEntryPoint(supabaseProperties)
+    }
+
+    @Bean
+    fun supabaseAuthenticationProvider(): SupabaseAuthenticationProvider {
+        return SupabaseAuthenticationProvider()
+    }
+
+    @Bean
+    fun supabaseJwtFilter(
+        authenticationManager: AuthenticationManager,
+        supabaseProperties: SupabaseProperties
+    ): SupabaseJwtFilter {
+        return SupabaseJwtFilter(authenticationManager, supabaseProperties)
+    }
+
+    @Bean
+    fun authenticationManager(supabaseAuthenticationProvider: SupabaseAuthenticationProvider): AuthenticationManager {
+        return ProviderManager(supabaseAuthenticationProvider)
     }
 
 }

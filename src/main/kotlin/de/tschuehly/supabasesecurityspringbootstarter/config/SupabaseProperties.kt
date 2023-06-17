@@ -14,7 +14,8 @@ class SupabaseProperties(
     val unauthenticatedPage: String?,
     val unauthorizedPage: String?,
     val sslOnly: Boolean = true,
-    val public: Public = Public()
+    val public: Public = Public(),
+    val roles: MutableMap<String, Role> = mutableMapOf()
 ) {
 
     init {
@@ -34,8 +35,6 @@ class SupabaseProperties(
         var delete: Array<String> = arrayOf()
         var put: Array<String> = arrayOf()
     }
-
-    val roles: MutableMap<String, Role> = mutableMapOf()
 
     class Role {
         var get: Array<String> = arrayOf()
