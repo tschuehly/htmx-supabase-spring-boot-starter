@@ -13,6 +13,7 @@ Supabase gives us access to two important things for free:
 - Spring Security Configuration with application.yaml/properties
 - Integration with htmx
 - Role-Based Access Control
+- Basic Authentication
 
 ## Known Issues:
 
