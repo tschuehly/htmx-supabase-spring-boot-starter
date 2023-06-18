@@ -238,7 +238,7 @@ supabase:
   basicAuth:
     enabled: true
     username: prometheus
-    password: "{bcrypt}$2a$10$tRAe5kCBpBSWSWjkyz5uVu/uj2Dzb7AH.JlJUnInvwknF9OjGFcGy"
+    password: "{bcrypt}$2a$$LVUNCy8Lht68w7KA0nobWuwyzbW8AdF3bRC25glv7M12ACAZ4PT8u"
     roles:
       - "ADMIN"
 ```
