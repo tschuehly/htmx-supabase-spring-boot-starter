@@ -43,6 +43,7 @@ class SupabaseUserService(
         try {
             val resp = supabaseGoTrueClient.signInWithEmail(username, password)
             response.setJWTCookie(resp.accessToken, supabaseProperties)
+            response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
         } catch (e: GoTrueHttpException) {
             if (e.data?.contains("Invalid login credentials") == true) {
                 val msg = "$username either does not exist or has tried to login with the wrong password"

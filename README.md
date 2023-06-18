@@ -31,7 +31,7 @@ on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/supabase-se
 
 ````kotlin
 dependencies {
-    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.2.2")
+    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.2.3")
 }
 ````
 

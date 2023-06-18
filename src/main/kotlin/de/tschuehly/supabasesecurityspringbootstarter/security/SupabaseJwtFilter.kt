@@ -25,9 +25,9 @@ class SupabaseJwtFilter(
         val cookie = request.cookies?.find { it.name == "JWT" }
 
         val header: String? = request.getHeader("HX-Current-URL")
-        val jwtValue = if(header?.contains("#access_token=") == true){
+        val jwtValue = if (header?.contains("#access_token=") == true) {
             header.substringBefore("&").substringAfter("#access_token=")
-        }else{
+        } else {
             cookie?.value
         }
         jwtValue?.let { jwt ->
@@ -39,17 +39,17 @@ class SupabaseJwtFilter(
                 val context = SecurityContextHolder.createEmptyContext()
                 context.authentication = authentication
                 SecurityContextHolder.setContext(context)
-                response.setJWTCookie(jwtValue,supabaseProperties)
+                response.setJWTCookie(jwtValue, supabaseProperties)
             } catch (e: TokenExpiredException) {
-                response.setJWTCookie(jwtValue, supabaseProperties,0)
+                response.setJWTCookie(jwtValue, supabaseProperties, 0)
             }
         }
         filterChain.doFilter(request, response)
     }
 
 
-    companion object{
-        public fun HttpServletResponse.setJWTCookie(
+    companion object {
+        fun HttpServletResponse.setJWTCookie(
 
             accessToken: String,
             supabaseProperties: SupabaseProperties,
@@ -61,7 +61,6 @@ class SupabaseJwtFilter(
                 it.path = "/"
                 it.maxAge = maxAge
             })
-            this.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
         }
 
     }
