@@ -226,4 +226,19 @@ After executing this SQL, this account can set the roles of other users with thi
 
 ````
 
+## Basic Auth
 
+Some applications need to be configured with Basic Authentication, for example Prometheus does not support cookie based authentication.
+
+You can configure Basic Authentication using the supabase.basicAuth property.
+Then encrypt the password using the [Spring Boot CLI](https://docs.spring.io/spring-boot/docs/current/reference/html/cli.html)
+
+```yaml
+supabase:
+  basicAuth:
+    enabled: true
+    username: prometheus
+    password: "{bcrypt}$2a$10$tRAe5kCBpBSWSWjkyz5uVu/uj2Dzb7AH.JlJUnInvwknF9OjGFcGy"
+    roles:
+      - "ADMIN"
+```
