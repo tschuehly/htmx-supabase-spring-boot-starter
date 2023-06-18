@@ -227,6 +227,15 @@ After executing this SQL, this account can set the roles of other users with thi
 
 ````
 
+You can also set the roles of a User with a little bit of SQL:
+
+```postgresql
+UPDATE auth.users SET  
+  raw_app_meta_data = jsonb_set(raw_app_meta_data,'{roles}','["admin"]'::jsonb,true)
+where email = 'user@example.com';
+```
+
+
 ## Basic Auth
 
 Some applications need to be configured with Basic Authentication, for example Prometheus does not support cookie based authentication.
