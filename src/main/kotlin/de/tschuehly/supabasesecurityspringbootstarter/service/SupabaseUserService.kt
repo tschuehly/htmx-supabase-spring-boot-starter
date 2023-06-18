@@ -1,16 +1,14 @@
 package de.tschuehly.supabasesecurityspringbootstarter.service
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
+import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
+import de.tschuehly.supabasesecurityspringbootstarter.exception.*
+import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseAuthenticationProvider
+import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseJwtFilter.Companion.setJWTCookie
+import de.tschuehly.supabasesecurityspringbootstarter.types.SupabaseUser
 import io.supabase.gotrue.GoTrueClient
 import io.supabase.gotrue.http.GoTrueHttpException
 import io.supabase.gotrue.types.GoTrueTokenResponse
 import io.supabase.gotrue.types.GoTrueUserAttributes
-import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
-import de.tschuehly.supabasesecurityspringbootstarter.exception.*
-import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseAuthenticationToken
-import de.tschuehly.supabasesecurityspringbootstarter.types.SupabaseUser
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
@@ -21,7 +19,8 @@ import org.springframework.stereotype.Service
 @Service
 class SupabaseUserService(
     val supabaseProperties: SupabaseProperties,
-    val supabaseGoTrueClient: GoTrueClient<SupabaseUser, GoTrueTokenResponse>
+    val supabaseGoTrueClient: GoTrueClient<SupabaseUser, GoTrueTokenResponse>,
+    val supabaseAuthenticationProvider: SupabaseAuthenticationProvider
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserService::class.java)
     fun registerWithEmail(email: String, password: String, response: HttpServletResponse): SupabaseUser {
@@ -43,7 +42,7 @@ class SupabaseUserService(
     ): HttpServletResponse {
         try {
             val resp = supabaseGoTrueClient.signInWithEmail(username, password)
-            setCookies(response, resp.accessToken)
+            response.setJWTCookie(resp.accessToken, supabaseProperties)
         } catch (e: GoTrueHttpException) {
             if (e.data?.contains("Invalid login credentials") == true) {
                 val msg = "$username either does not exist or has tried to login with the wrong password"
@@ -70,11 +69,9 @@ class SupabaseUserService(
     ): HttpServletResponse {
         val header: String? = request.getHeader("HX-Current-URL")
         if (header != null) {
-            val accessToken = header.substringBefore("&").substringAfter("#access_token=")
-            val authenticationToken = getAuthenticationToken(accessToken)
-            setCookies(response, accessToken)
+            val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
             if (header.contains("type=recovery")) {
-                logger.debug("User: ${authenticationToken.getSupabaseUser().email} is trying to reset his password")
+                logger.debug("User: ${user.email} is trying to reset his password")
                 response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
             }
         }
@@ -95,37 +92,14 @@ class SupabaseUserService(
 
     fun setRolesWithRequest(request: HttpServletRequest, userId: String, roles: List<String>?) {
         request.cookies?.find { it.name == "JWT" }?.let {
-            setRoles(it.value,userId,roles)
+            setRoles(it.value, userId, roles)
         }
     }
 
-    fun setRoles(serviceRoleJWT: String, userId: String,roles: List<String>?){
+    fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?) {
         val roleArray = roles ?: listOf()
         supabaseGoTrueClient.updateUserAppMetadata(serviceRoleJWT, userId, mapOf("roles" to roleArray))
         logger.debug("The roles of the user with id $userId were updated to $roleArray")
-    }
-
-
-    private fun setCookies(
-        response: HttpServletResponse,
-        accessToken: String
-    ) {
-        response.addCookie(Cookie("JWT", accessToken).also {
-            it.secure = supabaseProperties.sslOnly
-            it.isHttpOnly = true
-            it.path = "/"
-            it.maxAge = 6000
-        })
-        response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
-    }
-
-    fun getAuthenticationToken(jwt: String): SupabaseAuthenticationToken {
-        val jwtClaims = JWT
-            .require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build().verify(jwt).claims
-
-        return SupabaseAuthenticationToken(
-            SupabaseUser(jwtClaims)
-        )
     }
 
     fun sendPasswordRecoveryEmail(email: String) {
@@ -141,7 +115,7 @@ class SupabaseUserService(
                     password = password
                 )
             )
-            val user = getAuthenticationToken(jwt = cookie.value).getSupabaseUser()
+            val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
             val msg = "User with the mail: ${user.email} updated his password successfully"
             logger.debug(msg)
             throw SuccessfulPasswordUpdate(msg)

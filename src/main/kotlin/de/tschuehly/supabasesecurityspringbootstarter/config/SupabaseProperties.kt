@@ -14,7 +14,9 @@ class SupabaseProperties(
     val unauthenticatedPage: String?,
     val unauthorizedPage: String?,
     val sslOnly: Boolean = true,
-    val public: Public = Public()
+    val public: Public = Public(),
+    val roles: MutableMap<String, Role> = mutableMapOf(),
+    val basicAuth: BasicAuth = BasicAuth()
 ) {
 
     init {
@@ -28,14 +30,28 @@ class SupabaseProperties(
         require(unauthorizedPage != null) { "You need to specify the property: unauthorizedPage in your application.yaml" }
     }
 
+    class BasicAuth(
+        val enabled: Boolean = false,
+        val username: String? = null,
+        val password: String? = null,
+        val roles: List<String> = listOf()
+
+    ) {
+        init {
+            if (enabled) {
+                require(username != null) { "You need to specify the property: supabase.basicAuth.username in you application.yaml" }
+                require(password != null) { "You need to specify the property: supabase.basicAuth.password in you application.yaml" }
+            }
+        }
+
+    }
+
     class Public {
         var get: Array<String> = arrayOf()
         var post: Array<String> = arrayOf()
         var delete: Array<String> = arrayOf()
         var put: Array<String> = arrayOf()
     }
-
-    val roles: MutableMap<String, Role> = mutableMapOf()
 
     class Role {
         var get: Array<String> = arrayOf()

@@ -28,8 +28,7 @@ import org.springframework.util.StringUtils
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(
     classes = [TestApplication::class],
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["debug=org.springframework.security"],
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 class SupabaseIntegrationTest() {
 
@@ -95,17 +94,6 @@ class SupabaseIntegrationTest() {
         then(indexResponse.statusCode).isEqualTo(HttpStatus.OK)
     }
 
-    @Test
-    fun `Normal user can't access admin page and gets redirected to unauthenticated`() {
-        val adminResponse: ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port/admin", HttpMethod.GET, HttpEntity(null, null), String::class.java
-        )
-
-        then(adminResponse.statusCode)
-            .isEqualTo(HttpStatus.FOUND)
-        then(adminResponse.headers.get("Location")!![0])
-            .endsWith("/unauthenticated")
-    }
 
     @Test
     fun `Authenticated User cannot set Roles for Users`() {
@@ -205,6 +193,46 @@ class SupabaseIntegrationTest() {
             .endsWith("/unauthenticated")
     }
 
+    @Test
+    fun `Normal user can't access admin page and gets redirected to unauthenticated`() {
+        val adminResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/admin", HttpMethod.GET, HttpEntity(null, null), String::class.java
+        )
+
+        then(adminResponse.statusCode)
+            .isEqualTo(HttpStatus.FOUND)
+        then(adminResponse.headers["Location"]!![0])
+            .endsWith("/unauthenticated")
+    }
+
+    @Test
+    fun `Normal User cannot access Admin Page`(){
+        val adminResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/admin",
+            HttpMethod.GET,
+            HttpEntity<String>(getHeaderForJwt(fixture("/fixtures/valid-user-jwt.txt"))),
+            String::class.java
+        )
+        then(adminResponse.statusCode)
+            .isEqualTo(HttpStatus.FOUND)
+        then(adminResponse.headers["Location"]!![0])
+            .endsWith("/unauthorized")
+    }
+
+    @Test
+    fun `User with Admin BasicAuth can access Admin Page`(){
+        val basicAuthHeader = HttpHeaders()
+        basicAuthHeader.add("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")
+        val adminResponse: ResponseEntity<String> = restTemplate.exchange(
+            "http://localhost:$port/admin",
+            HttpMethod.GET,
+            HttpEntity(null,basicAuthHeader),
+            String::class.java
+        )
+        then(adminResponse.statusCode)
+            .isEqualTo(HttpStatus.OK)
+    }
+
     private fun getFormDataEntity(
         vararg formdata: Pair<String, String>,
         jwt: String?
@@ -219,6 +247,7 @@ class SupabaseIntegrationTest() {
         }
         return HttpEntity(map, headers);
     }
+
 
     private fun fixture(path: String): String {
         return SupabaseIntegrationTest::class.java.getResource(path)?.readText()

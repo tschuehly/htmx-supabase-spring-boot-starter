@@ -8,6 +8,16 @@ supabase:
   unauthenticatedPage: "/unauthenticated"
   unauthorizedPage: "/unauthorized"
   sslOnly: false
+  basicAuth:
+    enabled: true
+    username: admin
+    password: "{bcrypt}$2a$10$AqgP120RLJ48mvTv.diNHeVlQA/WdsrgEr0aLe5P1ffYPy1FQAecy"
+    roles:
+      - "ADMIN"
+  roles:
+    admin:
+      get:
+        - "/admin/**"
   public:
     get:
       - "/"
@@ -23,7 +33,7 @@ supabase:
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
-    roles:
-      admin:
-        get:
-          - "/admin"
+
+logging:
+  level:
+    org.springframework.security: debug
