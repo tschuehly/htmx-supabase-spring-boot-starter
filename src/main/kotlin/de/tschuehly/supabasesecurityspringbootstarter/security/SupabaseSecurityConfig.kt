@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.ProviderManager
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.invoke
@@ -17,6 +17,7 @@ import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+
 
 @Configuration
 @EnableWebSecurity(debug = false)
@@ -39,7 +40,6 @@ class SupabaseSecurityConfig(
                         logger.info("Path: $path with Method GET is secured with Expression: hasRole('$role')")
                         authorize(path, hasRole(role.uppercase()))
                     }
-
                     paths.post.forEach { path ->
                         logger.info("Path: $path with Method POST is secured with Expression: hasRole('$role')")
                         authorize(path, hasRole(role.uppercase()))
@@ -55,6 +55,7 @@ class SupabaseSecurityConfig(
                 }
             }
         }
+
         http.invoke {
             authorizeHttpRequests {
                 supabaseProperties.public.get.forEach { path ->
@@ -79,13 +80,15 @@ class SupabaseSecurityConfig(
             sessionManagement {
                 sessionCreationPolicy = SessionCreationPolicy.STATELESS
             }
+            authenticationManager = supabaseAuthenticationManager
+            httpBasic {
+            }
             csrf { disable() }
             headers {
                 frameOptions {
                     sameOrigin
                 }
             }
-            authenticationManager = supabaseAuthenticationManager
             addFilterBefore<UsernamePasswordAuthenticationFilter>(supabaseJwtFilter)
             exceptionHandling {
                 authenticationEntryPoint = supabaseAuthenticationEntryPoint()
@@ -120,8 +123,23 @@ class SupabaseSecurityConfig(
     }
 
     @Bean
-    fun authenticationManager(supabaseAuthenticationProvider: SupabaseAuthenticationProvider): AuthenticationManager {
-        return ProviderManager(supabaseAuthenticationProvider)
+    fun authManager(
+        http: HttpSecurity,
+        supabaseAuthenticationProvider: SupabaseAuthenticationProvider,
+        supabaseProperties: SupabaseProperties
+    ): AuthenticationManager {
+        val authenticationManagerBuilder = http.getSharedObject(
+            AuthenticationManagerBuilder::class.java
+        )
+        authenticationManagerBuilder.authenticationProvider(supabaseAuthenticationProvider)
+        if (supabaseProperties.basicAuth.enabled) {
+            authenticationManagerBuilder.inMemoryAuthentication()
+                .withUser(supabaseProperties.basicAuth.username)
+                .password(supabaseProperties.basicAuth.password)
+                .roles(*supabaseProperties.basicAuth.roles.toTypedArray())
+
+        }
+        return authenticationManagerBuilder.build()
     }
 
 }
