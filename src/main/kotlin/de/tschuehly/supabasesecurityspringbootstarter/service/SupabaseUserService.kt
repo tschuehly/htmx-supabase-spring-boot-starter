@@ -74,6 +74,8 @@ class SupabaseUserService(
             if (header.contains("type=recovery")) {
                 logger.debug("User: ${user.email} is trying to reset his password")
                 response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
+            }else{
+                response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
             }
         }
         return response
@@ -87,7 +89,7 @@ class SupabaseUserService(
                 cookieString += "Secure;"
             }
             response.setHeader("Set-Cookie", cookieString)
-            response.setHeader("HX-Redirect", "/") // TODO: Introduce Redirect Header or HTXM / JSON Switch
+            response.setHeader("HX-Redirect", "/") // TODO: Introduce Redirect Header or HTMX / JSON Switch
         }
     }
 
