@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jreleaser.model.Active
 
 plugins {
-	id("org.springframework.boot") version "3.0.3"
-	id("io.spring.dependency-management") version "1.1.0"
-	kotlin("jvm") version "1.7.22"
-	kotlin("plugin.spring") version "1.7.22"
-	kotlin("plugin.jpa") version "1.7.22"
+	id("org.springframework.boot") version "3.1.2"
+	id("io.spring.dependency-management") version "1.1.2"
+	kotlin("jvm") version "1.8.22"
+	kotlin("plugin.spring") version "1.8.22"
+	kotlin("plugin.jpa") version "1.8.22"
 
 	id("maven-publish")
 	id("org.jreleaser") version "1.5.1"
@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.2.4"
+version = "0.2.5-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -29,10 +29,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-	implementation("com.auth0:java-jwt:4.1.0")
+	implementation("com.auth0:java-jwt:4.3.0")
 	implementation("com.github.tschuehly:gotrue-kt:659f8c6757")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -40,6 +38,7 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql")
 
 	testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+	testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.github.tomakehurst:wiremock:3.0.0-beta-8")
 
@@ -130,6 +129,7 @@ jreleaser {
 				create("maven-central") {
 					active.set(Active.ALWAYS)
 					url.set("https://s01.oss.sonatype.org/service/local")
+					snapshotUrl.set("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 					closeRepository.set(true)
 					releaseRepository.set(true)
 					stagingRepositories.add("build/staging-deploy")
