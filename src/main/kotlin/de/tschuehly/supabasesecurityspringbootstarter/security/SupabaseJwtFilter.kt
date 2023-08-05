@@ -2,6 +2,7 @@ package de.tschuehly.supabasesecurityspringbootstarter.security
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.IncorrectClaimException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
 import jakarta.servlet.FilterChain
@@ -17,6 +18,7 @@ class SupabaseJwtFilter(
     private val authenticationManager: AuthenticationManager,
     private val supabaseProperties: SupabaseProperties
 ) : OncePerRequestFilter() {
+    private val jwtVerifier = JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build()
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -32,19 +34,31 @@ class SupabaseJwtFilter(
         }
         jwtValue?.let { jwt ->
             try {
-                val claims =
-                    JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build().verify(jwt).claims
-                val authentication =
-                    authenticationManager.authenticate(SupabaseAuthenticationToken.unauthenticated(claims))
-                val context = SecurityContextHolder.createEmptyContext()
-                context.authentication = authentication
-                SecurityContextHolder.setContext(context)
-                response.setJWTCookie(jwtValue, supabaseProperties)
+                setContext(jwt, response)
             } catch (e: TokenExpiredException) {
                 response.setJWTCookie(jwtValue, supabaseProperties, 0)
+            }catch (e: IncorrectClaimException){
+                if(e.message?.contains("The Token can't be used before") == true){
+                    // Wait for one second on login if the jwt is not active yet
+                    Thread.sleep(1000L)
+                    setContext(jwt,response)
+                }
             }
         }
         filterChain.doFilter(request, response)
+    }
+
+    private fun setContext(
+        jwt: String,
+        response: HttpServletResponse
+    ) {
+        val claims = jwtVerifier.verify(jwt).claims
+        val authentication =
+            authenticationManager.authenticate(SupabaseAuthenticationToken.unauthenticated(claims))
+        val context = SecurityContextHolder.createEmptyContext()
+        context.authentication = authentication
+        SecurityContextHolder.setContext(context)
+        response.setJWTCookie(jwt, supabaseProperties)
     }
 
 
