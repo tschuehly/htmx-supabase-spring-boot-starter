@@ -27,7 +27,6 @@ class SupabaseUserServiceGoTrueImpl(
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
     override fun registerWithEmail(email: String, password: String) {
         runBlocking {
-            logger.debug("User with the email $email is trying to register")
             try {
                 val user = goTrueClient.signUpWith(Email) {
                     this.email = email
@@ -45,7 +44,6 @@ class SupabaseUserServiceGoTrueImpl(
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
 
         runBlocking {
-            logger.debug("User with the email $email is trying to login")
             try {
                 goTrueClient.loginWith(Email) {
                     this.email = email

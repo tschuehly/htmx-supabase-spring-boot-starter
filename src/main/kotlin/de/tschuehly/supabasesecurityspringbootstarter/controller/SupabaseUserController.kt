@@ -26,10 +26,9 @@ class SupabaseUserController(
     ) {
         val email = request.parameterMap["email"]?.get(0)
         val password = request.parameterMap["password"]?.get(0)
+        logger.debug("User with the email $email is trying to register")
         if (email != null && password != null) {
-            logger.debug("User with the email $email is trying to register")
             val user = supabaseUserService.registerWithEmail(email.trim(), password.trim())
-            logger.debug("User with the mail ${email} successfully registered, Confirmation Mail sent")
         }
     }
 
@@ -41,10 +40,9 @@ class SupabaseUserController(
     ) {
         val email = credentials["email"]
         val password = credentials["password"]
+        logger.debug("User with the email $email is trying to login")
         if (email != null && password != null) {
-            logger.debug("User with the email $email is trying to login")
             supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
-            logger.debug("User: $email successfully logged in")
         }
     }
 
