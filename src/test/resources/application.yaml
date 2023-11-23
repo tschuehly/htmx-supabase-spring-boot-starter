@@ -1,8 +1,8 @@
 supabase:
-  projectId: "yourProjectId"
-  anonKey: "supabaseAnonKey"
-  databasePassword: "supabaseDatabasePassword"
-  jwtSecret: "VhLI85yN/oF3Eu95epgHOeg/iRIGiJtk2PWyCyCdORRuVVW90wToyJcJXZcHuHZ2dh7qVgH0UMjqbq1gGMF6JQ=="
+  projectId: ${SUPABASE_PROJECT_ID}
+  anonKey: ${SUPABASE_ANON_KEY}
+  databasePassword: ${SUPABASE_DATABASE_PASSWORD}
+  jwtSecret: ${SUPABASE_JWT_SECRET}
   successfulLoginRedirectPage: "/"
   passwordRecoveryPage: "/requestPasswordReset"
   unauthenticatedPage: "/unauthenticated"
@@ -21,6 +21,7 @@ supabase:
   public:
     get:
       - "/"
+      - "/favicon.ico"
       - "/logout"
       - "/login"
       - "/error"
@@ -36,4 +37,5 @@ supabase:
 
 logging:
   level:
+    de.tschuehly: debug
     org.springframework.security: debug

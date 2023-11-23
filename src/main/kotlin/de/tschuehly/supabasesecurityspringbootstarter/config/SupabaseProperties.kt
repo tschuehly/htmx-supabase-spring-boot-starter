@@ -53,6 +53,7 @@ class SupabaseProperties(
         var put: Array<String> = arrayOf()
     }
 
+
     class Role {
         var get: Array<String> = arrayOf()
         var post: Array<String> = arrayOf()

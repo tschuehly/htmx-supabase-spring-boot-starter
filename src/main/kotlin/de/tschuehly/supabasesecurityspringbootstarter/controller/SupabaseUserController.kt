@@ -1,36 +1,35 @@
 package de.tschuehly.supabasesecurityspringbootstarter.controller
 
+import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.SuccessfulRegistrationConfirmationEmailSentException
-import de.tschuehly.supabasesecurityspringbootstarter.service.SupabaseUserService
+import de.tschuehly.supabasesecurityspringbootstarter.service.ISupabaseUserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
+import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @Controller
 @RequestMapping("api/user")
 class SupabaseUserController(
-    val supabaseUserService: SupabaseUserService,
+    val supabaseUserService: ISupabaseUserService,
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
 
     @PostMapping("/register")
     fun register(
-        @RequestParam credentials: Map<String, String>,
-        request: HttpServletRequest,
-        response: HttpServletResponse
+        request: HttpServletRequest
     ) {
-        val email = credentials["email"]
-        val password = credentials["password"]
+        val email = request.parameterMap["email"]?.get(0)
+        val password = request.parameterMap["password"]?.get(0)
         if (email != null && password != null) {
             logger.debug("User with the email $email is trying to register")
-            val user = supabaseUserService.registerWithEmail(email.trim(), password.trim(), response)
-            logger.debug("User with the mail ${user.email} successfully registered, Confirmation Mail sent")
-            throw SuccessfulRegistrationConfirmationEmailSentException("User with the mail ${user.email} successfully registered, Confirmation Mail sent")
+            val user = supabaseUserService.registerWithEmail(email.trim(), password.trim())
+            logger.debug("User with the mail ${email} successfully registered, Confirmation Mail sent")
         }
     }
 
@@ -44,7 +43,7 @@ class SupabaseUserController(
         val password = credentials["password"]
         if (email != null && password != null) {
             logger.debug("User with the email $email is trying to login")
-            supabaseUserService.login(email.trim(), password.trim(), response)
+            supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
             logger.debug("User: $email successfully logged in")
         }
     }

@@ -64,7 +64,6 @@ class SupabaseJwtFilter(
 
     companion object {
         fun HttpServletResponse.setJWTCookie(
-
             accessToken: String,
             supabaseProperties: SupabaseProperties,
             maxAge: Int = 6000
