@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.2.5-SNAPSHOT"
+version = "0.2.5"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -30,7 +30,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("com.auth0:java-jwt:4.3.0")
+	implementation("com.auth0:java-jwt:4.4.0")
 	implementation("com.github.tschuehly:gotrue-kt:659f8c6757")
 
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -40,7 +40,7 @@ dependencies {
 	testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 	testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("com.github.tomakehurst:wiremock:3.0.0-beta-8")
+	testImplementation("com.github.tomakehurst:wiremock:3.0.1")
 
 }
 
