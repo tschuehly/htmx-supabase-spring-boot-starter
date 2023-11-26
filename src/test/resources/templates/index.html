@@ -3,15 +3,14 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <script src="https://unpkg.com/htmx.org@1.9.9"></script>
     <title>Supabase Auth</title>
+    <th:block th:replace="scripts"></th:block>
 </head>
 <body>
 <h1>
-    Index
+    Supabase Security Spring Boot Starter
 </h1>
 
-<a href="/account">Account Page</a>
 
 <h2>authentication</h2>
 <span th:text="${#authentication }">
@@ -23,14 +22,14 @@
     <h2>
         Login
     </h2>
-    <form>
+    <form  hx-post="/api/user/login"  target="#auth-response">
         <label>Email:
             <input name="email" type="text"/>
         </label>
         <label>Password:
             <input name="password" type="password"/>
         </label>
-        <button hx-post="/api/user/login">Submit</button>
+        <button type="submit">Submit</button>
     </form>
 
     <h2>
@@ -43,26 +42,21 @@
         <label>Password:
             <input name="password" type="password"/>
         </label>
-        <button  >Submit</button>
+        <button type="submit" >Submit</button>
     </form>
+
+    <a href="https://eyxbhhammxxopyqgwvej.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
 
 </div>
 
 <div id="auth-response"></div>
 
-
-<a href="https://eyxbhhammxxopyqgwvej.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
-
-</body>
 <div sec:authorize="!hasRole('ROLE_ANONYMOUS')">
+    <a href="/account">Account Page</a>
     <h2>
         <button hx-get="/api/user/logout">Logout</button>
     </h2>
 </div>
-<script>
-    if (window.location.hash.startsWith("#access_token")) {
-        htmx.ajax('POST', '/api/user/jwt', {target: '#body', swap: 'outerHTML'})
-            .then(window.location.hash = "")
-    }
-</script>
+
+</body>
 </html>

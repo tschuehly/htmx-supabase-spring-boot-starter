@@ -15,10 +15,6 @@ Supabase gives us access to two important things for free:
 - Role-Based Access Control
 - Basic Authentication
 
-## Known Issues:
-
-Access Denied
-
 ## Initial Setup:
 
 Go to [supabase.com](https://app.supabase.com/sign-up) and sign up for an account.
@@ -31,7 +27,7 @@ on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/supabase-se
 
 ````kotlin
 dependencies {
-    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.2.3")
+    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.3.0")
 }
 ````
 
@@ -58,7 +54,7 @@ You need to set the Site URL and the Redirect URL in your supabase dashboard as 
 You can find them at Authentication -> URL Configuration.
 If you didn't mess with the ``server.port`` property you should set it to `http://localhost:8080`
 
-Now you can get started with integrating Authentication. The Supabase Postgres Database is automatically configured
+Now you can get started with integrating authentication. The supabase PostgreSQL database is automatically configured
 for you.
 
 ## Configuring Public Authorization

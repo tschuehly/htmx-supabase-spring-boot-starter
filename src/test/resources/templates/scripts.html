@@ -1,0 +1,10 @@
+
+<script src="https://unpkg.com/htmx.org@1.9.9"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sakura.css/css/sakura.css" type="text/css">
+
+<script>
+  if (window.location.hash.startsWith("#access_token")) {
+    htmx.ajax('POST', '/api/user/jwt', {target: '#body', swap: 'outerHTML'})
+    .then(window.location.hash = "")
+  }
+</script>
