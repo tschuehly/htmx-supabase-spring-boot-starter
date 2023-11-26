@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.1.5"
+    id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.8.22"
-    kotlin("plugin.spring") version "1.8.22"
-    kotlin("plugin.jpa") version "1.8.22"
+    kotlin("jvm") version "1.9.20"
+    kotlin("plugin.spring") version "1.9.20"
+    kotlin("plugin.jpa") version "1.9.20"
 
     id("maven-publish")
     id("org.jreleaser") version "1.5.1"
@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.2.5-SNAPSHOT"
+version = "0.3.0-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -32,9 +32,9 @@ dependencies {
     implementation("org.springframework:spring-context-support")
 
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
-    implementation("com.auth0:java-jwt:4.1.0")
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:1.0.0-rc-2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
+    implementation("com.auth0:java-jwt:4.3.0")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:1.4.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.31")
 
 
 
@@ -46,7 +46,7 @@ dependencies {
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    runtimeOnly("io.ktor:ktor-client-apache:2.3.0")
+    runtimeOnly("io.ktor:ktor-client-apache:2.3.6")
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
@@ -54,8 +54,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.github.tomakehurst:wiremock:3.0.1")
     testImplementation("org.springframework.boot:spring-boot-devtools")
-    testImplementation("io.ktor:ktor-client-mock:2.3.0")
-    testImplementation("com.russhwolf:multiplatform-settings-test:1.0.0")
+    testImplementation("io.ktor:ktor-client-mock:2.3.6")
+    testImplementation("com.russhwolf:multiplatform-settings-test:1.1.1")
 
 }
 
