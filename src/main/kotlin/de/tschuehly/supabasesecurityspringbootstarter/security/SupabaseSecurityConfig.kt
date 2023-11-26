@@ -1,5 +1,6 @@
 package de.tschuehly.supabasesecurityspringbootstarter.security
 
+import com.auth0.jwt.JWTVerifier
 import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -117,9 +118,10 @@ class SupabaseSecurityConfig(
     @Bean
     fun supabaseJwtFilter(
         authenticationManager: AuthenticationManager,
-        supabaseProperties: SupabaseProperties
+        supabaseProperties: SupabaseProperties,
+        jwtVerifier: JWTVerifier
     ): SupabaseJwtFilter {
-        return SupabaseJwtFilter(authenticationManager, supabaseProperties)
+        return SupabaseJwtFilter(authenticationManager, supabaseProperties, jwtVerifier)
     }
 
     @Bean

@@ -1,6 +1,7 @@
 package de.tschuehly.supabasesecurityspringbootstarter.security
 
 import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.IncorrectClaimException
 import com.auth0.jwt.exceptions.TokenExpiredException
@@ -16,9 +17,10 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 class SupabaseJwtFilter(
     private val authenticationManager: AuthenticationManager,
-    private val supabaseProperties: SupabaseProperties
+    private val supabaseProperties: SupabaseProperties,
+    private val jwtVerifier: JWTVerifier
 ) : OncePerRequestFilter() {
-    private val jwtVerifier = JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build()
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,

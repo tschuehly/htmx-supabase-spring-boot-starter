@@ -1,5 +1,8 @@
 package de.tschuehly.supabasesecurityspringbootstarter
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
+import com.auth0.jwt.algorithms.Algorithm
 import de.tschuehly.supabasesecurityspringbootstarter.config.DefaultExceptionHandlerConfig
 import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
 import de.tschuehly.supabasesecurityspringbootstarter.controller.SupabaseUserController
@@ -15,17 +18,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.*
+import org.springframework.stereotype.Component
 
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
 @EnableConfigurationProperties(SupabaseProperties::class)
-@Import(SupabaseSecurityConfig::class,DefaultExceptionHandlerConfig::class)
+@Import(SupabaseSecurityConfig::class, DefaultExceptionHandlerConfig::class)
 @PropertySource("classpath:application-supabase.properties")
 class SupabaseAutoConfiguration(
     val supabaseProperties: SupabaseProperties,
 ) {
     val logger: Logger =
         LoggerFactory.getLogger(SupabaseAutoConfiguration::class.java)
+
     @Bean
     @ConditionalOnMissingBean
     fun supabaseService(
@@ -51,5 +56,11 @@ class SupabaseAutoConfiguration(
             url = "https://${supabaseProperties.projectId}.supabase.co/auth/v1",
             apiKey = supabaseProperties.anonKey
         )
+    }
+
+    @Bean
+    fun supabaseJwtVerifier(supabaseProperties: SupabaseProperties): JWTVerifier {
+        return JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build()
+
     }
 }
