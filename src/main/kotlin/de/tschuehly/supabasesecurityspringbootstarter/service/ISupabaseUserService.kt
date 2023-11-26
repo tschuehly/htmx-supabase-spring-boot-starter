@@ -1,6 +1,5 @@
 package de.tschuehly.supabasesecurityspringbootstarter.service
 
-import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseAuthenticationToken
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
@@ -18,4 +17,5 @@ interface ISupabaseUserService {
     fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?)
     fun sendPasswordRecoveryEmail(email: String)
     fun updatePassword(request: HttpServletRequest, password: String)
+    fun sendOtp(email: String)
 }

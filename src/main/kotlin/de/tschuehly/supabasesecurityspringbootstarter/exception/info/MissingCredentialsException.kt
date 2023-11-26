@@ -1,4 +1,4 @@
-package de.tschuehly.supabasesecurityspringbootstarter.exception
+package de.tschuehly.supabasesecurityspringbootstarter.exception.info
 
 class MissingCredentialsException(message: String) : Exception(message) {
     companion object {

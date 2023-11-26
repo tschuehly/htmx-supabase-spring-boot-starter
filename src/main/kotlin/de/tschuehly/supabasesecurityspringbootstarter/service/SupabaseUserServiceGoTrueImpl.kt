@@ -2,6 +2,13 @@ package de.tschuehly.supabasesecurityspringbootstarter.service
 
 import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
 import de.tschuehly.supabasesecurityspringbootstarter.exception.*
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.OtpEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.InvalidLoginCredentialsException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserAlreadyRegisteredException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserNeedsToConfirmEmailBeforeLoginException
 import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseJwtFilter.Companion.setJWTCookie
 import de.tschuehly.supabasesecurityspringbootstarter.types.SupabaseUser
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -17,7 +24,6 @@ import kotlinx.serialization.json.putJsonArray
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Service
 
 class SupabaseUserServiceGoTrueImpl(
     private val supabaseProperties: SupabaseProperties,
@@ -38,7 +44,7 @@ class SupabaseUserServiceGoTrueImpl(
                     val msg = "User with the mail $email successfully signed up, " +
                             "Confirmation Mail sent at ${user?.confirmationSentAt}"
                     logger.debug(msg)
-                    throw SuccessfulSignUpConfirmationEmailSent(msg)
+                    throw RegistrationConfirmationEmailSent(msg)
                 }
             }catch (e: BadRequestRestException){
                 val errorMessage = e.message
@@ -70,9 +76,7 @@ class SupabaseUserServiceGoTrueImpl(
                 if (errorMessage?.contains("Invalid login credentials") == true) {
                     val msg = "$email has tried to login with invalid credentials"
                     logger.debug(msg)
-                    throw InvalidLoginCredentialsException(
-                        msg, e
-                    )
+                    throw InvalidLoginCredentialsException(msg, e)
                 } else if (errorMessage?.contains("Email not confirmed") == true) {
                     val msg = "$email needs to confirm email before he can login"
                     logger.debug(msg)
@@ -81,6 +85,17 @@ class SupabaseUserServiceGoTrueImpl(
             } finally {
                 goTrueClient.sessionManager.deleteSession()
             }
+        }
+    }
+
+    override fun sendOtp(email: String){
+        runBlocking {
+            goTrueClient.sendOtpTo(Email){
+                this.email = email
+            }
+            val msg = "OTP sent to $email"
+            logger.debug(msg)
+            throw OtpEmailSent(msg)
         }
     }
 

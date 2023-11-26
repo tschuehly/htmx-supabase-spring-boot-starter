@@ -46,6 +46,18 @@
     <button hx-post="/api/user/signup" hx-target="#signup-response">Submit</button>
   </form>
   <div id="signup-response"></div>
+  <h2>
+    OTP
+  </h2>
+  <form>
+    <label>Email:
+      <input name="email" type="text"/>
+    </label>
+    <button hx-post="/api/user/sendEmailOtp" hx-target="#signup-otp-response">Submit</button>
+  </form>
+  <div id="signup-otp-response"></div>
+
+
 
   <a href="https://ettvaltrmhclwfsfzxvh.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
 

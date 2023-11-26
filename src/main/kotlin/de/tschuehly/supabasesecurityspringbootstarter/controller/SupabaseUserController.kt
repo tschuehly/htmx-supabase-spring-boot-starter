@@ -1,6 +1,6 @@
 package de.tschuehly.supabasesecurityspringbootstarter.controller
 
-import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException.Companion.MissingCredentials
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException.Companion.MissingCredentials
 import de.tschuehly.supabasesecurityspringbootstarter.service.ISupabaseUserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -18,16 +18,6 @@ class SupabaseUserController(
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
 
-    @PostMapping("/signup")
-    fun signUp(
-        request: HttpServletRequest,
-        response: HttpServletResponse
-    ) {
-        request.checkCredentialsAndExecute { email, password ->
-            logger.debug("User with the email $email is trying to signup")
-            supabaseUserService.signUpWithEmail(email, password, response)
-        }
-    }
 
     @PostMapping("/login")
     fun login(
@@ -40,6 +30,30 @@ class SupabaseUserController(
             supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
         }
     }
+    @PostMapping("/signup")
+    fun signUp(
+        request: HttpServletRequest,
+        response: HttpServletResponse
+    ) {
+        request.checkCredentialsAndExecute { email, password ->
+            logger.debug("User with the email $email is trying to signup")
+            supabaseUserService.signUpWithEmail(email, password, response)
+        }
+    }
+    @PostMapping("/sendEmailOtp")
+    fun sendEmailOtp(
+        @RequestParam email: String?
+    ) {
+        if (email != null) {
+            logger.debug("User with the email $email is trying to signup")
+            supabaseUserService.sendOtp(email)
+        }else{
+            MissingCredentials.EMAIL_MISSING.throwExc()
+        }
+    }
+
+
+
 
     private fun HttpServletRequest.checkCredentialsAndExecute(
         function: (email: String, password: String) -> Unit

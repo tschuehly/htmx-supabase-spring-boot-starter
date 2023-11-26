@@ -1,7 +1,13 @@
 package de.tschuehly.supabasesecurityspringbootstarter.application
 
-import de.tschuehly.supabasesecurityspringbootstarter.exception.*
-import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException.Companion.MissingCredentials
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException.Companion.MissingCredentials
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.handler.SupabaseExceptionHandler
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.InvalidLoginCredentialsException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserNeedsToConfirmEmailBeforeLoginException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ResponseBody
 
@@ -29,7 +35,7 @@ class CustomExceptionHandlerTest: SupabaseExceptionHandler {
     }
 
     @ResponseBody
-    override fun handleSuccessfulRegistration(exception: SuccessfulSignUpConfirmationEmailSent): Any {
+    override fun handleSuccessfulRegistration(exception: RegistrationConfirmationEmailSent): Any {
         return "SuccessfulRegistrationConfirmationEmailSent"
     }
 

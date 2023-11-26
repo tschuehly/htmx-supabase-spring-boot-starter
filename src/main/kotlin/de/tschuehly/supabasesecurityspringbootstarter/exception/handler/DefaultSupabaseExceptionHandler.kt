@@ -1,5 +1,11 @@
-package de.tschuehly.supabasesecurityspringbootstarter.exception
+package de.tschuehly.supabasesecurityspringbootstarter.exception.handler
 
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.InvalidLoginCredentialsException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserNeedsToConfirmEmailBeforeLoginException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -11,7 +17,7 @@ class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
 
     init {
         val msg =
-            "You probably want to define a @ControllerAdvice that implements de.tschuehly.supabasesecurityspringbootstarter.exception.SupabaseExceptionHandler to handle exceptions from the " +
+            "You probably want to define a @ControllerAdvice that implements de.tschuehly.supabasesecurityspringbootstarter.exception.handler.SupabaseExceptionHandler to handle exceptions from the " +
                     "supabase-security-spring-boot-starter and show messages to your user"
         logger.warn(msg)
     }
@@ -35,7 +41,7 @@ class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     }
 
     @ResponseBody
-    override fun handleSuccessfulRegistration(exception: SuccessfulSignUpConfirmationEmailSent): Any {
+    override fun handleSuccessfulRegistration(exception: RegistrationConfirmationEmailSent): Any {
         logger.debug(exception.message)
         return "SuccessfulRegistrationConfirmationEmailSent"
     }
