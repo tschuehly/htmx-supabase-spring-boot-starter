@@ -4,19 +4,18 @@ import org.slf4j.LoggerFactory
 
 
 import de.tschuehly.supabasesecurityspringbootstarter.exception.*
+import org.slf4j.Logger
 import org.springframework.web.bind.annotation.ControllerAdvice
-import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseBody
 
 @ControllerAdvice
-class ExceptionController : SupabaseExceptionHandler {
-    val logger = LoggerFactory.getLogger(ExceptionController::class.java)
+class ExceptionHandlerAdvice : SupabaseExceptionHandler {
+    val logger: Logger = LoggerFactory.getLogger(ExceptionHandlerAdvice::class.java)
 
     @ResponseBody
     override fun handleMissingCredentialsException(exception: MissingCredentialsException): String {
         logger.debug(exception.message)
-        return "MissingCredentialsException"
+        return exception.message ?: "MissingCredentialsException"
     }
 
     @ResponseBody
@@ -32,7 +31,7 @@ class ExceptionController : SupabaseExceptionHandler {
     }
 
     @ResponseBody
-    override fun handleSuccessfulRegistration(exception: SuccessfulRegistrationConfirmationEmailSent): String {
+    override fun handleSuccessfulRegistration(exception: SuccessfulSignUpConfirmationEmailSent): String {
         logger.debug(exception.message)
         return "SuccessfulRegistrationConfirmationEmailSent"
     }

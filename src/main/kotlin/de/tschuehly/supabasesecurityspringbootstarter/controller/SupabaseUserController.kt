@@ -1,6 +1,5 @@
 package de.tschuehly.supabasesecurityspringbootstarter.controller
 
-import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException.Companion.MissingCredentials
 import de.tschuehly.supabasesecurityspringbootstarter.service.ISupabaseUserService
 import jakarta.servlet.http.HttpServletRequest
@@ -11,7 +10,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.util.function.Supplier
 
 @Controller
 @RequestMapping("api/user")
@@ -22,11 +20,12 @@ class SupabaseUserController(
 
     @PostMapping("/register")
     fun register(
-        request: HttpServletRequest
+        request: HttpServletRequest,
+        response: HttpServletResponse
     ) {
         request.checkCredentialsAndExecute { email, password ->
             logger.debug("User with the email $email is trying to register")
-            supabaseUserService.registerWithEmail(email, password)
+            supabaseUserService.signUpWithEmail(email, password, response)
         }
     }
 
@@ -42,21 +41,16 @@ class SupabaseUserController(
         }
     }
 
-    private fun HttpServletRequest.checkCredentialsAndExecute(function: (String, String) -> Unit) {
-
+    private fun HttpServletRequest.checkCredentialsAndExecute(function: (email: String, password: String) -> Unit) {
         val email = this.parameterMap["email"]?.firstOrNull()
         val password = this.parameterMap["password"]?.firstOrNull()
-
         when {
             email.isNullOrBlank() && password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_AND_EMAIL_MISSING.throwExc()
-
             email.isNullOrBlank() ->
                 MissingCredentials.EMAIL_MISSING.throwExc()
-
             password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_MISSING.throwExc()
-
             else ->
                 function(email.trim(), password.trim())
         }

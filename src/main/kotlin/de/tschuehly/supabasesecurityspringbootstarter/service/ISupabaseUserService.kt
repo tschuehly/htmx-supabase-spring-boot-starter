@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
 interface ISupabaseUserService {
-    fun registerWithEmail(email: String, password: String)
+    fun signUpWithEmail(email: String, password: String, response: HttpServletResponse)
     fun loginWithEmail(email: String, password: String, response: HttpServletResponse)
 
     fun authorizeWithJwtOrResetPassword(

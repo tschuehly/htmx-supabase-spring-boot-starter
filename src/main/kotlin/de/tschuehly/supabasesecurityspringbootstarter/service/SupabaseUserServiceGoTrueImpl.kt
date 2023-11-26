@@ -25,24 +25,28 @@ class SupabaseUserServiceGoTrueImpl(
     val goTrueClient: GoTrue
 ) : ISupabaseUserService {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
-    override fun registerWithEmail(email: String, password: String) {
+    override fun signUpWithEmail(email: String, password: String, response: HttpServletResponse) {
         runBlocking {
             try {
                 val user = goTrueClient.signUpWith(Email) {
                     this.email = email
                     this.password = password
                 }
-
-                logger.debug("User with the mail $email successfully registered, Confirmation Mail sent at ${user?.confirmationSentAt}")
-                throw SuccessfulRegistrationConfirmationEmailSent("User with the mail $email successfully registered, Confirmation Mail sent")
+                if (emailConfirmationDisabled(user)) {
+                    loginWithEmail(email, password, response)
+                    logger.debug("User with the mail $email successfully registered, and signed in")
+                } else {
+                    logger.debug("User with the mail $email successfully registered, " +
+                            "Confirmation Mail sent at ${user?.confirmationSentAt}")
+                    throw SuccessfulSignUpConfirmationEmailSent("User with the mail $email successfully registered, " +
+                            "Confirmation Mail sent")
+                }
             } finally {
                 goTrueClient.sessionManager.deleteSession()
             }
         }
     }
-
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
-
         runBlocking {
             try {
                 goTrueClient.loginWith(Email) {
@@ -51,7 +55,7 @@ class SupabaseUserServiceGoTrueImpl(
                 }
                 val token = goTrueClient.currentSessionOrNull()?.accessToken
                     ?: throw JWTTokenNullException("The JWT that $email requested is null")
-                response.setJWTCookie(token,supabaseProperties)
+                response.setJWTCookie(token, supabaseProperties)
                 response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
 
                 logger.debug("User: $email successfully logged in")
@@ -83,7 +87,7 @@ class SupabaseUserServiceGoTrueImpl(
             if (header.contains("type=recovery")) {
                 logger.debug("User: ${user.email} is trying to reset his password")
                 response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
-            }else{
+            } else {
                 response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
             }
         }
@@ -138,7 +142,6 @@ class SupabaseUserServiceGoTrueImpl(
     }
 
 
-
     override fun sendPasswordRecoveryEmail(email: String) {
         runBlocking {
             goTrueClient.sendRecoveryEmail(email)
@@ -164,5 +167,9 @@ class SupabaseUserServiceGoTrueImpl(
                 goTrueClient.sessionManager.deleteSession()
             }
         }
+    }
+
+    private fun emailConfirmationDisabled(user: Email.Result?): Boolean {
+        return user == null
     }
 }

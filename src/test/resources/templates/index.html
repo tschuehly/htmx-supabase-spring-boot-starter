@@ -3,12 +3,12 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Supabase Auth</title>
-    <th:block th:replace="scripts"></th:block>
+  <title>Supabase Auth</title>
+  <th:block th:replace="scripts"></th:block>
 </head>
 <body>
 <h1>
-    Supabase Security Spring Boot Starter
+  Supabase Security Spring Boot Starter
 </h1>
 
 
@@ -19,44 +19,50 @@
 <span th:text="${#authorization}">
 </span>
 <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
-    <h2>
-        Login
-    </h2>
-    <form  hx-post="/api/user/login"  target="#auth-response">
-        <label>Email:
-            <input name="email" type="text"/>
-        </label>
-        <label>Password:
-            <input name="password" type="password"/>
-        </label>
-        <button type="submit">Submit</button>
-    </form>
+  <h2>
+    Login
+  </h2>
+  <form hx-post="/api/user/login" hx-target="#login-response">
+    <label>Email:
+      <input name="email" type="text"/>
+    </label>
+    <label>Password:
+      <input name="password" type="password"/>
+    </label>
+    <button type="submit">Submit</button>
+  </form>
 
-    <h2>
-        Register
-    </h2>
-    <form hx-post="/api/user/register" target="#auth-response">
-        <label>Email:
-            <input name="email" type="text"/>
-        </label>
-        <label>Password:
-            <input name="password" type="password"/>
-        </label>
-        <button type="submit" >Submit</button>
-    </form>
+  <div id="login-response"></div>
+  <h2>
+    Register
+  </h2>
+  <form>
+    <label>Email:
+      <input name="email" type="text"/>
+    </label>
+    <label>Password:
+      <input name="password" type="password"/>
+    </label>
+    <button hx-post="/api/user/register" hx-target="#register-response">Submit</button>
+  </form>
+  <div id="register-response"></div>
 
-    <a href="https://eyxbhhammxxopyqgwvej.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
+  <a href="https://ettvaltrmhclwfsfzxvh.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
 
 </div>
 
-<div id="auth-response"></div>
 
 <div sec:authorize="!hasRole('ROLE_ANONYMOUS')">
-    <a href="/account">Account Page</a>
-    <h2>
-        <button hx-get="/api/user/logout">Logout</button>
-    </h2>
+  <a href="/account">Account Page</a>
+  <h2>
+    <button hx-get="/api/user/logout">Logout</button>
+  </h2>
 </div>
-
+<script>
+  if (window.location.hash.startsWith("#access_token")) {
+    htmx.ajax('POST', '/api/user/jwt', {target: '#body', swap: 'outerHTML'})
+    .then(window.location.hash = "")
+  }
+</script>
 </body>
 </html>
