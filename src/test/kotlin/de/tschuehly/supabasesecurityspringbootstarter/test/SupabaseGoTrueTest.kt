@@ -51,6 +51,16 @@ class SupabaseGoTrueTest {
         then(response.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Max-Age=6000; Expires=Sun, ").endsWith(" GMT; Path=/; HttpOnly")
     }
 
+    @Test
+    fun `register works works`(){
+
+        val response = restClient.post()
+            .uri("/api/user/login")
+            .form("email" to "email@example.com", "password" to GoTrueMock.VALID_PASSWORD)
+            .retrieve().toEntity<String>()
+        then(response.statusCode).isEqualTo(HttpStatus.OK)
+    }
+
     private fun RestClient.RequestBodySpec.form(
         vararg formdata: Pair<String, String>, jwt: String? = null
     ): RestClient.RequestBodySpec {

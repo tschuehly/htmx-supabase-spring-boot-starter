@@ -1,7 +1,7 @@
 package de.tschuehly.supabasesecurityspringbootstarter.controller
 
 import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException
-import de.tschuehly.supabasesecurityspringbootstarter.exception.SuccessfulRegistrationConfirmationEmailSentException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.MissingCredentialsException.Companion.MissingCredentials
 import de.tschuehly.supabasesecurityspringbootstarter.service.ISupabaseUserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -9,9 +9,9 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
-import org.springframework.util.MultiValueMap
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.function.Supplier
 
 @Controller
 @RequestMapping("api/user")
@@ -24,11 +24,9 @@ class SupabaseUserController(
     fun register(
         request: HttpServletRequest
     ) {
-        val email = request.parameterMap["email"]?.get(0)
-        val password = request.parameterMap["password"]?.get(0)
-        logger.debug("User with the email $email is trying to register")
-        if (email != null && password != null) {
-            val user = supabaseUserService.registerWithEmail(email.trim(), password.trim())
+        request.checkCredentialsAndExecute { email, password ->
+            logger.debug("User with the email $email is trying to register")
+            supabaseUserService.registerWithEmail(email, password)
         }
     }
 
@@ -38,11 +36,29 @@ class SupabaseUserController(
         response: HttpServletResponse,
         request: HttpServletRequest
     ) {
-        val email = credentials["email"]
-        val password = credentials["password"]
-        logger.debug("User with the email $email is trying to login")
-        if (email != null && password != null) {
+        request.checkCredentialsAndExecute { email, password ->
+            logger.debug("User with the email $email is trying to register")
             supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
+        }
+    }
+
+    private fun HttpServletRequest.checkCredentialsAndExecute(function: (String, String) -> Unit) {
+
+        val email = this.parameterMap["email"]?.firstOrNull()
+        val password = this.parameterMap["password"]?.firstOrNull()
+
+        when {
+            email.isNullOrBlank() && password.isNullOrBlank() ->
+                MissingCredentials.PASSWORD_AND_EMAIL_MISSING.throwExc()
+
+            email.isNullOrBlank() ->
+                MissingCredentials.EMAIL_MISSING.throwExc()
+
+            password.isNullOrBlank() ->
+                MissingCredentials.PASSWORD_MISSING.throwExc()
+
+            else ->
+                function(email.trim(), password.trim())
         }
     }
 
