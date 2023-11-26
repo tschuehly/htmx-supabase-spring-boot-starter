@@ -152,7 +152,7 @@ class SupabaseUserServiceGoTrueImpl(
             try {
                 request.cookies?.find { it.name == "JWT" }?.let { cookie ->
                     goTrueClient.importAuthToken(cookie.value)
-                    goTrueClient.modifyUser(Email) {
+                    goTrueClient.modifyUser(true) {
                         this.password = password
                     }
                     val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser

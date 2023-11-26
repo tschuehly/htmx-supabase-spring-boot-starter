@@ -34,7 +34,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
     implementation("com.auth0:java-jwt:4.3.0")
     implementation("io.github.jan-tennert.supabase:gotrue-kt:1.4.7")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.31")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
 
 
