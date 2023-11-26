@@ -1,6 +1,6 @@
 package de.tschuehly.supabasesecurityspringbootstarter.application
 
-import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseAutoConfiguration
+import de.tschuehly.supabasesecurityspringbootstarter.SupabaseAutoConfiguration
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration

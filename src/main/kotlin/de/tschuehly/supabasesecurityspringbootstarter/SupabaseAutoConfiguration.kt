@@ -1,9 +1,10 @@
-package de.tschuehly.supabasesecurityspringbootstarter.config
+package de.tschuehly.supabasesecurityspringbootstarter
 
+import de.tschuehly.supabasesecurityspringbootstarter.config.DefaultExceptionHandlerConfig
+import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
 import de.tschuehly.supabasesecurityspringbootstarter.controller.SupabaseUserController
 import de.tschuehly.supabasesecurityspringbootstarter.exception.DefaultSupabaseExceptionHandler
 import de.tschuehly.supabasesecurityspringbootstarter.exception.SupabaseExceptionHandler
-import de.tschuehly.supabasesecurityspringbootstarter.exception.SupabaseExceptionHandlerNotDefinedException
 import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseAuthenticationProvider
 import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseSecurityConfig
 import de.tschuehly.supabasesecurityspringbootstarter.service.ISupabaseUserService
@@ -12,35 +13,21 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.standaloneSupabaseModule
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
-import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.*
-import org.springframework.web.bind.annotation.ControllerAdvice
 
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
-@ComponentScan(
-    "de.tschuehly.supabasesecurityspringbootstarter", excludeFilters = [
-        ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = [DefaultSupabaseExceptionHandler::class])]
-)
 @EnableConfigurationProperties(SupabaseProperties::class)
-@Import(SupabaseSecurityConfig::class)
+@Import(SupabaseSecurityConfig::class,DefaultExceptionHandlerConfig::class)
 @PropertySource("classpath:application-supabase.properties")
 class SupabaseAutoConfiguration(
-    val supabaseProperties: SupabaseProperties
+    val supabaseProperties: SupabaseProperties,
 ) {
     val logger: Logger =
         LoggerFactory.getLogger(SupabaseAutoConfiguration::class.java)
-
-    @Bean
-    @ConditionalOnMissingBean(SupabaseExceptionHandler::class)
-    fun default(): SupabaseExceptionHandler {
-        return DefaultSupabaseExceptionHandler()
-    }
-
     @Bean
     @ConditionalOnMissingBean
     fun supabaseService(
