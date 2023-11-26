@@ -1,17 +1,30 @@
-package de.tschuehly.supabasesecurityspringbootstarter.test
+package de.tschuehly.supabasesecurityspringbootstarter.test.mock
 
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
-import io.ktor.client.engine.mock.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.MockRequestHandleScope
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondOk
+import io.ktor.client.engine.mock.toByteArray
+import io.ktor.client.request.HttpRequestData
+import io.ktor.client.request.HttpResponseData
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
-class GoTrueMock {
+class GoTrueMock() {
 
     val engine = MockEngine {
         handleRequest(it) ?: respondInternalError("Invalid route")
@@ -27,8 +40,15 @@ class GoTrueMock {
             urlWithoutQuery.endsWith("verify") -> handleVerify(request)
             urlWithoutQuery.endsWith("otp") -> handleOtp(request)
             urlWithoutQuery.endsWith("recover") -> handleRecovery(request)
+            urlWithoutQuery.endsWith("logout") -> handleLogout(request)
             else -> null
         }
+    }
+
+    private suspend fun MockRequestHandleScope.handleLogout(request: HttpRequestData): HttpResponseData {
+        if(request.method != HttpMethod.Post) return respondBadRequest("Invalid method")
+        if(!request.headers.contains("Authorization")) return respondBadRequest("access token missing")
+        return respondOk()
     }
 
     private suspend fun MockRequestHandleScope.handleRecovery(request: HttpRequestData): HttpResponseData {
@@ -82,9 +102,9 @@ class GoTrueMock {
         val token = authorizationHeader.substringAfter("Bearer ")
         if(token != VALID_ACCESS_TOKEN) return respondUnauthorized()
         return when(request.method) {
-            HttpMethod.Get -> respond(UserInfo(aud="",id = "userid"))
+            HttpMethod.Get -> respond(UserInfo(aud = "", id = "userid"))
             HttpMethod.Put -> {
-                respond(UserInfo(aud="", id = "userid", email = "old_email@email.com", emailChangeSentAt = Clock.System.now()))
+                respond(UserInfo(aud = "", id = "userid", email = "old_email@email.com", emailChangeSentAt = Clock.System.now()))
             }
             else -> return respondBadRequest("Invalid method")
         }

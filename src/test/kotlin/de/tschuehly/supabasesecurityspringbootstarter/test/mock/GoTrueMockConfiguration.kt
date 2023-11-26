@@ -1,4 +1,4 @@
-package de.tschuehly.supabasesecurityspringbootstarter.test
+package de.tschuehly.supabasesecurityspringbootstarter.test.mock
 
 import com.russhwolf.settings.MapSettings
 import io.github.jan.supabase.createSupabaseClient
@@ -9,7 +9,6 @@ import io.github.jan.supabase.gotrue.gotrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 
 class GoTrueMockConfiguration {
     val mockEngine = GoTrueMock().engine

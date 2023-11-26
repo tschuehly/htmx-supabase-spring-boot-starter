@@ -1,8 +1,12 @@
 package de.tschuehly.supabasesecurityspringbootstarter.test
 
 import de.tschuehly.supabasesecurityspringbootstarter.application.TestApplication
-import org.assertj.core.api.BDDAssertions
+import de.tschuehly.supabasesecurityspringbootstarter.test.mock.GoTrueMock
+import de.tschuehly.supabasesecurityspringbootstarter.test.mock.GoTrueMockConfiguration
+import org.assertj.core.api.BDDAssertions.*
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -12,8 +16,10 @@ import org.springframework.http.*
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 import org.springframework.util.StringUtils
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.toEntity
+import org.springframework.web.util.DefaultUriBuilderFactory
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(
@@ -25,38 +31,42 @@ import org.springframework.util.StringUtils
     properties = ["SUPABASE_PROJECT_ID=", "SUPABASE_ANON_KEY=", "SUPABASE_DATABASE_PW=", "SUPABASE_JWT_SECRET="]
 )
 @Import(GoTrueMockConfiguration::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SupabaseGoTrueTest {
-    val restTemplate = TestRestTemplate()
+    lateinit var restClient: RestClient
     @LocalServerPort
     var port: Int? = null
+    @BeforeAll
+    fun setup() {
+        restClient = RestClient.create("http://localhost:$port")
+    }
+
     @Test
-    fun test(){
-        val loginResponse: ResponseEntity<String> = restTemplate.exchange(
-            "http://localhost:$port/api/user/login", HttpMethod.POST, getFormDataEntity(
-                formdata = arrayOf("email" to "email@example.com", "password" to GoTrueMock.VALID_PASSWORD), jwt = null
-            ), String::class.java
-        )
-        BDDAssertions.then(loginResponse.statusCode).isEqualTo(HttpStatus.OK)
-        BDDAssertions.then(loginResponse.headers["Set-Cookie"]!![0]).isNotNull
+    fun `login returns set-cookie`() {
+        val response = restClient.post()
+            .uri("/api/user/login")
+            .form("email" to "email@example.com", "password" to GoTrueMock.VALID_PASSWORD)
+            .retrieve().toEntity<String>()
+        then(response.statusCode).isEqualTo(HttpStatus.OK)
+        then(response.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Max-Age=6000; Expires=Sun, ").endsWith(" GMT; Path=/; HttpOnly")
     }
 
-    private fun getFormDataEntity(
-        vararg formdata: Pair<String, String>, jwt: String?
-    ): HttpEntity<MultiValueMap<String, String>> {
-        val headers = jwt?.let {
-            getHeaderForJwt(jwt)
-        } ?: HttpHeaders()
-        headers.contentType = MediaType.APPLICATION_FORM_URLENCODED
-        val map = LinkedMultiValueMap<String, String>()
-        formdata.forEach {
-            map.add(it.first, it.second)
+    private fun RestClient.RequestBodySpec.form(
+        vararg formdata: Pair<String, String>, jwt: String? = null
+    ): RestClient.RequestBodySpec {
+        return this.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .addJWTCookie(jwt)
+            .body(
+                LinkedMultiValueMap(formdata.groupBy({ it.first }, { it.second }))
+            )
+    }
+
+    private fun RestClient.RequestBodySpec.addJWTCookie(jwt: String?): RestClient.RequestBodySpec {
+        jwt?.let {
+            this.headers {
+                it.add("Cookie", "JWT=" + StringUtils.trimAllWhitespace(jwt))
+            }
         }
-        return HttpEntity(map, headers)
-    }
-
-    private fun getHeaderForJwt(jwt: String): HttpHeaders {
-        val headers = HttpHeaders()
-        headers.add("Cookie", "JWT=" + StringUtils.trimAllWhitespace(jwt))
-        return headers
+        return this
     }
 }
