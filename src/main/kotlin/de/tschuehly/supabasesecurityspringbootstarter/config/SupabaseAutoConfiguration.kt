@@ -22,7 +22,10 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
-@ComponentScan("de.tschuehly.supabasesecurityspringbootstarter")
+@ComponentScan(
+    "de.tschuehly.supabasesecurityspringbootstarter", excludeFilters = [
+        ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = [DefaultSupabaseExceptionHandler::class])]
+)
 @EnableConfigurationProperties(SupabaseProperties::class)
 @Import(SupabaseSecurityConfig::class)
 @PropertySource("classpath:application-supabase.properties")
@@ -33,13 +36,20 @@ class SupabaseAutoConfiguration(
         LoggerFactory.getLogger(SupabaseAutoConfiguration::class.java)
 
     @Bean
+    @ConditionalOnMissingBean(SupabaseExceptionHandler::class)
+    fun default(): SupabaseExceptionHandler {
+        return DefaultSupabaseExceptionHandler()
+    }
+
+    @Bean
     @ConditionalOnMissingBean
     fun supabaseService(
         goTrueClient: GoTrue,
         supabaseAuthenticationProvider: SupabaseAuthenticationProvider
     ): ISupabaseUserService {
         logger.debug("Registering the SupabaseUserService")
-        return SupabaseUserServiceGoTrueImpl(supabaseProperties, goTrueClient)    }
+        return SupabaseUserServiceGoTrueImpl(supabaseProperties, goTrueClient)
+    }
 
     @Bean
     @ConditionalOnMissingBean

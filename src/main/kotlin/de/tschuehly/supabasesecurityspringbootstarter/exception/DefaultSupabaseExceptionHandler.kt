@@ -2,12 +2,11 @@ package de.tschuehly.supabasesecurityspringbootstarter.exception
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Conditional
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ResponseBody
 
 @ControllerAdvice
-@Conditional(SupabaseExceptionHandlerExists::class)
 class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     private final val logger: Logger = LoggerFactory.getLogger(DefaultSupabaseExceptionHandler::class.java)
 
