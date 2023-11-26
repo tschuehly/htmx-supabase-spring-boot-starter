@@ -76,7 +76,7 @@ supabase:
       - "/unauthenticated"
       - "/unauthorized"
     post:
-      - "/api/user/register"
+      - "/api/user/signup"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
@@ -103,7 +103,7 @@ Google / confirm your email
 </script>
 ````
 
-### Register
+### SignUp
 
 ````html
 <form>
@@ -113,7 +113,7 @@ Google / confirm your email
     <label>Password:
         <input type="password" name="password"/>
     </label>
-    <button hx-post="/api/user/register">Submit</button>
+    <button hx-post="/api/user/signup">Submit</button>
 </form>
 ````
 

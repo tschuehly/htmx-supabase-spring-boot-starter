@@ -1,6 +1,7 @@
 package de.tschuehly.supabasesecurityspringbootstarter.config
 
 import de.tschuehly.supabasesecurityspringbootstarter.controller.SupabaseUserController
+import de.tschuehly.supabasesecurityspringbootstarter.exception.DefaultSupabaseExceptionHandler
 import de.tschuehly.supabasesecurityspringbootstarter.exception.SupabaseExceptionHandler
 import de.tschuehly.supabasesecurityspringbootstarter.exception.SupabaseExceptionHandlerNotDefinedException
 import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseAuthenticationProvider
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.*
+import org.springframework.web.bind.annotation.ControllerAdvice
 
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
@@ -25,22 +27,10 @@ import org.springframework.context.annotation.*
 @Import(SupabaseSecurityConfig::class)
 @PropertySource("classpath:application-supabase.properties")
 class SupabaseAutoConfiguration(
-    val supabaseProperties: SupabaseProperties,
-    val applicationContext: ApplicationContext
+    val supabaseProperties: SupabaseProperties
 ) {
     val logger: Logger =
         LoggerFactory.getLogger(SupabaseAutoConfiguration::class.java)
-
-    init {
-        try {
-            applicationContext.getBean(SupabaseExceptionHandler::class.java)
-        } catch (e: NoSuchBeanDefinitionException) {
-            val msg =
-                "You need to define a Bean of type SupabaseExceptionHandler to handle exceptions from the " + "supabase security spring boot starter and show messages to your user"
-            logger.error(msg)
-            throw SupabaseExceptionHandlerNotDefinedException(msg)
-        }
-    }
 
     @Bean
     @ConditionalOnMissingBean

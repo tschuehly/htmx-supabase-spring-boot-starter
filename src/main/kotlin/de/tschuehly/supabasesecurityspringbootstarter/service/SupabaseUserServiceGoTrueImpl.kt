@@ -19,12 +19,11 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 
-@Service
 class SupabaseUserServiceGoTrueImpl(
-    val supabaseProperties: SupabaseProperties,
-    val goTrueClient: GoTrue
+    private val supabaseProperties: SupabaseProperties,
+    private val goTrueClient: GoTrue
 ) : ISupabaseUserService {
-    val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
     override fun signUpWithEmail(email: String, password: String, response: HttpServletResponse) {
         runBlocking {
             try {
@@ -34,12 +33,19 @@ class SupabaseUserServiceGoTrueImpl(
                 }
                 if (emailConfirmationDisabled(user)) {
                     loginWithEmail(email, password, response)
-                    logger.debug("User with the mail $email successfully registered, and signed in")
+                    logger.debug("User with the mail $email successfully signed up, and logged in")
                 } else {
-                    logger.debug("User with the mail $email successfully registered, " +
-                            "Confirmation Mail sent at ${user?.confirmationSentAt}")
-                    throw SuccessfulSignUpConfirmationEmailSent("User with the mail $email successfully registered, " +
-                            "Confirmation Mail sent")
+                    val msg = "User with the mail $email successfully signed up, " +
+                            "Confirmation Mail sent at ${user?.confirmationSentAt}"
+                    logger.debug(msg)
+                    throw SuccessfulSignUpConfirmationEmailSent(msg)
+                }
+            }catch (e: BadRequestRestException){
+                val errorMessage = e.message
+                if (errorMessage?.contains("User already registered") == true) {
+                    val msg = "user with the $email has tried to sign up again, but he was already registered"
+                    logger.debug(msg)
+                    throw UserAlreadyRegisteredException(msg)
                 }
             } finally {
                 goTrueClient.sessionManager.deleteSession()

@@ -30,7 +30,7 @@ supabase:
       - "/requestPasswordReset"
       - "/api/user/logout"
     post:
-      - "/api/user/register"
+      - "/api/user/signup"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"

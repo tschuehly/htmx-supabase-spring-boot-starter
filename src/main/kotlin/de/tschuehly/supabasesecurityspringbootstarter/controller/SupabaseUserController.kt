@@ -18,13 +18,13 @@ class SupabaseUserController(
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
 
-    @PostMapping("/register")
-    fun register(
+    @PostMapping("/signup")
+    fun signUp(
         request: HttpServletRequest,
         response: HttpServletResponse
     ) {
         request.checkCredentialsAndExecute { email, password ->
-            logger.debug("User with the email $email is trying to register")
+            logger.debug("User with the email $email is trying to signup")
             supabaseUserService.signUpWithEmail(email, password, response)
         }
     }
@@ -36,21 +36,26 @@ class SupabaseUserController(
         request: HttpServletRequest
     ) {
         request.checkCredentialsAndExecute { email, password ->
-            logger.debug("User with the email $email is trying to register")
+            logger.debug("User with the email $email is trying to signup")
             supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
         }
     }
 
-    private fun HttpServletRequest.checkCredentialsAndExecute(function: (email: String, password: String) -> Unit) {
+    private fun HttpServletRequest.checkCredentialsAndExecute(
+        function: (email: String, password: String) -> Unit
+    ) {
         val email = this.parameterMap["email"]?.firstOrNull()
         val password = this.parameterMap["password"]?.firstOrNull()
         when {
             email.isNullOrBlank() && password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_AND_EMAIL_MISSING.throwExc()
+
             email.isNullOrBlank() ->
                 MissingCredentials.EMAIL_MISSING.throwExc()
+
             password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_MISSING.throwExc()
+
             else ->
                 function(email.trim(), password.trim())
         }

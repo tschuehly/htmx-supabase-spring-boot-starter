@@ -52,7 +52,7 @@ class SupabaseGoTrueTest {
     }
 
     @Test
-    fun `register works works`(){
+    fun `sign-up works`(){
 
         val response = restClient.post()
             .uri("/api/user/login")

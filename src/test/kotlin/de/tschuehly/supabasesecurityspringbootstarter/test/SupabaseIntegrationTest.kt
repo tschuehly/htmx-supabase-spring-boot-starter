@@ -36,17 +36,17 @@
 //    var port: Int? = null
 //
 //    @Test
-//    fun `User should be able to register with Email`() {
+//    fun `User should be able to signup with Email`() {
 //        wireMockServer.stubFor(
 //            post("/signup").willReturn(
 //                    WireMock.aResponse().withStatus(200).withBody(fixture("/fixtures/signup-response.json"))
 //                )
 //        )
-//        val registerEntity: ResponseEntity<String> = restTemplate.postForEntity(
-//            "http://localhost:$port/api/user/register",
+//        val signupEntity: ResponseEntity<String> = restTemplate.postForEntity(
+//            "http://localhost:$port/api/user/signup",
 //            HttpEntity(null, null), String::class.java
 //        )
-//        then(registerEntity.statusCode).isEqualTo(HttpStatus.OK)
+//        then(signupEntity.statusCode).isEqualTo(HttpStatus.OK)
 //    }
 //
 //    @Test

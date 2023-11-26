@@ -34,7 +34,7 @@
 
   <div id="login-response"></div>
   <h2>
-    Register
+    Sign Up
   </h2>
   <form>
     <label>Email:
@@ -43,9 +43,9 @@
     <label>Password:
       <input name="password" type="password"/>
     </label>
-    <button hx-post="/api/user/register" hx-target="#register-response">Submit</button>
+    <button hx-post="/api/user/signup" hx-target="#signup-response">Submit</button>
   </form>
-  <div id="register-response"></div>
+  <div id="signup-response"></div>
 
   <a href="https://ettvaltrmhclwfsfzxvh.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
 
