@@ -7,6 +7,7 @@ import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRe
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.InvalidLoginCredentialsException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.NewPasswordShouldBeDifferentFromOldPasswordException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserAlreadyRegisteredException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserNeedsToConfirmEmailBeforeLoginException
 import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseJwtFilter.Companion.setJWTCookie
@@ -184,6 +185,13 @@ class SupabaseUserServiceGoTrueImpl(
                     logger.debug(msg)
                     throw SuccessfulPasswordUpdate(msg)
                 }
+            }catch (e: BadRequestRestException){
+                if (e.message?.contains("New password should be different from the old password") == true) {
+                    val msg = "User tried to set a new password that was the same as the old one"
+                    logger.debug(msg)
+                    throw NewPasswordShouldBeDifferentFromOldPasswordException(msg)
+                }
+                throw e
             } finally {
                 goTrueClient.sessionManager.deleteSession()
             }

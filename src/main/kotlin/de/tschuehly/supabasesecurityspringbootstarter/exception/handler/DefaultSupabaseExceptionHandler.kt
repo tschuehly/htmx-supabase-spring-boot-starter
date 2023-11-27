@@ -1,11 +1,11 @@
 package de.tschuehly.supabasesecurityspringbootstarter.exception.handler
 
-import de.tschuehly.supabasesecurityspringbootstarter.exception.info.InvalidLoginCredentialsException
-import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException
-import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserNeedsToConfirmEmailBeforeLoginException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.OtpEmailSent
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.*
+import io.github.jan.supabase.exceptions.RestException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -51,11 +51,27 @@ class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
         logger.debug(exception.message)
         return "PasswordRecoveryEmailSent"
     }
-
     @ResponseBody
     override fun handleSuccessfulPasswordUpdate(exception: SuccessfulPasswordUpdate): Any {
         logger.debug(exception.message)
         return "SuccessfulPasswordUpdate"
     }
+
+    @ResponseBody
+    override fun handleOtpEmailSent(exception: OtpEmailSent): Any {
+        logger.debug(exception.message)
+        return "OtpEmailSent"
+    }
+    @ResponseBody
+    override fun handleUserAlreadyRegisteredException(exception: UserAlreadyRegisteredException): Any {
+        logger.debug(exception.message)
+        return "UserAlreadyRegisteredException"
+    }
+    @ResponseBody
+    override fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any {
+        logger.debug(exception.message)
+        return "NewPasswordShouldBeDifferentFromOldPasswordException"
+    }
+
 
 }
