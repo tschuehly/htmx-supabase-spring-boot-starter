@@ -1,5 +1,5 @@
 package de.tschuehly.supabasesecurityspringbootstarter.exception.email
 
-class SuccessfulPasswordUpdate(message: String) : Exception(message) {
+class SuccessfulPasswordUpdate(email: String?) : Exception("User with the mail: $email updated his password successfully") {
 
 }

@@ -1,5 +1,3 @@
 package de.tschuehly.supabasesecurityspringbootstarter.exception.email
 
-class OtpEmailSent(message: String) : Exception(message) {
-
-}
+class OtpEmailSent(email: String) : Exception("OTP sent to $email")

@@ -96,6 +96,12 @@
       "type": "java.lang.String",
       "description": "The Page the User will get redirected to when a logged in User doesn't have the right to access a resource",
       "sourceType": "de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.otpCreateUser",
+      "type": "java.lang.Boolean",
+      "description": "When a new user requests a OTP should a user be created? If set to false this will create a ",
+      "sourceType": "de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties"
     }
   ],
   "hints": []

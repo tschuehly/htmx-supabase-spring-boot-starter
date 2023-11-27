@@ -1,5 +1,5 @@
 package de.tschuehly.supabasesecurityspringbootstarter.exception.info
 
-class InvalidLoginCredentialsException(message: String, cause: Throwable) : Exception(message, cause) {
+class InvalidLoginCredentialsException(email: String) : Exception("User: $email has tried to login with invalid credentials") {
 
 }

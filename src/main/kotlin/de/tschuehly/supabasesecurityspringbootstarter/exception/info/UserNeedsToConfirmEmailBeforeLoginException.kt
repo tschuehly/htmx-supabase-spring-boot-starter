@@ -1,5 +1,3 @@
 package de.tschuehly.supabasesecurityspringbootstarter.exception.info
 
-class UserNeedsToConfirmEmailBeforeLoginException(message: String) : Exception(message) {
-
-}
+class UserNeedsToConfirmEmailBeforeLoginException(email: String) : Exception("User: $email needs to confirm email before he can login")

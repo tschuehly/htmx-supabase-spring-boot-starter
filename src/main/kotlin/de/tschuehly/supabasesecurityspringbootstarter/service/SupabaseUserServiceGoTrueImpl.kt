@@ -4,20 +4,20 @@ import de.tschuehly.supabasesecurityspringbootstarter.config.SupabaseProperties
 import de.tschuehly.supabasesecurityspringbootstarter.exception.*
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.OtpEmailSent
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
-import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.InvalidLoginCredentialsException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.NewPasswordShouldBeDifferentFromOldPasswordException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserAlreadyRegisteredException
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.UserNeedsToConfirmEmailBeforeLoginException
 import de.tschuehly.supabasesecurityspringbootstarter.security.SupabaseJwtFilter.Companion.setJWTCookie
 import de.tschuehly.supabasesecurityspringbootstarter.types.SupabaseUser
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
@@ -31,89 +31,57 @@ class SupabaseUserServiceGoTrueImpl(
     private val goTrueClient: GoTrue
 ) : ISupabaseUserService {
     private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
+
+
     override fun signUpWithEmail(email: String, password: String, response: HttpServletResponse) {
-        runBlocking {
-            try {
-                val user = goTrueClient.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
-                if (emailConfirmationDisabled(user)) {
-                    loginWithEmail(email, password, response)
-                    logger.debug("User with the mail $email successfully signed up, and logged in")
-                } else {
-                    val msg = "User with the mail $email successfully signed up, " +
-                            "Confirmation Mail sent at ${user?.confirmationSentAt}"
-                    logger.debug(msg)
-                    throw RegistrationConfirmationEmailSent(msg)
-                }
-            }catch (e: BadRequestRestException){
-                val errorMessage = e.message
-                if (errorMessage?.contains("User already registered") == true) {
-                    val msg = "user with the $email has tried to sign up again, but he was already registered"
-                    logger.debug(msg)
-                    throw UserAlreadyRegisteredException(msg)
-                }
-            } finally {
-                goTrueClient.sessionManager.deleteSession()
+        runGoTrue(email) {
+            val user = goTrueClient.signUpWith(Email) {
+                this.email = email
+                this.password = password
             }
+            if (emailConfirmationEnabled(user)) {
+                throw RegistrationConfirmationEmailSent(email, user?.confirmationSentAt)
+            }
+            loginWithEmail(email, password, response)
+            logger.debug("User with the mail $email successfully signed up")
         }
     }
+
+
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
-        runBlocking {
-            try {
-                goTrueClient.loginWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
-                val token = goTrueClient.currentSessionOrNull()?.accessToken
-                    ?: throw JWTTokenNullException("The JWT that $email requested is null")
-                response.setJWTCookie(token, supabaseProperties)
-                response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
-
-                logger.debug("User: $email successfully logged in")
-            } catch (e: BadRequestRestException) {
-                val errorMessage = e.message
-                if (errorMessage?.contains("Invalid login credentials") == true) {
-                    val msg = "$email has tried to login with invalid credentials"
-                    logger.debug(msg)
-                    throw InvalidLoginCredentialsException(msg, e)
-                } else if (errorMessage?.contains("Email not confirmed") == true) {
-                    val msg = "$email needs to confirm email before he can login"
-                    logger.debug(msg)
-                    throw UserNeedsToConfirmEmailBeforeLoginException(msg)
-                }
-            } finally {
-                goTrueClient.sessionManager.deleteSession()
+        runGoTrue(email) {
+            goTrueClient.loginWith(Email) {
+                this.email = email
+                this.password = password
             }
+            val token = goTrueClient.currentSessionOrNull()?.accessToken
+                ?: throw JWTTokenNullException("The JWT that $email requested from supabase is null")
+            response.setJWTCookie(token, supabaseProperties)
+            response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
+            logger.debug("User: $email successfully logged in")
         }
     }
 
-    override fun sendOtp(email: String){
-        runBlocking {
-            goTrueClient.sendOtpTo(Email){
+    override fun sendOtp(email: String) {
+        runGoTrue(email) {
+            goTrueClient.sendOtpTo(Email, createUser = supabaseProperties.otpCreateUser) {
                 this.email = email
             }
-            val msg = "OTP sent to $email"
-            logger.debug(msg)
-            throw OtpEmailSent(msg)
+            throw OtpEmailSent(email)
         }
     }
 
     override fun authorizeWithJwtOrResetPassword(
         request: HttpServletRequest, response: HttpServletResponse
-    ): HttpServletResponse {
-        val header: String? = request.getHeader("HX-Current-URL")
-        if (header != null) {
-            val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
-            if (header.contains("type=recovery")) {
-                logger.debug("User: ${user.email} is trying to reset his password")
-                response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
-            } else {
-                response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
-            }
+    ) {
+        val header = request.getHeader("HX-Current-URL") ?: throw HxCurrentUrlHeaderNotFound()
+        val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
+        if (header.contains("type=recovery")) {
+            logger.debug("User: ${user.email} is trying to reset his password")
+            response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
+        } else {
+            response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
         }
-        return response
     }
 
     override fun logout(request: HttpServletRequest, response: HttpServletResponse) {
@@ -134,71 +102,71 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
-    override fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?) {
+    private fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?) {
         val roleArray = roles ?: listOf()
-
-        runBlocking {
-            try {
-                goTrueClient.importAuthToken(serviceRoleJWT)
-                goTrueClient.admin.updateUserById(uid = userId) {
-                    appMetadata = buildJsonObject {
-                        putJsonArray("roles") {
-                            roleArray.map { add(it) }
-                        }
+        runGoTrue(userId = userId) {
+            goTrueClient.importAuthToken(serviceRoleJWT)
+            goTrueClient.admin.updateUserById(uid = userId) {
+                appMetadata = buildJsonObject {
+                    putJsonArray("roles") {
+                        roleArray.map { add(it) }
                     }
                 }
-                logger.debug("The roles of the user with id {} were updated to {}", userId, roleArray)
-            } catch (e: UnauthorizedRestException) {
-                val errorMessage = e.message
-                if (errorMessage?.contains("User not allowed") == true) {
-                    val msg = "User with id: $userId has tried to setRoles without having service_role"
-                    logger.debug(msg)
-                    throw MissingServiceRoleForAdminAccessException(
-                        msg, e
-                    )
-                }
-            } finally {
-                goTrueClient.sessionManager.deleteSession()
             }
+            logger.debug("The roles of the user with id {} were updated to {}", userId, roleArray)
         }
     }
 
 
     override fun sendPasswordRecoveryEmail(email: String) {
-        runBlocking {
+        runGoTrue(email) {
             goTrueClient.sendRecoveryEmail(email)
             throw PasswordRecoveryEmailSent("User with $email has requested a password recovery email")
         }
     }
 
     override fun updatePassword(request: HttpServletRequest, password: String) {
+        val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
+        val email = user.email ?: "no-email"
+        runGoTrue(email) {
+            val jwt = request.cookies?.find { it.name == "JWT" }?.value ?: throw JWTTokenNullException("No JWT found in request")
+            goTrueClient.importAuthToken(jwt)
+            goTrueClient.modifyUser(true) {
+                this.password = password
+            }
+            throw SuccessfulPasswordUpdate(user.email)
+        }
+    }
 
+    private fun runGoTrue(
+        email: String = "no-email",
+        userId: String = "no-userid",
+        block: suspend CoroutineScope.() -> Unit
+    ) {
         runBlocking {
             try {
-                request.cookies?.find { it.name == "JWT" }?.let { cookie ->
-                    goTrueClient.importAuthToken(cookie.value)
-                    goTrueClient.modifyUser(true) {
-                        this.password = password
-                    }
-                    val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
-                    val msg = "User with the mail: ${user.email} updated his password successfully"
-                    logger.debug(msg)
-                    throw SuccessfulPasswordUpdate(msg)
-                }
-            }catch (e: BadRequestRestException){
-                if (e.message?.contains("New password should be different from the old password") == true) {
-                    val msg = "User tried to set a new password that was the same as the old one"
-                    logger.debug(msg)
-                    throw NewPasswordShouldBeDifferentFromOldPasswordException(msg)
-                }
-                throw e
+                block()
+            } catch (e: RestException) {
+                handleGoTrueException(e, email, userId)
             } finally {
                 goTrueClient.sessionManager.deleteSession()
             }
         }
     }
 
-    private fun emailConfirmationDisabled(user: Email.Result?): Boolean {
-        return user == null
+    private fun handleGoTrueException(e: RestException, email: String, userId: String) {
+        val message = e.message ?: throw UnknownSupabaseException()
+        when {
+            message.contains("User already registered", true) -> throw UserAlreadyRegisteredException(email)
+            message.contains("Invalid login credentials", true) -> throw InvalidLoginCredentialsException(email)
+            message.contains("Email not confirmed", true) -> throw UserNeedsToConfirmEmailBeforeLoginException(email)
+            message.contains("Signups not allowed for otp", true) -> throw OtpSignupNotAllowedExceptions(message)
+            message.contains("User not allowed", true) -> throw MissingServiceRoleForAdminAccessException(userId)
+            message.contains("New password should be different from the old password",true) -> throw NewPasswordShouldBeDifferentFromOldPasswordException(email)
+        }
+        throw UnknownSupabaseException()
+    }
+    private fun emailConfirmationEnabled(user: Email.Result?): Boolean {
+        return user != null
     }
 }

@@ -2,13 +2,10 @@ package de.tschuehly.supabasesecurityspringbootstarter.exception.handler
 
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.OtpEmailSent
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
-import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.*
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.RestException
 import org.springframework.web.bind.annotation.ExceptionHandler
-import java.lang.Exception
 
 interface SupabaseExceptionHandler {
     @ExceptionHandler(MissingCredentialsException::class)
@@ -37,5 +34,6 @@ interface SupabaseExceptionHandler {
 
     @ExceptionHandler(NewPasswordShouldBeDifferentFromOldPasswordException::class)
     fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any
+    // TODO: handle general supabase exceptions
 
 }

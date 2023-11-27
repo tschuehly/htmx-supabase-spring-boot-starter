@@ -10,11 +10,10 @@ interface ISupabaseUserService {
     fun authorizeWithJwtOrResetPassword(
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): HttpServletResponse
+    )
 
     fun logout(request: HttpServletRequest, response: HttpServletResponse)
     fun setRolesWithRequest(request: HttpServletRequest, userId: String, roles: List<String>?)
-    fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?)
     fun sendPasswordRecoveryEmail(email: String)
     fun updatePassword(request: HttpServletRequest, password: String)
     fun sendOtp(email: String)

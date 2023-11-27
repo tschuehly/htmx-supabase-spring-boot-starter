@@ -1,13 +1,12 @@
 package de.tschuehly.supabasesecurityspringbootstarter.application
 
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.OtpEmailSent
-import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException.Companion.MissingCredentials
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.PasswordRecoveryEmailSent
-import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.email.RegistrationConfirmationEmailSent
+import de.tschuehly.supabasesecurityspringbootstarter.exception.email.SuccessfulPasswordUpdate
 import de.tschuehly.supabasesecurityspringbootstarter.exception.handler.SupabaseExceptionHandler
 import de.tschuehly.supabasesecurityspringbootstarter.exception.info.*
-import io.github.jan.supabase.exceptions.RestException
+import de.tschuehly.supabasesecurityspringbootstarter.exception.info.MissingCredentialsException.Companion.MissingCredentials
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ResponseBody
 
@@ -49,14 +48,17 @@ class CustomExceptionHandlerTest: SupabaseExceptionHandler {
         return "SuccessfulPasswordUpdate"
     }
 
+    @ResponseBody
     override fun handleOtpEmailSent(exception: OtpEmailSent): Any {
         return "OtpEmailSent"
     }
 
+    @ResponseBody
     override fun handleUserAlreadyRegisteredException(exception: UserAlreadyRegisteredException): Any {
         return "UserAlreadyRegisteredException"
     }
 
+    @ResponseBody
     override fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any {
         return "NewPasswordShouldBeDifferentFromOldPasswordException"
     }
