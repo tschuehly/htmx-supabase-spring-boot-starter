@@ -1,17 +1,16 @@
-# Supabase Security Spring Boot Starter
+# supabase authentication for springboot and htmx
 
-This Spring Starter is aimed at Developers that want to simplify Spring Security and
-integrate [Supabase](https://supabase.com/) into their Project.
+Easy integration of [supabase auth](https://supabase.com/auth) in your spring boot + htmx project!
 
 Supabase gives us access to two important things for free:
 
 - Hosted Postgres Server with 500 MB Database Storage
 - Integrated GoTrue API for Authentication/Authorization of up to 50.000 Monthly Active Users
 
-## Features of supabase-security-spring-boot-starter
+## Features of htmx-spring-supabase-auth
 
+- supabase auth integration
 - Spring Security Configuration with application.yaml/properties
-- Integration with htmx
 - Role-Based Access Control
 - Basic Authentication
 
@@ -23,11 +22,11 @@ Create a new Supabase project. Save your database password for later.
 Go to [start.spring.io](https://start.spring.io/) and create a new Spring Boot project.
 
 Include the dependency in your build.gradle.kts. You can look up the newest version
-on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/supabase-security-spring-boot-starter)
+on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/htmx-spring-supabase-auth)
 
 ````kotlin
 dependencies {
-    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.3.0")
+    implementation("de.tschuehly:htmx-spring-supabase-auth:0.3.0")
 }
 ````
 
@@ -60,34 +59,27 @@ for you.
 ## Configuring Public Authorization
 
 You can configure public accessible paths in your application.yaml with the property `supabase.public`. You can
-configure access for get,post,put,delete
+configure access for get,post,put,delete. This is the minimal configuration for getting started:
 
 ```yaml
-supabase:
   public:
     get:
-      - "/"
-      - "/logout"
-      - "/login"
-      - "/403"
-      - "/favicon.ico"
-      - "/error"
-      - "/resetPassword"
       - "/unauthenticated"
       - "/unauthorized"
+      - "/api/user/logout"
     post:
       - "/api/user/signup"
+      - "/api/user/sendEmailOtp"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
 ```
 
-## Basic Usage with HTMX
+## Usage with HTMX
 
 This Library is heavily optimized for [HTMX](https://htmx.org/), an awesome Library to
 build [modern user interfaces](https://htmx.org/examples) with the simplicity and power of hypertext. htmx gives you
-access
-to [AJAX](https://htmx.org/docs#ajax), [CSS Transitions](https://htmx.org/docs#css_transitions), [WebSockets](https://htmx.org/docs#websockets)
+access to [AJAX](https://htmx.org/docs#ajax), [CSS Transitions](https://htmx.org/docs#css_transitions), [WebSockets](https://htmx.org/docs#websockets)
 and [Server Sent Events](https://htmx.org/docs#sse) directly in HTML,
 using [attributes](https://htmx.org/reference#attributes)
 
@@ -149,9 +141,7 @@ If you configured Google you can just insert a link to log in with Google
 ### Logout
 
 ````html
-<h2>
-    <button hx-get="/api/user/logout">Logout</button>
-</h2>
+<button hx-get="/api/user/logout">Logout</button>
 ````
 
 ## Role-based access control
@@ -189,7 +179,7 @@ curl -X PUT --location "http://localhost:8080/api/user/setRoles" \
 
 ### Superuser account
 
-You can also elevate a normal user account that will act as a "superuser" account.
+You can also elevate a normal user account that will act as a "superuser" account. This user will also ignore Row Level Security!
 
 To do this you need to set the role of the user to "service_role" in the auth.users table;
 

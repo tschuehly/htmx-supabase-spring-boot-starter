@@ -91,15 +91,15 @@ publishing {
         create<MavenPublication>("Maven") {
             from(components["java"])
             groupId = "de.tschuehly"
-            artifactId = "supabase-security-spring-boot-starter"
-            description = "Create Spring Boot Applications with Supabase Security"
+            artifactId = "htmx-spring-supabase-auth"
+            description = "Spring Security with htmx and supabase with ease"
         }
         withType<MavenPublication> {
             pom {
                 packaging = "jar"
-                name.set("supabase-security-spring-boot-starter")
-                description.set("Supabase Security Spring Boot Starter")
-                url.set("https://github.com/tschuehly/supabase-security-spring-boot-starter/")
+                name.set("htmx-spring-supabase-auth")
+                description.set("Spring Security with htmx and supabase with ease")
+                url.set("https://github.com/tschuehly/htmx-spring-supabase-auth/")
                 inceptionYear.set("2023")
                 licenses {
                     license {
@@ -115,9 +115,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:git@github.com:tschuehly/supabase-security-spring-boot-starter.git")
-                    developerConnection.set("scm:git:ssh:git@github.com:tschuehly/supabase-security-spring-boot-starter.git")
-                    url.set("https://github.com/tschuehly/supabase-security-spring-boot-starter")
+                    connection.set("scm:git:git@github.com:tschuehly/htmx-spring-supabase-auth.git")
+                    developerConnection.set("scm:git:ssh:git@github.com:tschuehly/htmx-spring-supabase-auth.git")
+                    url.set("https://github.com/tschuehly/htmx-spring-supabase-auth")
                 }
             }
         }
