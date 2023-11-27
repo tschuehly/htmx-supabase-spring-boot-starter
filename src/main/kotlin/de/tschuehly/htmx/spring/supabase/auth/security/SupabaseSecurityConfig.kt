@@ -111,8 +111,8 @@ class SupabaseSecurityConfig(
     }
 
     @Bean
-    fun supabaseAuthenticationProvider(): SupabaseAuthenticationProvider {
-        return SupabaseAuthenticationProvider()
+    fun supabaseAuthenticationProvider(jwtVerifier: JWTVerifier): SupabaseAuthenticationProvider {
+        return SupabaseAuthenticationProvider(jwtVerifier)
     }
 
     @Bean
@@ -121,7 +121,7 @@ class SupabaseSecurityConfig(
         supabaseProperties: SupabaseProperties,
         jwtVerifier: JWTVerifier
     ): SupabaseJwtFilter {
-        return SupabaseJwtFilter(authenticationManager, supabaseProperties, jwtVerifier)
+        return SupabaseJwtFilter(authenticationManager, supabaseProperties)
     }
 
     @Bean
@@ -139,7 +139,6 @@ class SupabaseSecurityConfig(
                 .withUser(supabaseProperties.basicAuth.username)
                 .password(supabaseProperties.basicAuth.password)
                 .roles(*supabaseProperties.basicAuth.roles.toTypedArray())
-
         }
         return authenticationManagerBuilder.build()
     }

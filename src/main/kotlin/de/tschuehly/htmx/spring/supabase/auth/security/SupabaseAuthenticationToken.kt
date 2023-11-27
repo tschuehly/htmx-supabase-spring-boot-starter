@@ -1,36 +1,23 @@
 package de.tschuehly.htmx.spring.supabase.auth.security
 
-import com.auth0.jwt.interfaces.Claim
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import org.springframework.security.authentication.AbstractAuthenticationToken
-import org.springframework.security.core.authority.AuthorityUtils
 import org.springframework.util.Assert
 
-class SupabaseAuthenticationToken : AbstractAuthenticationToken {
-    val claims: Map<String, Claim>?
-    private val principal: SupabaseUser?
+class SupabaseAuthenticationToken(
+    private val supabaseUser: SupabaseUser
+) : AbstractAuthenticationToken(supabaseUser.getAuthorities()) {
 
-    constructor(claims: Map<String, Claim>) : super(null) {
-        this.claims = claims
-        this.principal = null
-        isAuthenticated = false
-    }
-
-    constructor(supabaseUser: SupabaseUser) :
-            super(AuthorityUtils.createAuthorityList(*supabaseUser.roles.map { "ROLE_${it.uppercase()}" }
-                .toTypedArray())) {
-        this.claims = null
-        this.principal = supabaseUser
+    init {
         super.setAuthenticated(true)
     }
 
     companion object {
-        fun unauthenticated(claims: Map<String, Claim>) = SupabaseAuthenticationToken(claims)
         fun authenticated(supabaseUser: SupabaseUser) = SupabaseAuthenticationToken(supabaseUser)
     }
 
     override fun getCredentials() = null
-    override fun getPrincipal() = principal
+    override fun getPrincipal() = supabaseUser
 
     override fun setAuthenticated(authenticated: Boolean) {
         Assert.isTrue(

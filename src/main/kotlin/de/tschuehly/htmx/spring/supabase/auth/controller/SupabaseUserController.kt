@@ -26,7 +26,7 @@ class SupabaseUserController(
         request: HttpServletRequest
     ) {
         request.checkCredentialsAndExecute { email, password ->
-            logger.debug("User with the email $email is trying to signup")
+            logger.debug("User with the email $email is trying to login")
             supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
         }
     }
@@ -47,7 +47,7 @@ class SupabaseUserController(
         @RequestParam email: String?
     ) {
         if (email != null) {
-            logger.debug("User with the email $email is trying to signup")
+            logger.debug("User with the email $email is requesting an OTP")
             supabaseUserService.sendOtp(email)
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
