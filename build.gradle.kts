@@ -48,7 +48,7 @@ dependencies {
 
     runtimeOnly("io.ktor:ktor-client-apache:2.3.6")
     runtimeOnly("org.postgresql:postgresql")
-
+    testImplementation("org.htmlunit:htmlunit:3.6.0")
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")

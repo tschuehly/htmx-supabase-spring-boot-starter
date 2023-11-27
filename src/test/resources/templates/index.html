@@ -22,14 +22,14 @@
   <h2>
     Login
   </h2>
-  <form hx-post="/api/user/login" hx-target="#login-response">
+  <form name="login-form" hx-post="/api/user/login" hx-target="#login-response">
     <label>Email:
-      <input name="email" type="text"/>
+      <input id="login-email" name="email" type="text"/>
     </label>
     <label>Password:
-      <input name="password" type="password"/>
+      <input id="login-password"  name="password" type="password"/>
     </label>
-    <button type="submit">Submit</button>
+    <button name="submit" type="submit">Submit</button>
   </form>
 
   <div id="login-response"></div>

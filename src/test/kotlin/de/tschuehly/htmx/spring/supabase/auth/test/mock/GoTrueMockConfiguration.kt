@@ -9,17 +9,17 @@ import io.github.jan.supabase.gotrue.gotrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 
+@Configuration
 class GoTrueMockConfiguration {
     val mockEngine = GoTrueMock().engine
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val dispatcher = StandardTestDispatcher()
 
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Bean
-    public fun createSupabaseClient(): GoTrue {
+    fun createSupabaseClient(): GoTrue {
         return createSupabaseClient(
             supabaseUrl = "https://example.com",
             supabaseKey = "example",

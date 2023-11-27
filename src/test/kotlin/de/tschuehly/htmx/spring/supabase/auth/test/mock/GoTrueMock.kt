@@ -11,7 +11,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 
-class GoTrueMock() {
+class GoTrueMock {
 
     val engine = MockEngine {
         handleRequest(it) ?: respondInternalError("Invalid route")
