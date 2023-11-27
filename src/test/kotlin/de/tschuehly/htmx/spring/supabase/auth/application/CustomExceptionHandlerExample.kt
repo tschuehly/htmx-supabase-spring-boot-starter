@@ -1,5 +1,6 @@
 package de.tschuehly.htmx.spring.supabase.auth.application
 
+import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ResponseBody
 
 @ControllerAdvice
-class CustomExceptionHandlerTest : SupabaseExceptionHandler {
+class CustomExceptionHandlerExample : SupabaseExceptionHandler {
     @ResponseBody
     override fun handleMissingCredentialsException(exception: MissingCredentialsException): Any {
         return when (exception.message) {
@@ -62,5 +63,11 @@ class CustomExceptionHandlerTest : SupabaseExceptionHandler {
     override fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any {
         return "NewPasswordShouldBeDifferentFromOldPasswordException"
     }
+
+    @ResponseBody
+    override fun handleUnknownSupabaseException(exception: UnknownSupabaseException): Any {
+        return "UnknownSupabaseException"
+    }
+
 
 }

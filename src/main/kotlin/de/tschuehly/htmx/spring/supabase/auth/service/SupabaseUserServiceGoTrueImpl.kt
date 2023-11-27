@@ -156,7 +156,10 @@ class SupabaseUserServiceGoTrueImpl(
     }
 
     private fun handleGoTrueException(e: RestException, email: String, userId: String) {
-        val message = e.message ?: throw UnknownSupabaseException()
+        val message = e.message ?: let {
+            logger.error(e.message)
+            throw UnknownSupabaseException()
+        }
         when {
             message.contains("User already registered", true) -> throw UserAlreadyRegisteredException(email)
             message.contains("Invalid login credentials", true) -> throw InvalidLoginCredentialsException(email)
@@ -167,6 +170,7 @@ class SupabaseUserServiceGoTrueImpl(
                 throw NewPasswordShouldBeDifferentFromOldPasswordException(email)
             }
         }
+        logger.error(e.message)
         throw UnknownSupabaseException()
     }
 

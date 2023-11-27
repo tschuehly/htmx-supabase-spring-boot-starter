@@ -1,5 +1,6 @@
 package de.tschuehly.htmx.spring.supabase.auth.exception.handler
 
+import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
@@ -34,6 +35,8 @@ interface SupabaseExceptionHandler {
 
     @ExceptionHandler(NewPasswordShouldBeDifferentFromOldPasswordException::class)
     fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any
-    // TODO: handle general supabase exceptions
+
+    @ExceptionHandler(UnknownSupabaseException::class)
+    fun handleUnknownSupabaseException(exception: UnknownSupabaseException): Any
 
 }

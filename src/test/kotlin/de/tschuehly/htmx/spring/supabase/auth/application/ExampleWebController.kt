@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView
 
 
 @Controller
-class WebController {
+class ExampleWebController {
     @GetMapping("/")
     fun index() = "index"
 

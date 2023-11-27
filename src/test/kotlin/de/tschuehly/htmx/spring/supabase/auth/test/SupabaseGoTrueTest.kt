@@ -63,7 +63,7 @@ class SupabaseGoTrueTest {
             .retrieve().toBodilessEntity()
             .let {
                 then(it.statusCode).isEqualTo(HttpStatus.OK)
-                then(it.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Max-Age=6000; Expires=Sun, ")
+                then(it.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Max-Age=6000; Expires=")
                     .endsWith(" GMT; Path=/; HttpOnly")
             }
     }

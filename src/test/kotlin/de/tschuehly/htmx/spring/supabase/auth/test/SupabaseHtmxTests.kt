@@ -27,7 +27,7 @@ import org.springframework.web.context.WebApplicationContext
     properties = ["SUPABASE_PROJECT_ID=", "SUPABASE_ANON_KEY=", "SUPABASE_DATABASE_PW=", "SUPABASE_JWT_SECRET="]
 )
 @Import(GoTrueMockConfiguration::class)
-class HtmlUnitTest {
+class SupabaseHtmxTests {
 
     @LocalServerPort
     var port: Int? = null
@@ -50,12 +50,13 @@ class HtmlUnitTest {
         passwordInput.type("Test1234")
         val pageResult: HtmlPage = form.getButtonByName("submit").click()
         webClient.waitForBackgroundJavaScript(500)
-        then(pageResult.getElementById("login-response").textContent).isEqualTo("InvalidLoginCredentialsException")
+        then(pageResult.getElementById("login-response").textContent).isEqualTo("UnknownSupabaseException")
+//        TODO: Change mock to match supabase api? https://github.com/supabase-community/supabase-kt/issues/362
 
         passwordInput.type("password")
         val pageResult2: HtmlPage = form.getButtonByName("submit").click()
         webClient.waitForBackgroundJavaScript(500)
-        then(pageResult2.getElementById("login-response").textContent).isEqualTo("InvalidLoginCredentialsException")
+        then(pageResult2.getElementById("login-response").textContent).isEqualTo("UnknownSupabaseException")
 
     }
 

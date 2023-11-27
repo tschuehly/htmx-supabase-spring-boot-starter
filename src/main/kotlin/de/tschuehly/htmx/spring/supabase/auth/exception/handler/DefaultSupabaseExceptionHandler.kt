@@ -1,5 +1,6 @@
 package de.tschuehly.htmx.spring.supabase.auth.exception.handler
 
+import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ResponseBody
 
 @ControllerAdvice
-class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
+open class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     private final val logger: Logger = LoggerFactory.getLogger(DefaultSupabaseExceptionHandler::class.java)
 
     init {
@@ -73,6 +74,11 @@ class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     override fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any {
         logger.debug(exception.message)
         return "NewPasswordShouldBeDifferentFromOldPasswordException"
+    }
+    @ResponseBody
+    override fun handleUnknownSupabaseException(exception: UnknownSupabaseException): Any {
+        logger.debug(exception.message)
+        return "UnknownSupabaseException"
     }
 
 
