@@ -119,9 +119,10 @@ class SupabaseSecurityConfig(
     fun supabaseJwtFilter(
         authenticationManager: AuthenticationManager,
         supabaseProperties: SupabaseProperties,
-        jwtVerifier: JWTVerifier
+        jwtVerifier: JWTVerifier,
+        authenticationEntryPoint: AuthenticationEntryPoint
     ): SupabaseJwtFilter {
-        return SupabaseJwtFilter(authenticationManager, supabaseProperties)
+        return SupabaseJwtFilter(authenticationManager, supabaseProperties, authenticationEntryPoint)
     }
 
     @Bean

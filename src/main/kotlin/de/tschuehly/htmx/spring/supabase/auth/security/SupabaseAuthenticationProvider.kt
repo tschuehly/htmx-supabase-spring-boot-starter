@@ -5,7 +5,6 @@ import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.context.SecurityContextHolder
 
 class SupabaseAuthenticationProvider(
     private val jwtVerifier: JWTVerifier
@@ -16,11 +15,7 @@ class SupabaseAuthenticationProvider(
             throw UnknownSupabaseException("Something went wrong when trying to authenticate with the jwt")
         }
         val claims = jwtVerifier.verify(token.jwtString).claims
-        val auth = SupabaseAuthenticationToken.authenticated(SupabaseUser(claims))
-        val context = SecurityContextHolder.createEmptyContext()
-        context.authentication = auth
-        SecurityContextHolder.setContext(context)
-        return auth
+        return SupabaseAuthenticationToken.authenticated(SupabaseUser(claims))
     }
 
     override fun supports(authentication: Class<*>): Boolean {
