@@ -92,7 +92,7 @@ class SupabaseUserServiceGoTrueImpl(
                 cookieString += "Secure;"
             }
             response.setHeader("Set-Cookie", cookieString)
-            response.setHeader("HX-Redirect", "/") // TODO: Introduce Redirect Header or HTMX / JSON Switch
+            response.setHeader("HX-Redirect", "/")
         }
     }
 

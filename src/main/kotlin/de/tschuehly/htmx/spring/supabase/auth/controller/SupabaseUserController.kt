@@ -21,24 +21,25 @@ class SupabaseUserController(
 
     @PostMapping("/login")
     fun login(
-        @RequestParam credentials: Map<String, String>,
+        @RequestParam email: String?,
+        @RequestParam password: String?,
         response: HttpServletResponse,
-        request: HttpServletRequest
     ) {
-        request.checkCredentialsAndExecute { email, password ->
-            logger.debug("User with the email $email is trying to login")
-            supabaseUserService.loginWithEmail(email.trim(), password.trim(), response)
+        checkCredentialsAndExecute(email, password) { checkedEmail, checkedPassword ->
+            logger.debug("User with the email $checkedEmail is trying to login")
+            supabaseUserService.loginWithEmail(checkedEmail, checkedPassword, response)
         }
     }
 
     @PostMapping("/signup")
     fun signUp(
-        request: HttpServletRequest,
+        @RequestParam email: String?,
+        @RequestParam password: String?,
         response: HttpServletResponse
     ) {
-        request.checkCredentialsAndExecute { email, password ->
-            logger.debug("User with the email $email is trying to signup")
-            supabaseUserService.signUpWithEmail(email, password, response)
+        checkCredentialsAndExecute(email, password) { checkedEmail, checkedPassword ->
+            logger.debug("User with the email $checkedEmail is trying to signup")
+            supabaseUserService.signUpWithEmail(checkedEmail, checkedPassword, response)
         }
     }
 
@@ -55,11 +56,10 @@ class SupabaseUserController(
     }
 
 
-    private fun HttpServletRequest.checkCredentialsAndExecute(
+    private fun checkCredentialsAndExecute(
+        email: String?, password: String?,
         function: (email: String, password: String) -> Unit
     ) {
-        val email = this.parameterMap["email"]?.firstOrNull()
-        val password = this.parameterMap["password"]?.firstOrNull()
         when {
             email.isNullOrBlank() && password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_AND_EMAIL_MISSING.throwExc()
@@ -69,7 +69,6 @@ class SupabaseUserController(
 
             password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_MISSING.throwExc()
-
             else ->
                 function(email.trim(), password.trim())
         }
