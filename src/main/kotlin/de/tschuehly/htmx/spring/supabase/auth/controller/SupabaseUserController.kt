@@ -1,7 +1,7 @@
 package de.tschuehly.htmx.spring.supabase.auth.controller
 
 import de.tschuehly.htmx.spring.supabase.auth.exception.info.MissingCredentialsException.Companion.MissingCredentials
-import de.tschuehly.htmx.spring.supabase.auth.service.ISupabaseUserService
+import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException
 @Controller
 @RequestMapping("api/user")
 class SupabaseUserController(
-    val supabaseUserService: ISupabaseUserService,
+    val supabaseUserService: SupabaseUserService,
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
 

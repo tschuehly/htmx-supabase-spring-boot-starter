@@ -1,1 +1,1 @@
-rootProject.name = "htmx-spring-supabase-auth"
+rootProject.name = "htmx-supabase-spring-boot-starter"

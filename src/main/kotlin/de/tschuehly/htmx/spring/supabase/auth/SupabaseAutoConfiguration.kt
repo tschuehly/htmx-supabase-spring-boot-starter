@@ -8,7 +8,7 @@ import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
 import de.tschuehly.htmx.spring.supabase.auth.controller.SupabaseUserController
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationProvider
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityConfig
-import de.tschuehly.htmx.spring.supabase.auth.service.ISupabaseUserService
+import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserServiceGoTrueImpl
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.standaloneSupabaseModule
@@ -38,14 +38,14 @@ class SupabaseAutoConfiguration(
     fun supabaseService(
         goTrueClient: GoTrue,
         supabaseAuthenticationProvider: SupabaseAuthenticationProvider
-    ): ISupabaseUserService {
+    ): SupabaseUserService {
         logger.debug("Registering the SupabaseUserService")
         return SupabaseUserServiceGoTrueImpl(supabaseProperties, goTrueClient)
     }
 
     @Bean
     @ConditionalOnMissingBean
-    fun supabaseController(supabaseUserService: ISupabaseUserService): SupabaseUserController {
+    fun supabaseController(supabaseUserService: SupabaseUserService): SupabaseUserController {
         logger.debug("Registering the SupabaseUserController")
         return SupabaseUserController(supabaseUserService)
     }
@@ -56,7 +56,11 @@ class SupabaseAutoConfiguration(
         return standaloneSupabaseModule(
             GoTrue,
             url = "https://${supabaseProperties.projectId}.supabase.co/auth/v1",
-            apiKey = supabaseProperties.anonKey
+            apiKey = supabaseProperties.anonKey,
+            config = {
+                alwaysAutoRefresh = false
+                autoLoadFromStorage = false
+            }
         )
     }
 

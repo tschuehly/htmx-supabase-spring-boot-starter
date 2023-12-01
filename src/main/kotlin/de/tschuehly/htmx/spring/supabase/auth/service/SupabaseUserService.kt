@@ -3,7 +3,7 @@ package de.tschuehly.htmx.spring.supabase.auth.service
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
-interface ISupabaseUserService {
+interface SupabaseUserService {
     fun signUpWithEmail(email: String, password: String, response: HttpServletResponse)
     fun loginWithEmail(email: String, password: String, response: HttpServletResponse)
 

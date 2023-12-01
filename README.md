@@ -7,7 +7,7 @@ Supabase gives us access to two important things for free:
 - Hosted Postgres Server with 500 MB Database Storage
 - Integrated GoTrue API for Authentication/Authorization of up to 50.000 Monthly Active Users
 
-## Features of htmx-spring-supabase-auth
+## Features of htmx-supabase-spring-boot-starter
 
 - supabase auth integration
 - Spring Security Configuration with application.yaml/properties
@@ -22,11 +22,11 @@ Create a new Supabase project. Save your database password for later.
 Go to [start.spring.io](https://start.spring.io/) and create a new Spring Boot project.
 
 Include the dependency in your build.gradle.kts. You can look up the newest version
-on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/htmx-spring-supabase-auth)
+on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/htmx-supabase-spring-boot-starter)
 
 ````kotlin
 dependencies {
-    implementation("de.tschuehly:htmx-spring-supabase-auth:0.3.0")
+    implementation("de.tschuehly:htmx-supabase-spring-boot-starter:0.3.0")
 }
 ````
 

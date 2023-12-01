@@ -29,7 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 class SupabaseUserServiceGoTrueImpl(
     private val supabaseProperties: SupabaseProperties,
     private val goTrueClient: GoTrue
-) : ISupabaseUserService {
+) : SupabaseUserService {
     private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
 
 
@@ -150,7 +150,7 @@ class SupabaseUserServiceGoTrueImpl(
             } catch (e: RestException) {
                 handleGoTrueException(e, email, userId)
             } finally {
-                goTrueClient.sessionManager.deleteSession()
+                goTrueClient.clearSession()
             }
         }
     }

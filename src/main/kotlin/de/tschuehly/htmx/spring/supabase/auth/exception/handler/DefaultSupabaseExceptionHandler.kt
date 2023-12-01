@@ -18,7 +18,7 @@ open class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     init {
         val msg =
             "You probably want to define a @ControllerAdvice that implements de.tschuehly.htmx.spring.supabase.auth.exception.handler.SupabaseExceptionHandler to handle exceptions from the " +
-                    "htmx-spring-supabase-auth and show messages to your user"
+                    "htmx-supabase-spring-boot-starter and show messages to your user"
         logger.warn(msg)
     }
 
