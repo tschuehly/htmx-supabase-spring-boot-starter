@@ -1,4 +1,4 @@
-# supabase authentication for springboot and htmx
+# Supabase authentication for springboot and htmx
 
 Easy integration of [supabase auth](https://supabase.com/auth) in your spring boot + htmx project!
 

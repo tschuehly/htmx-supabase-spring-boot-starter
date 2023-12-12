@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.3.0-RC1"
+version = "0.3.0-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -33,7 +33,7 @@ dependencies {
 
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
     implementation("com.auth0:java-jwt:4.3.0")
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:1.4.7")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
 

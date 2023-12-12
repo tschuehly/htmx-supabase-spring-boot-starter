@@ -10,8 +10,9 @@ import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationPro
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityConfig
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserServiceGoTrueImpl
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.plugins.standaloneSupabaseModule
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -36,7 +37,7 @@ class SupabaseAutoConfiguration(
     @Bean
     @ConditionalOnMissingBean
     fun supabaseService(
-        goTrueClient: GoTrue,
+        goTrueClient: Auth,
         supabaseAuthenticationProvider: SupabaseAuthenticationProvider
     ): SupabaseUserService {
         logger.debug("Registering the SupabaseUserService")
@@ -52,16 +53,18 @@ class SupabaseAutoConfiguration(
 
     @Bean
     @ConditionalOnMissingBean
-    fun supabaseClient(supabaseProperties: SupabaseProperties): GoTrue {
-        return standaloneSupabaseModule(
-            GoTrue,
-            url = "https://${supabaseProperties.projectId}.supabase.co/auth/v1",
-            apiKey = supabaseProperties.anonKey,
-            config = {
-                alwaysAutoRefresh = false
+    fun supabaseClient(supabaseProperties: SupabaseProperties): Auth {
+        val supabase = createSupabaseClient(
+            supabaseUrl = "https://${supabaseProperties.projectId}.supabase.co/auth/v1",
+            supabaseKey = supabaseProperties.anonKey
+        ) {
+            install(Auth) {
+                autoSaveToStorage = false
                 autoLoadFromStorage = false
+                alwaysAutoRefresh = false
             }
-        )
+        }
+        return supabase.auth
     }
 
     @Bean

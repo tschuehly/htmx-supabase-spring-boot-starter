@@ -5,9 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties("supabase")
 class SupabaseProperties(
-    val projectId: String?,
-    val databasePassword: String?,
-    val anonKey: String?,
+    val projectId: String,
+    val databasePassword: String,
+    val anonKey: String,
     val jwtSecret: String?,
     val otpCreateUser: Boolean = true,
     val successfulLoginRedirectPage: String?,

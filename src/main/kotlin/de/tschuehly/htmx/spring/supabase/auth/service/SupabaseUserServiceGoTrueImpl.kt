@@ -13,8 +13,9 @@ import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserNeedsToConfirmE
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtFilter.Companion.setJWTCookie
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.gotrue.providers.builtin.OTP
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 
 class SupabaseUserServiceGoTrueImpl(
     private val supabaseProperties: SupabaseProperties,
-    private val goTrueClient: GoTrue
+    private val goTrueClient: Auth
 ) : SupabaseUserService {
     private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
 
@@ -50,7 +51,7 @@ class SupabaseUserServiceGoTrueImpl(
 
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
         runGoTrue(email) {
-            goTrueClient.loginWith(Email) {
+            goTrueClient.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
@@ -64,8 +65,9 @@ class SupabaseUserServiceGoTrueImpl(
 
     override fun sendOtp(email: String) {
         runGoTrue(email) {
-            goTrueClient.sendOtpTo(Email, createUser = supabaseProperties.otpCreateUser) {
+            goTrueClient.signInWith(OTP){
                 this.email = email
+                this.createUser = supabaseProperties.otpCreateUser
             }
             throw OtpEmailSent(email)
         }
@@ -120,7 +122,7 @@ class SupabaseUserServiceGoTrueImpl(
 
     override fun sendPasswordRecoveryEmail(email: String) {
         runGoTrue(email) {
-            goTrueClient.sendRecoveryEmail(email)
+            goTrueClient.resetPasswordForEmail(email)
             throw PasswordRecoveryEmailSent("User with $email has requested a password recovery email")
         }
     }
