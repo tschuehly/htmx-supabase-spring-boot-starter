@@ -1,4 +1,4 @@
-# Supabase authentication for springboot and htmx
+# Htmx Supabase Spring Boot Starter
 
 Easy integration of [supabase auth](https://supabase.com/auth) in your spring boot + htmx project!
 
@@ -10,7 +10,7 @@ Supabase gives us access to two important things for free:
 ## Features of htmx-supabase-spring-boot-starter
 
 - supabase auth integration
-- Spring Security Configuration with application.yaml/properties
+- Spring Security configuration with application.yaml/properties
 - Role-Based Access Control
 - Basic Authentication
 
@@ -53,7 +53,7 @@ You need to set the Site URL and the Redirect URL in your supabase dashboard as 
 You can find them at Authentication -> URL Configuration.
 If you didn't mess with the ``server.port`` property you should set it to `http://localhost:8080`
 
-Now you can get started with integrating authentication. The supabase PostgreSQL database is automatically configured
+Now you can get started with integrating authentication. The Supabase PostgreSQL database is automatically configured
 for you.
 
 ## Configuring Public Authorization
@@ -128,7 +128,7 @@ the property: `supabase.successfulLoginRedirectPage: "/account"`
 
 ### Login with Social Provides
 
-You need to configure each social provider in your supabase dashboard at Authentication -> Configuration -> Providers
+You need to configure each social provider in your Supabase dashboard at Authentication -> Configuration -> Providers
 
 #### Google
 
