@@ -1,25 +1,20 @@
-# Htmx Supabase Spring Boot Starter
+# HTMX Supabase Spring Boot Starter
 
-Easy integration of [supabase auth](https://supabase.com/auth) in your spring boot + htmx project!
+Easy integration of [Supabase Authentication](https://supabase.com/auth) in your Spring Boot + [htmx](https://htmx.org/) project!
 
 Supabase gives us access to two important things for free:
 
 - Hosted Postgres Server with 500 MB Database Storage
-- Integrated GoTrue API for Authentication/Authorization of up to 50.000 Monthly Active Users
+- GoTrue API for Authentication of up to 50.000 Monthly Active Users
 
 ## Features of htmx-supabase-spring-boot-starter
 
-- supabase auth integration
+- Supabase Authentication integration
 - Spring Security configuration with application.yaml/properties
 - Role-Based Access Control
 - Basic Authentication
 
 ## Initial Setup:
-
-Go to [supabase.com](https://app.supabase.com/sign-up) and sign up for an account.
-Create a new Supabase project. Save your database password for later.
-
-Go to [start.spring.io](https://start.spring.io/) and create a new Spring Boot project.
 
 Include the dependency in your build.gradle.kts. You can look up the newest version
 on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/htmx-supabase-spring-boot-starter)
@@ -30,7 +25,10 @@ dependencies {
 }
 ````
 
-Go to your Spring App and configure your application.yaml/properties.
+Go to [supabase.com](https://app.supabase.com/sign-up) and sign up for an account.
+Create a new Supabase project. Save your database password for later.
+
+Go to your Spring App and configure your application.yaml using the Supabase API credentials.
 You can find them at Project Settings -> API or `https://app.supabase.com/project/yourProjectId/settings/api`
 
 ```yaml
@@ -109,7 +107,7 @@ Google / confirm your email
 </form>
 ````
 
-You should get an email with a confirmation link and if we click on that we get redirected to the page we specified with
+You should get an email with a confirmation link, and if we click on that we get redirected to the page we specified with
 the property: `supabase.successfulLoginRedirectPage: "/account"`
 
 ### Login with E-Mail
@@ -173,14 +171,14 @@ supabase:
         - "/user-feature-1/**"
 ```
 
-With this configuration users with the Authority ROLE_ADMIN can access any endpoints under the /admin/** path, and any user with the Authority ROLE_USER can create POST request to the endpoints under the /user-feature-1/** path.
+With this configuration, users with the Authority ROLE_ADMIN can access any endpoints under the /admin/** path, and any user with the Authority ROLE_USER can create POST request to the endpoints under the /user-feature-1/** path.
 
-You need to be able to set roles for a user but there are two ways to do that:
+You need to be able to set roles for a user, but there are two ways to do that:
 
 ### service role JWT
 
-When you go to your supabase project in the Project Settings -> API section you can find the service_role secret. With
-this secret, you can set the role for any user. This way you can control user roles directly from your backend.
+When you go to your supabase project in the Project Settings -> API section, you can find the service_role secret.
+With this secret, you can set the role for any user. This way you can control user roles directly from your backend.
 
 Here is an example curl request that sets the role of the user with the id: `381c6358-22dd-4681-81e3-c79846117511` to `USER`
 
