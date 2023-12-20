@@ -1,23 +1,18 @@
-# Supabase Security Spring Boot Starter
+# Htmx Supabase Spring Boot Starter
 
-This Spring Starter is aimed at Developers that want to simplify Spring Security and
-integrate [Supabase](https://supabase.com/) into their Project.
+Easy integration of [supabase auth](https://supabase.com/auth) in your spring boot + htmx project!
 
 Supabase gives us access to two important things for free:
 
 - Hosted Postgres Server with 500 MB Database Storage
 - Integrated GoTrue API for Authentication/Authorization of up to 50.000 Monthly Active Users
 
-## Features of supabase-security-spring-boot-starter
+## Features of htmx-supabase-spring-boot-starter
 
-- Spring Security Configuration with application.yaml/properties
-- Integration with htmx
+- supabase auth integration
+- Spring Security configuration with application.yaml/properties
 - Role-Based Access Control
 - Basic Authentication
-
-## Known Issues:
-
-Access Denied
 
 ## Initial Setup:
 
@@ -27,11 +22,11 @@ Create a new Supabase project. Save your database password for later.
 Go to [start.spring.io](https://start.spring.io/) and create a new Spring Boot project.
 
 Include the dependency in your build.gradle.kts. You can look up the newest version
-on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/supabase-security-spring-boot-starter)
+on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/htmx-supabase-spring-boot-starter)
 
 ````kotlin
 dependencies {
-    implementation("de.tschuehly:supabase-security-spring-boot-starter:0.2.3")
+    implementation("de.tschuehly:htmx-supabase-spring-boot-starter:0.3.0")
 }
 ````
 
@@ -58,40 +53,33 @@ You need to set the Site URL and the Redirect URL in your supabase dashboard as 
 You can find them at Authentication -> URL Configuration.
 If you didn't mess with the ``server.port`` property you should set it to `http://localhost:8080`
 
-Now you can get started with integrating Authentication. The Supabase Postgres Database is automatically configured
+Now you can get started with integrating authentication. The Supabase PostgreSQL database is automatically configured
 for you.
 
 ## Configuring Public Authorization
 
 You can configure public accessible paths in your application.yaml with the property `supabase.public`. You can
-configure access for get,post,put,delete
+configure access for get,post,put,delete. This is the minimal configuration for getting started:
 
 ```yaml
-supabase:
   public:
     get:
-      - "/"
-      - "/logout"
-      - "/login"
-      - "/403"
-      - "/favicon.ico"
-      - "/error"
-      - "/resetPassword"
       - "/unauthenticated"
       - "/unauthorized"
+      - "/api/user/logout"
     post:
-      - "/api/user/register"
+      - "/api/user/signup"
+      - "/api/user/sendEmailOtp"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
 ```
 
-## Basic Usage with HTMX
+## Usage with HTMX
 
 This Library is heavily optimized for [HTMX](https://htmx.org/), an awesome Library to
 build [modern user interfaces](https://htmx.org/examples) with the simplicity and power of hypertext. htmx gives you
-access
-to [AJAX](https://htmx.org/docs#ajax), [CSS Transitions](https://htmx.org/docs#css_transitions), [WebSockets](https://htmx.org/docs#websockets)
+access to [AJAX](https://htmx.org/docs#ajax), [CSS Transitions](https://htmx.org/docs#css_transitions), [WebSockets](https://htmx.org/docs#websockets)
 and [Server Sent Events](https://htmx.org/docs#sse) directly in HTML,
 using [attributes](https://htmx.org/reference#attributes)
 
@@ -107,7 +95,7 @@ Google / confirm your email
 </script>
 ````
 
-### Register
+### SignUp
 
 ````html
 <form>
@@ -117,7 +105,7 @@ Google / confirm your email
     <label>Password:
         <input type="password" name="password"/>
     </label>
-    <button hx-post="/api/user/register">Submit</button>
+    <button hx-post="/api/user/signup">Submit</button>
 </form>
 ````
 
@@ -140,7 +128,7 @@ the property: `supabase.successfulLoginRedirectPage: "/account"`
 
 ### Login with Social Provides
 
-You need to configure each social provider in your supabase dashboard at Authentication -> Configuration -> Providers
+You need to configure each social provider in your Supabase dashboard at Authentication -> Configuration -> Providers
 
 #### Google
 
@@ -153,10 +141,22 @@ If you configured Google you can just insert a link to log in with Google
 ### Logout
 
 ````html
-<h2>
-    <button hx-get="/api/user/logout">Logout</button>
-</h2>
+<button hx-get="/api/user/logout">Logout</button>
 ````
+
+## User facing messages and Exception Handling
+
+To show info/error messages to the user you will need to implement the `de.tschuehly.htmx.spring.supabase.auth.exception.handler.SupabaseExceptionHandler` interface.
+
+After successful registration a `RegistrationConfirmationEmailSent` Exception is thrown from the library 
+that you handle by overriding the `handleSuccessfulRegistration` method.
+
+You can find an example of a custom Exception handler here:
+
+```
+src/test/kotlin/de/tschuehly/htmx/spring/supabase/auth/application/CustomExceptionHandlerExample.kt
+```
+
 
 ## Role-based access control
 
@@ -193,7 +193,7 @@ curl -X PUT --location "http://localhost:8080/api/user/setRoles" \
 
 ### Superuser account
 
-You can also elevate a normal user account that will act as a "superuser" account.
+You can also elevate a normal user account that will act as a "superuser" account. This user will also ignore Row Level Security!
 
 To do this you need to set the role of the user to "service_role" in the auth.users table;
 

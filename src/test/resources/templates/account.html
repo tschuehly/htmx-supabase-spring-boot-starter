@@ -3,32 +3,29 @@
       xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-
-    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <th:block th:replace="scripts"></th:block>
 </head>
-Logged user: <span th:text="${#authentication.name}"></span>
 <body>
+Logged user: <p th:text="${#authentication.name}"></p>
 <h1>You are authenticated</h1>
 <div sec:authorize="hasRole('ROLE_ADMIN')">
-    <a href="/admin">Admin Page</a>
+  <span>You are an admin:</span>
+  <a href="/admin">Admin Page</a>
 
-</div>
-<form>
+  <form>
     <label>User Id
-        <input name="userId" type="text">
+      <input name="userId" type="text">
     </label>
     <label>Admin Role
-        <input name="roles" type="checkbox" value="admin"/>
+      <input name="roles" type="checkbox" value="admin"/>
     </label>
     <label>User Role
-        <input name="roles" type="checkbox" value="user"/>
+      <input name="roles" type="checkbox" value="user"/>
     </label>
     <button hx-put="/api/user/setRoles" hx-target="#response">Submit</button>
-</form>
-<div id="response">
-
+  </form>
+  <div id="response"></div>
 </div>
 </body>
 </html>
