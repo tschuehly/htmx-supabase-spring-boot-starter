@@ -144,6 +144,20 @@ If you configured Google you can just insert a link to log in with Google
 <button hx-get="/api/user/logout">Logout</button>
 ````
 
+## User facing messages and Exception Handling
+
+To show info/error messages to the user you will need to implement the `de.tschuehly.htmx.spring.supabase.auth.exception.handler.SupabaseExceptionHandler` interface.
+
+After successful registration a `RegistrationConfirmationEmailSent` Exception is thrown from the library 
+that you handle by overriding the `handleSuccessfulRegistration` method.
+
+You can find an example of a custom Exception handler here:
+
+```
+src/test/kotlin/de/tschuehly/htmx/spring/supabase/auth/application/CustomExceptionHandlerExample.kt
+```
+
+
 ## Role-based access control
 
 You can create a role-based access control configuration right inside your application.yaml:
