@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.2.0"
+    id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.20"
-    kotlin("plugin.spring") version "1.9.20"
-    kotlin("plugin.jpa") version "1.9.20"
+    kotlin("jvm") version "1.9.22"
+    kotlin("plugin.spring") version "1.9.22"
+    kotlin("plugin.jpa") version "1.9.22"
 
     id("maven-publish")
     id("org.jreleaser") version "1.5.1"
@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.3.0"
+version = "0.3.1"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -33,9 +33,12 @@ dependencies {
 
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
     implementation("com.auth0:java-jwt:4.3.0")
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.4")
+    runtimeOnly("io.ktor:ktor-client-java:2.3.7")
+    testRuntimeOnly("io.ktor:ktor-client-java:2.3.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.ktor:ktor-client-mock:2.3.6")
 
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -46,15 +49,14 @@ dependencies {
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    runtimeOnly("io.ktor:ktor-client-apache:2.3.6")
     runtimeOnly("org.postgresql:postgresql")
-    testImplementation("org.htmlunit:htmlunit:3.6.0")
+
+    testImplementation("org.htmlunit:htmlunit:3.9.0")
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.github.tomakehurst:wiremock:3.0.1")
     testImplementation("org.springframework.boot:spring-boot-devtools")
-    testImplementation("io.ktor:ktor-client-mock:2.3.6")
     testImplementation("com.russhwolf:multiplatform-settings-test:1.1.1")
 
 }

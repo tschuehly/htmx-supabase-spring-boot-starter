@@ -55,7 +55,7 @@ class SupabaseAutoConfiguration(
     @ConditionalOnMissingBean
     fun supabaseClient(supabaseProperties: SupabaseProperties): Auth {
         val supabase = createSupabaseClient(
-            supabaseUrl = "https://${supabaseProperties.projectId}.supabase.co/auth/v1",
+            supabaseUrl = "https://${supabaseProperties.projectId}.supabase.co",
             supabaseKey = supabaseProperties.anonKey
         ) {
             install(Auth) {
