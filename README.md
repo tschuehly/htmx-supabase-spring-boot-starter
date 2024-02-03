@@ -35,16 +35,18 @@ You can find them at Project Settings -> API or `https://app.supabase.com/projec
 supabase:
   projectId: yourProjectId
   anonKey: ${SUPABASE_ANON_KEY}
-  databasePassword: ${SUPABASE_DATABASE_PW}
   jwtSecret: ${SUPABASE_JWT_SECRET}
   successfulLoginRedirectPage: "/account"
   passwordRecoveryPage: /updatePassword
   unauthenticatedPage: /unauthenticated
   unauthorizedPage: /unauthorizedPage
   sslOnly: false
+  database:
+    host: "aws-0-eu-central-1.pooler.supabase.com"
+    password:  ${SUPABASE_DATABASE_PASSWORD}
 ```
 
-``anonKey``, ``databasePassword`` and ``jwtSecret`` are sensitive properties, you should set these with environment
+``anonKey``, ``jwtSecret`` and ``database.password`` are sensitive properties, you should set these with environment
 variables.
 
 You need to set the Site URL and the Redirect URL in your supabase dashboard as well.

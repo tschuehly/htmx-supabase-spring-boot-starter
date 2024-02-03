@@ -14,12 +14,6 @@
       "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
     },
     {
-      "name": "supabase.databasePassword",
-      "type": "java.lang.String",
-      "description": "The password you provided when creating the supabase project on supabase.com",
-      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
-    },
-    {
       "name": "supabase.anonKey",
       "type": "java.lang.String",
       "description": "The anon project api key, found at Project settings - API",
@@ -41,6 +35,42 @@
       "name": "supabase.sslOnly",
       "type": "java.lang.String",
       "description": "Sets the HTTP Cookie as Secure; Set False for local development. Set True for Production.",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.database",
+      "type": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties.Database",
+      "description": "You can configure the database properties here",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.database.host",
+      "type": "java.lang.String",
+      "description": "Database host, for example: aws-0-eu-central-1.pooler.supabase.com",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.database.name",
+      "type": "java.lang.String",
+      "description": "Database name, default: postgres",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.database.username",
+      "type": "java.lang.String",
+      "description": "username for database, defaults to postgres.${projectId}",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.database.password",
+      "type": "java.lang.String",
+      "description": "Database password",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+    {
+      "name": "supabase.database.port",
+      "type": "java.lang.Integer",
+      "description": "Database port, defaults to 5432",
       "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
     },
     {

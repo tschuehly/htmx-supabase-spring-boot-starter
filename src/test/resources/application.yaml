@@ -2,7 +2,6 @@
 supabase:
   projectId: ${SUPABASE_PROJECT_ID}
   anonKey: ${SUPABASE_ANON_KEY}
-  databasePassword: ${SUPABASE_DATABASE_PASSWORD}
   jwtSecret: ${SUPABASE_JWT_SECRET}
   successfulLoginRedirectPage: "/"
   passwordRecoveryPage: "/requestPasswordReset"
@@ -22,6 +21,7 @@ supabase:
   public:
     get:
       - "/"
+      - "/jdbc"
       - "/favicon.ico"
       - "/logout"
       - "/login"
@@ -36,6 +36,9 @@ supabase:
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
+  database:
+    host: "aws-0-eu-central-1.pooler.supabase.com"
+    password:  ${SUPABASE_DATABASE_PASSWORD}
 
 logging:
   level:

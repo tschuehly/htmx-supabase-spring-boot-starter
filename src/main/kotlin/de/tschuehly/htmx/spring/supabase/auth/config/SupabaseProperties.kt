@@ -6,9 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties("supabase")
 class SupabaseProperties(
     val projectId: String,
-    val databasePassword: String,
     val anonKey: String,
     val jwtSecret: String?,
+    val database: Database? = null,
     val otpCreateUser: Boolean = true,
     val successfulLoginRedirectPage: String?,
     val passwordRecoveryPage: String?,
@@ -22,13 +22,22 @@ class SupabaseProperties(
 
     init {
         require(projectId != null) { "You need to specify the property: projectId in your application.yaml" }
-        require(databasePassword != null) { "You need to specify the property: databasePassword in your application.yaml" }
         require(anonKey != null) { "You need to specify the property: anonKey in your application.yaml" }
         require(jwtSecret != null) { "You need to specify the property: jwtSecret in your application.yaml" }
         require(successfulLoginRedirectPage != null) { "You need to specify the property: successfulLoginRedirectPage in your application.yaml" }
         require(passwordRecoveryPage != null) { "You need to specify the property: passwordRecoveryPage in your application.yaml" }
         require(unauthenticatedPage != null) { "You need to specify the property: unauthenticatedPage in your application.yaml" }
         require(unauthorizedPage != null) { "You need to specify the property: unauthorizedPage in your application.yaml" }
+    }
+
+    class Database(
+        val host: String?,
+        val name: String = "postgres",
+        val username: String?,
+        val password: String?,
+        val port: Int = 5432
+    ) {
+
     }
 
     class BasicAuth(

@@ -122,7 +122,7 @@ class SupabaseSecurityConfig(
         jwtVerifier: JWTVerifier,
         authenticationEntryPoint: AuthenticationEntryPoint
     ): SupabaseJwtFilter {
-        return SupabaseJwtFilter(authenticationManager, supabaseProperties, authenticationEntryPoint)
+        return SupabaseJwtFilter(authenticationManager, supabaseProperties)
     }
 
     @Bean

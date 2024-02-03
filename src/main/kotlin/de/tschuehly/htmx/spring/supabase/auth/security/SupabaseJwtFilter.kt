@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
 import org.springframework.security.web.context.SecurityContextRepository
 import org.springframework.web.filter.OncePerRequestFilter
@@ -18,8 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 class SupabaseJwtFilter(
     private val authenticationManager: AuthenticationManager,
-    private val supabaseProperties: SupabaseProperties,
-    private val authenticationEntryPoint: AuthenticationEntryPoint
+    private val supabaseProperties: SupabaseProperties
 ) : OncePerRequestFilter() {
     private val securityContextHolderStrategy = SecurityContextHolder
         .getContextHolderStrategy()

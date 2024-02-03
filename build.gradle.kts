@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.3.1"
+version = "0.3.2"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -25,8 +25,10 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
+
+    implementation("com.zaxxer:HikariCP")
+    implementation("org.springframework:spring-jdbc")
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context-support")

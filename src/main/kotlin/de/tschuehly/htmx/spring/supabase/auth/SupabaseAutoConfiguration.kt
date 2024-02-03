@@ -15,24 +15,27 @@ import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.context.annotation.PropertySource
+import javax.sql.DataSource
 
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
 @EnableConfigurationProperties(SupabaseProperties::class)
 @Import(SupabaseSecurityConfig::class, DefaultExceptionHandlerConfig::class)
-@PropertySource("classpath:application-supabase.properties")
+@AutoConfigureBefore(DataSourceAutoConfiguration::class)
 class SupabaseAutoConfiguration(
     val supabaseProperties: SupabaseProperties,
 ) {
     val logger: Logger =
-        LoggerFactory.getLogger(de.tschuehly.htmx.spring.supabase.auth.SupabaseAutoConfiguration::class.java)
+        LoggerFactory.getLogger(SupabaseAutoConfiguration::class.java)
 
     @Bean
     @ConditionalOnMissingBean
@@ -70,6 +73,22 @@ class SupabaseAutoConfiguration(
     @Bean
     fun supabaseJwtVerifier(supabaseProperties: SupabaseProperties): JWTVerifier {
         return JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build()
+    }
 
+    @Bean
+    @ConditionalOnProperty(prefix = "supabase.database", name = ["host"])
+    fun dataSource(
+        supabaseProperties: SupabaseProperties
+    ): DataSource {
+        val dataSourceBuilder = DataSourceBuilder.create()
+        dataSourceBuilder.driverClassName("org.postgresql.Driver")
+        supabaseProperties.database?.let { db ->
+            dataSourceBuilder.url("jdbc:postgresql://${db.host}:${db.port}/${db.name}")
+            db.username?.let {
+                dataSourceBuilder.username(it)
+            } ?: let { dataSourceBuilder.username("postgres.${supabaseProperties.projectId}") }
+            dataSourceBuilder.password(db.password)
+        }
+        return dataSourceBuilder.build()
     }
 }
