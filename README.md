@@ -21,7 +21,7 @@ on [search.maven.org](https://search.maven.org/artifact/de.tschuehly/htmx-supaba
 
 ````kotlin
 dependencies {
-    implementation("de.tschuehly:htmx-supabase-spring-boot-starter:0.3.0")
+    implementation("de.tschuehly:htmx-supabase-spring-boot-starter:LATEST_VERSION")
 }
 ````
 
