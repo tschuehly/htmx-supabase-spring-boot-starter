@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @ConfigurationProperties("supabase")
 class SupabaseProperties(
     val projectId: String,
+    val url: String?,
     val anonKey: String,
     val jwtSecret: String?,
     val database: Database? = null,
