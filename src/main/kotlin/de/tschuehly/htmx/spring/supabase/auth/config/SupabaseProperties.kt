@@ -9,6 +9,7 @@ class SupabaseProperties(
     val anonKey: String,
     val jwtSecret: String?,
     val database: Database? = null,
+    val supabaseUrl: String? = null,
     val otpCreateUser: Boolean = true,
     val successfulLoginRedirectPage: String?,
     val passwordRecoveryPage: String?,
