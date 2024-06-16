@@ -62,6 +62,13 @@
       "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
     },
     {
+      "name": "supabase.database.clientUrl",
+      "type": "java.lang.String",
+      "description": "clientUrl for Supabase Auth, defaults to https://${supabaseProperties.projectId}.supabase.co",
+      "sourceType": "de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties"
+    },
+
+    {
       "name": "supabase.database.password",
       "type": "java.lang.String",
       "description": "Database password",
