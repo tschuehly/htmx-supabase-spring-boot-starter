@@ -1,6 +1,7 @@
 package de.tschuehly.htmx.spring.supabase.auth.service
 
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
+import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserAuthenticatedEvent
 import de.tschuehly.htmx.spring.supabase.auth.exception.*
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
@@ -25,11 +26,13 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.security.core.context.SecurityContextHolder
 
 class SupabaseUserServiceGoTrueImpl(
     private val supabaseProperties: SupabaseProperties,
-    private val goTrueClient: Auth
+    private val goTrueClient: Auth,
+    private val applicationEventPublisher: ApplicationEventPublisher
 ) : SupabaseUserService {
     private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
 
@@ -82,6 +85,7 @@ class SupabaseUserServiceGoTrueImpl(
             logger.debug("User: ${user.email} is trying to reset his password")
             response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
         } else {
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticatedEvent(user))
             response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
         }
     }
