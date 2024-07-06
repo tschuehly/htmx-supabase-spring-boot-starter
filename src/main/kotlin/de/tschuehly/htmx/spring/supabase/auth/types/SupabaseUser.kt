@@ -14,7 +14,7 @@ data class SupabaseUser(
     val id: UUID?,
     val email: String?,
     val phone: String?,
-    val userMetadata: MutableMap<String, String>,
+    val userMetadata: MutableMap<String, Any>,
     val roles: List<String>,
     val provider: String?
 ) {
@@ -48,7 +48,7 @@ data class SupabaseUser(
         phone = claimsMap["phone"]?.asString(),
         userMetadata = claimsMap["user_metadata"]?.let {
             mapper.readValue(
-                claimsMap["user_metadata"]?.toString(), object : TypeReference<MutableMap<String, String>>() {}
+                claimsMap["user_metadata"]?.toString(), object : TypeReference<MutableMap<String, Any>>() {}
             )
         } ?: mutableMapOf(),
         roles = getRolesFromAppMetadata(claimsMap),

@@ -1,8 +1,5 @@
 
 supabase:
-  projectId: ${SUPABASE_PROJECT_ID}
-  anonKey: ${SUPABASE_ANON_KEY}
-  jwtSecret: ${SUPABASE_JWT_SECRET}
   successfulLoginRedirectPage: "/"
   passwordRecoveryPage: "/requestPasswordReset"
   unauthenticatedPage: "/unauthenticated"
@@ -30,19 +27,26 @@ supabase:
       - "/unauthorized"
       - "/requestPasswordReset"
       - "/api/user/logout"
+      - "/api/user/anon"
     post:
       - "/api/user/signup"
       - "/api/user/sendEmailOtp"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
+  anonKey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
+  jwtSecret: super-secret-jwt-token-with-at-least-32-characters-long
+  projectId: default
+  url: http://localhost:64321
   database:
-    host: "aws-0-eu-central-1.pooler.supabase.com"
-    password:  ${SUPABASE_DATABASE_PASSWORD}
+    port: 64322
+    host: localhost
+    username: postgres
+    password: postgres
 
 logging:
   level:
-    de.tschuehly: debug
+    de.tschuehly: trace
     org.springframework.security: debug
 server:
   port: 8765

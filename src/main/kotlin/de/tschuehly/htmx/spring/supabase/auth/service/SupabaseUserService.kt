@@ -17,4 +17,6 @@ interface SupabaseUserService {
     fun sendPasswordRecoveryEmail(email: String)
     fun updatePassword(request: HttpServletRequest, password: String)
     fun sendOtp(email: String)
+    fun signInAnonymously(request: HttpServletRequest, response: HttpServletResponse)
+    fun linkAnonToIdentity(email: String, request: HttpServletRequest, response: HttpServletResponse)
 }

@@ -52,19 +52,22 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
-
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
         runGoTrue(email) {
             goTrueClient.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
-            val token = goTrueClient.currentSessionOrNull()?.accessToken
-                ?: throw JWTTokenNullException("The JWT that $email requested from supabase is null")
-            response.setJWTCookie(token, supabaseProperties)
-            response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
+            setJwtCookieToCurrentSession(response)
             logger.debug("User: $email successfully logged in")
         }
+    }
+
+    private fun setJwtCookieToCurrentSession(response: HttpServletResponse) {
+        val token = goTrueClient.currentSessionOrNull()?.accessToken
+            ?: throw JWTTokenNullException("The JWT that requested from supabase is null")
+        response.setJWTCookie(token, supabaseProperties)
+        response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
     }
 
     override fun sendOtp(email: String) {
@@ -89,6 +92,22 @@ class SupabaseUserServiceGoTrueImpl(
             applicationEventPublisher.publishEvent(SupabaseUserAuthenticatedEvent(user))
             response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
         }
+    }
+
+    override fun signInAnonymously(request: HttpServletRequest, response: HttpServletResponse) {
+        runGoTrue {
+            goTrueClient.signInAnonymously()
+            setJwtCookieToCurrentSession(response)
+        }
+    }
+
+    override fun linkAnonToIdentity(email: String, request: HttpServletRequest, response: HttpServletResponse){
+        runGoTrue {
+            goTrueClient.updateUser {
+                this.email = email
+            }
+        }
+
     }
 
     override fun logout(request: HttpServletRequest, response: HttpServletResponse) {
@@ -168,7 +187,9 @@ class SupabaseUserServiceGoTrueImpl(
             throw UnknownSupabaseException()
         }
         when {
+
             message.contains("User already registered", true) -> throw UserAlreadyRegisteredException(email)
+            message.contains("Anonymous sign-ins are disabled", true) -> throw AnonymousSignInDisabled()
             message.contains("Invalid login credentials", true) -> throw InvalidLoginCredentialsException(email)
             message.contains("Email not confirmed", true) -> throw UserNeedsToConfirmEmailBeforeLoginException(email)
             message.contains("Signups not allowed for otp", true) -> throw OtpSignupNotAllowedExceptions(message)

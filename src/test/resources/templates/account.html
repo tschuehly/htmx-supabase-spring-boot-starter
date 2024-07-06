@@ -4,7 +4,7 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <th:block th:replace="scripts"></th:block>
+  <th:block th:replace="~{scripts}"></th:block>
 </head>
 <body>
 Logged user: <p th:text="${#authentication.name}"></p>

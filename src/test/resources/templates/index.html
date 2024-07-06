@@ -4,7 +4,7 @@
 
 <head>
   <title>Supabase Auth</title>
-  <th:block th:replace="scripts"></th:block>
+  <th:block th:replace="~{scripts}"></th:block>
 </head>
 <body>
 <h1>
@@ -55,13 +55,14 @@
     </label>
     <button hx-post="/api/user/sendEmailOtp" hx-target="#signup-otp-response">Submit</button>
   </form>
+
+  <a hx-get="/api/user/anon">Sign In Anonymously</a>
   <div id="signup-otp-response"></div>
 
 
   <a href="https://ettvaltrmhclwfsfzxvh.supabase.co/auth/v1/authorize?provider=google">Sign In with Google</a>
 
 </div>
-
 
 <div sec:authorize="!hasRole('ROLE_ANONYMOUS')">
   <a href="/account">Account Page</a>
