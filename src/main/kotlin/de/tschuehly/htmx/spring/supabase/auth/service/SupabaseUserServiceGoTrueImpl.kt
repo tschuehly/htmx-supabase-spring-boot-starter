@@ -17,6 +17,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.OTP
+import io.github.jan.supabase.gotrue.user.UserInfo
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kotlinx.coroutines.CoroutineScope
@@ -180,7 +181,7 @@ class SupabaseUserServiceGoTrueImpl(
         throw UnknownSupabaseException()
     }
 
-    private fun emailConfirmationEnabled(user: Email.Result?): Boolean {
-        return user != null
+    private fun emailConfirmationEnabled(user: UserInfo?): Boolean {
+        return user?.email != null
     }
 }

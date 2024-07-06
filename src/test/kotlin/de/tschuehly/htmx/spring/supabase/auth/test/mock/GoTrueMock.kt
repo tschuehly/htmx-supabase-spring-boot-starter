@@ -1,7 +1,5 @@
 package de.tschuehly.htmx.spring.supabase.auth.test.mock
 
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.engine.mock.*
@@ -118,24 +116,26 @@ class GoTrueMock {
         return when {
             body.containsKey("email") -> {
                 respond(
-                    Email.Result(
-                        "uuid",
-                        body["email"]!!.jsonPrimitive.content,
-                        Clock.System.now(),
-                        Clock.System.now(),
-                        Clock.System.now()
+                    UserInfo(
+                        id = "id",
+                        aud = "aud",
+                        email = body["email"]!!.jsonPrimitive.content,
+                        createdAt = Clock.System.now(),
+                        updatedAt = Clock.System.now(),
+                        confirmedAt = Clock.System.now()
                     )
                 )
             }
 
             body.containsKey("phone") -> {
                 respond(
-                    Phone.Result(
-                        "uuid",
-                        body["phone"]!!.jsonPrimitive.content,
-                        Clock.System.now(),
-                        Clock.System.now(),
-                        Clock.System.now()
+                    UserInfo(
+                        id = "id",
+                        aud = "aud",
+                        email = body["phone"]!!.jsonPrimitive.content,
+                        createdAt = Clock.System.now(),
+                        updatedAt = Clock.System.now(),
+                        confirmedAt = Clock.System.now()
                     )
                 )
             }

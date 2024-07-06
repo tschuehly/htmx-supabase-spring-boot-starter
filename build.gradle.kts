@@ -2,11 +2,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.2.2"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.spring") version "1.9.22"
-    kotlin("plugin.jpa") version "1.9.22"
+    id("org.springframework.boot") version "3.3.1"
+    id("io.spring.dependency-management") version "1.1.5"
+    kotlin("jvm") version "2.0.0"
+    kotlin("plugin.spring") version "2.0.0"
 
     id("maven-publish")
     id("org.jreleaser") version "1.13.0"
@@ -33,14 +32,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context-support")
 
-    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
-    implementation("com.auth0:java-jwt:4.3.0")
+    implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
+    implementation("com.auth0:java-jwt:4.4.0")
 
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.4")
-    runtimeOnly("io.ktor:ktor-client-java:2.3.7")
-    testRuntimeOnly("io.ktor:ktor-client-java:2.3.7")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("io.ktor:ktor-client-mock:2.3.6")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.5.1")
+    runtimeOnly("io.ktor:ktor-client-java:2.3.12")
+    testRuntimeOnly("io.ktor:ktor-client-java:2.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    testImplementation("io.ktor:ktor-client-mock:2.3.12")
 
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -53,7 +52,7 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation("org.htmlunit:htmlunit:3.9.0")
+    testImplementation("org.htmlunit:htmlunit:4.2.0")
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
