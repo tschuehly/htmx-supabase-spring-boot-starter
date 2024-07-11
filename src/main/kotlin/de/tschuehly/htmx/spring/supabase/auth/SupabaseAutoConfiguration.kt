@@ -27,6 +27,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.security.authentication.AuthenticationManager
 import javax.sql.DataSource
 
 @Configuration
@@ -48,7 +49,7 @@ class SupabaseAutoConfiguration(
         applicationEventPublisher: ApplicationEventPublisher
     ): SupabaseUserService {
         logger.debug("Registering the SupabaseUserService")
-        return SupabaseUserServiceGoTrueImpl(supabaseProperties, goTrueClient, applicationEventPublisher)
+        return SupabaseUserServiceGoTrueImpl(supabaseProperties, goTrueClient, applicationEventPublisher, supabaseAuthenticationProvider)
     }
 
     @Bean

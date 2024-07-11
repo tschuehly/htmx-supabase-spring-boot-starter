@@ -4,7 +4,10 @@ import com.auth0.jwt.interfaces.Claim
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.kotlinModule
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import java.util.*
@@ -14,13 +17,16 @@ data class SupabaseUser(
     val id: UUID?,
     val email: String?,
     val phone: String?,
+    val isAnonymous: Boolean,
     val userMetadata: MutableMap<String, Any>,
     val roles: List<String>,
-    val provider: String?
+    val provider: String?,
+
 ) {
     companion object {
-        val mapper: ObjectMapper = jacksonObjectMapper()
+        val mapper: ObjectMapper = ObjectMapper().registerModule(kotlinModule())
             .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+
 
         fun getRolesFromAppMetadata(claimsMap: Map<String, Claim>): List<String> {
             val roles = claimsMap["app_metadata"]?.asMap()?.get("roles")
@@ -46,6 +52,7 @@ data class SupabaseUser(
         },
         email = claimsMap["email"]?.asString(),
         phone = claimsMap["phone"]?.asString(),
+        isAnonymous = claimsMap["is_anonymous"]?.asBoolean() ?: true,
         userMetadata = claimsMap["user_metadata"]?.let {
             mapper.readValue(
                 claimsMap["user_metadata"]?.toString(), object : TypeReference<MutableMap<String, Any>>() {}

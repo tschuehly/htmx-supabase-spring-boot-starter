@@ -1,5 +1,6 @@
 package de.tschuehly.htmx.spring.supabase.auth.service
 
+import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
@@ -7,7 +8,7 @@ interface SupabaseUserService {
     fun signUpWithEmail(email: String, password: String, response: HttpServletResponse)
     fun loginWithEmail(email: String, password: String, response: HttpServletResponse)
 
-    fun authorizeWithJwtOrResetPassword(
+    fun handleClientAuthentication(
         request: HttpServletRequest,
         response: HttpServletResponse
     )
@@ -19,4 +20,6 @@ interface SupabaseUserService {
     fun sendOtp(email: String)
     fun signInAnonymously(request: HttpServletRequest, response: HttpServletResponse)
     fun linkAnonToIdentity(email: String, request: HttpServletRequest, response: HttpServletResponse)
+    fun authenticate(jwt: String): SupabaseUser
+    fun authenticateWithCurrentSession(): SupabaseUser
 }

@@ -43,7 +43,7 @@ class SupabaseUserController(
         }
     }
 
-    @GetMapping("/anon")
+    @PostMapping("/anon")
     fun anonSignIn(request: HttpServletRequest, response: HttpServletResponse) {
         supabaseUserService.signInAnonymously(request, response)
     }
@@ -93,7 +93,7 @@ class SupabaseUserController(
 
     @PostMapping("/jwt")
     fun authorizeWithJwtOrResetPassword(request: HttpServletRequest, response: HttpServletResponse) {
-        supabaseUserService.authorizeWithJwtOrResetPassword(request, response)
+        supabaseUserService.handleClientAuthentication(request, response)
     }
 
     @GetMapping("/logout")

@@ -3,6 +3,7 @@ package de.tschuehly.htmx.spring.supabase.auth.security
 import com.auth0.jwt.exceptions.IncorrectClaimException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
+import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
@@ -16,25 +17,19 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 
 class SupabaseJwtFilter(
-    private val authenticationManager: AuthenticationManager,
-    private val supabaseProperties: SupabaseProperties
+    private val supabaseProperties: SupabaseProperties,
+    private val supabaseUserService: SupabaseUserService
 ) : OncePerRequestFilter() {
-    private val securityContextHolderStrategy = SecurityContextHolder
-        .getContextHolderStrategy()
 
-    private val securityContextRepository: SecurityContextRepository = RequestAttributeSecurityContextRepository()
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val cookie = request.cookies?.find { it.name == "JWT" }
-
-        val header: String? = request.getHeader("HX-Current-URL")
-        val jwtString = getJwtString(header, cookie)
+        val jwtString = getJwtString(request)
         jwtString?.let { jwt ->
             try {
-                authenticate(jwt, request, response)
+                supabaseUserService.authenticate(jwt)
             } catch (e: TokenExpiredException) {
                 response.setJWTCookie(jwtString, supabaseProperties, 0)
             } catch (e: IncorrectClaimException) {
@@ -42,27 +37,20 @@ class SupabaseJwtFilter(
                     // Wait for one second on login if the jwt is not active yet
                     logger.debug(e.message)
                     Thread.sleep(1000L)
-                    authenticate(jwt, request, response)
+                    supabaseUserService.authenticate(jwt)
                 }
             }
         }
         filterChain.doFilter(request, response)
     }
 
-    private fun authenticate(
-        jwt: String,
-        request: HttpServletRequest,
-        response: HttpServletResponse
-    ) {
-        val authResult = authenticationManager.authenticate(JwtAuthenticationToken(jwt))
-        val context: SecurityContext = securityContextHolderStrategy.createEmptyContext()
-        context.authentication = authResult
-        response.setJWTCookie(jwt, supabaseProperties)
-        securityContextRepository.saveContext(context, request, response)
-    }
 
 
-    private fun getJwtString(header: String?, cookie: Cookie?): String? {
+
+    private fun getJwtString(request: HttpServletRequest): String? {
+
+        val cookie = request.cookies?.find { it.name == "JWT" }
+        val header: String? = request.getHeader("HX-Current-URL")
         return if (header?.contains("#access_token=") == true) {
             header.substringBefore("&").substringAfter("#access_token=")
         } else {

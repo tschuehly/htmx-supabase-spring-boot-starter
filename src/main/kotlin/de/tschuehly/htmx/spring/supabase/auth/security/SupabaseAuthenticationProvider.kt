@@ -12,7 +12,7 @@ import java.util.*
 class SupabaseAuthenticationProvider(
     private val jwtVerifier: JWTVerifier
 ) : AuthenticationProvider {
-    override fun authenticate(token: Authentication): Authentication {
+    override fun authenticate(token: Authentication): SupabaseAuthenticationToken {
         token is JwtAuthenticationToken
         if (token !is JwtAuthenticationToken) {
             throw UnknownSupabaseException("Something went wrong when trying to authenticate with the jwt")
