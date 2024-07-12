@@ -27,9 +27,9 @@ class SupabaseJwtFilter(
         filterChain: FilterChain
     ) {
         val jwtString = getJwtString(request)
-        jwtString?.let { jwt ->
+        if (jwtString != null) {
             try {
-                supabaseUserService.authenticate(jwt)
+                supabaseUserService.authenticate(jwtString)
             } catch (e: TokenExpiredException) {
                 response.setJWTCookie(jwtString, supabaseProperties, 0)
             } catch (e: IncorrectClaimException) {
@@ -37,7 +37,7 @@ class SupabaseJwtFilter(
                     // Wait for one second on login if the jwt is not active yet
                     logger.debug(e.message)
                     Thread.sleep(1000L)
-                    supabaseUserService.authenticate(jwt)
+                    val user = supabaseUserService.authenticate(jwtString)
                 }
             }
         }
