@@ -64,19 +64,20 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
+    private fun emailConfirmationEnabled(user: UserInfo?) = user?.email != null
+
+
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
         runGoTrue(email) {
             goTrueClient.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
-            setJwtCookieToCurrentSession(response)
+            val user = authenticateWithCurrentSession()
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticatedEvent(user))
             logger.debug("User: $email successfully logged in")
         }
     }
-
-    private fun setJwtCookieToCurrentSession(response: HttpServletResponse) {
-        }
 
     override fun sendOtp(email: String) {
         runGoTrue(email) {
@@ -156,6 +157,7 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
+
     private fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?) {
         val roleArray = roles ?: listOf()
         runGoTrue(userId = userId) {
@@ -170,7 +172,6 @@ class SupabaseUserServiceGoTrueImpl(
             logger.debug("The roles of the user with id {} were updated to {}", userId, roleArray)
         }
     }
-
 
     override fun sendPasswordRecoveryEmail(email: String) {
         runGoTrue(email) {
@@ -228,9 +229,5 @@ class SupabaseUserServiceGoTrueImpl(
         }
         logger.error(e.message)
         throw UnknownSupabaseException()
-    }
-
-    private fun emailConfirmationEnabled(user: UserInfo?): Boolean {
-        return user?.email != null
     }
 }
