@@ -1,34 +1,45 @@
 package de.tschuehly.htmx.spring.supabase.auth.types
 
 import com.auth0.jwt.interfaces.Claim
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.KotlinFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.kotlinModule
+import com.auth0.jwt.interfaces.DecodedJWT
+import de.tschuehly.htmx.spring.supabase.auth.exception.ClaimsCannotBeNullException
+import io.github.jan.supabase.gotrue.user.UserInfo
+import kotlinx.serialization.json.Json
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.AuthorityUtils
 import java.util.*
 
 
 data class SupabaseUser(
-    val id: UUID?,
+    val id: UUID,
     val email: String?,
     val phone: String?,
     val isAnonymous: Boolean,
     val userMetadata: MutableMap<String, Any>,
     val roles: List<String>,
     val provider: String?,
-
-) {
+    val verifiedJwt: String
+    ) {
     companion object {
-        val mapper: ObjectMapper = ObjectMapper().registerModule(kotlinModule())
-            .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
 
+        fun createFromJWT(verifiedJwt: DecodedJWT): SupabaseUser {
+            val claimsMap = verifiedJwt.claims
+            val metadata = claimsMap["user_metadata"]?.asMap()?.toMutableMap() ?: mutableMapOf()
+            return SupabaseUser(
+                id = claimsMap["sub"]?.let {
+                    UUID.fromString(it.asString())
+                } ?: throw ClaimsCannotBeNullException("sub claim is null"),
+                email = claimsMap["email"]?.asString(),
+                phone = claimsMap["phone"]?.asString(),
+                isAnonymous = claimsMap["is_anonymous"]?.asBoolean() ?: true,
+                userMetadata = metadata,
+                roles = getRolesFromAppMetadata(claimsMap),
+                provider = getProviderFromAppMetadata(claimsMap),
+                verifiedJwt = verifiedJwt.token
+            )
+        }
 
-        fun getRolesFromAppMetadata(claimsMap: Map<String, Claim>): List<String> {
+        private fun getRolesFromAppMetadata(claimsMap: Map<String, Claim>): List<String> {
             val roles = claimsMap["app_metadata"]?.asMap()?.get("roles")
             if (roles is List<*> && roles.firstOrNull() is String) {
                 return roles as List<String>
@@ -36,7 +47,7 @@ data class SupabaseUser(
             return listOf()
         }
 
-        fun getProviderFromAppMetadata(claimsMap: Map<String, Claim>): String {
+        private fun getProviderFromAppMetadata(claimsMap: Map<String, Claim>): String {
             return claimsMap["app_metadata"]?.asMap()?.get("provider").toString() ?: ""
         }
     }
@@ -46,19 +57,4 @@ data class SupabaseUser(
         return AuthorityUtils.createAuthorityList(*roleList)
     }
 
-    constructor(claimsMap: Map<String, Claim>) : this(
-        id = claimsMap["sub"]?.let {
-            UUID.fromString(it.asString())
-        },
-        email = claimsMap["email"]?.asString(),
-        phone = claimsMap["phone"]?.asString(),
-        isAnonymous = claimsMap["is_anonymous"]?.asBoolean() ?: true,
-        userMetadata = claimsMap["user_metadata"]?.let {
-            mapper.readValue(
-                claimsMap["user_metadata"]?.toString(), object : TypeReference<MutableMap<String, Any>>() {}
-            )
-        } ?: mutableMapOf(),
-        roles = getRolesFromAppMetadata(claimsMap),
-        provider = getProviderFromAppMetadata(claimsMap)
-    )
 }

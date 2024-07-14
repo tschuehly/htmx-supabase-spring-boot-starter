@@ -17,8 +17,8 @@ class SupabaseAuthenticationProvider(
         if (token !is JwtAuthenticationToken) {
             throw UnknownSupabaseException("Something went wrong when trying to authenticate with the jwt")
         }
-        val claims = jwtVerifier.verify(token.jwtString).claims
-        return SupabaseAuthenticationToken.authenticated(SupabaseUser(claims))
+        val jwt = jwtVerifier.verify(token.jwtString)
+        return SupabaseAuthenticationToken.authenticated(SupabaseUser.createFromJWT(jwt ))
     }
 
     override fun supports(authentication: Class<*>): Boolean {
