@@ -9,7 +9,7 @@ plugins {
     kotlin("plugin.jpa") version "1.9.22"
 
     id("maven-publish")
-    id("org.jreleaser") version "1.5.1"
+    id("org.jreleaser") version "1.13.0"
     id("signing")
 }
 
