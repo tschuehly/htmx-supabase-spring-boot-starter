@@ -252,3 +252,14 @@ supabase:
     roles:
       - "ADMIN"
 ```
+
+## Customizing the datasource
+
+If you want to change the settings of the HikariCP connection pool you can do that using the `supabase.datasource property`.
+
+To change the maximum pool size for example:
+```yaml
+supabase:
+  datasource:
+    maximum-pool-size: 30
+```

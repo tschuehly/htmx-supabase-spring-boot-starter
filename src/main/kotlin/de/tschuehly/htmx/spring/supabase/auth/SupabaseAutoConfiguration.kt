@@ -3,6 +3,7 @@ package de.tschuehly.htmx.spring.supabase.auth
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.zaxxer.hikari.HikariDataSource
 import de.tschuehly.htmx.spring.supabase.auth.config.DefaultExceptionHandlerConfig
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
 import de.tschuehly.htmx.spring.supabase.auth.controller.SupabaseUserController
@@ -19,6 +20,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.context.annotation.Bean
@@ -76,11 +78,12 @@ class SupabaseAutoConfiguration(
     }
 
     @Bean
+    @ConfigurationProperties("supabase.datasource")
     @ConditionalOnProperty(prefix = "supabase.database", name = ["host"])
     fun dataSource(
         supabaseProperties: SupabaseProperties
-    ): DataSource {
-        val dataSourceBuilder = DataSourceBuilder.create()
+    ): HikariDataSource {
+        val dataSourceBuilder = DataSourceBuilder.create().type(HikariDataSource::class.java)
         dataSourceBuilder.driverClassName("org.postgresql.Driver")
         supabaseProperties.database?.let { db ->
             dataSourceBuilder.url("jdbc:postgresql://${db.host}:${db.port}/${db.name}")
