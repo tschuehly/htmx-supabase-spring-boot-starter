@@ -1,5 +1,6 @@
 package de.tschuehly.htmx.spring.supabase.auth.htmx
 
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxRequestHeader
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponseHeader
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxSwapType
 import jakarta.servlet.http.HttpServletRequest
@@ -17,6 +18,15 @@ object HtmxUtil {
     fun retarget(cssSelector: String?) {
         setHeader(HtmxResponseHeader.HX_RETARGET.getValue(), cssSelector)
     }
+    fun retargetToId(id: String) {
+        val request: HttpServletRequest = getRequest()
+        if (request.getHeader(HtmxRequestHeader.HX_REQUEST.getValue()) != null) {
+            setHeader(
+                headerName = HtmxResponseHeader.HX_RETARGET.value,
+                headerValue = if (id.startsWith("#")) id else "#$id"
+            )
+        }
+    }
 
     fun swap(hxSwapType: HxSwapType) {
         setHeader(HtmxResponseHeader.HX_RESWAP.getValue(), hxSwapType.getValue())
@@ -27,12 +37,13 @@ object HtmxUtil {
         setHeader(HtmxResponseHeader.HX_TRIGGER.getValue(), event)
     }
 
-    fun URI(uriTemplate: String?, vararg variables: Any?): String {
-        return UriTemplate(uriTemplate!!).expand(*variables).toString()
-    }
 
     fun setHeader(headerName: String?, headerValue: String?) {
             getResponse().setHeader(headerName, headerValue)
+    }
+
+    fun isHtmxRequest(): Boolean {
+        return getRequest().getHeader(HtmxRequestHeader.HX_REQUEST.value) == "true"
     }
 
     fun getResponse(): HttpServletResponse {
