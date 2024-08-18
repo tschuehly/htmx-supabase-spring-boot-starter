@@ -1,7 +1,5 @@
 package de.tschuehly.htmx.spring.supabase.auth.test.mock
 
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.engine.mock.*
@@ -91,9 +89,9 @@ class GoTrueMock {
         val token = authorizationHeader.substringAfter("Bearer ")
         if (token != VALID_ACCESS_TOKEN) return respondUnauthorized()
         return when (request.method) {
-            HttpMethod.Get -> respond(UserInfo(aud = "", id = "userid"))
+            HttpMethod.Get -> respondJson(UserInfo(aud = "", id = "userid"))
             HttpMethod.Put -> {
-                respond(
+                respondJson(
                     UserInfo(
                         aud = "",
                         id = "userid",
@@ -118,25 +116,18 @@ class GoTrueMock {
         return when {
             body.containsKey("email") -> {
                 respond(
-                    Email.Result(
-                        "uuid",
-                        body["email"]!!.jsonPrimitive.content,
-                        Clock.System.now(),
-                        Clock.System.now(),
-                        Clock.System.now()
-                    )
+                    sampleUserObject(body["email"]!!.jsonPrimitive.content),
+                            HttpStatusCode.OK,
+                    headersOf("Content-Type" to listOf("application/json"))
+
                 )
             }
 
             body.containsKey("phone") -> {
                 respond(
-                    Phone.Result(
-                        "uuid",
-                        body["phone"]!!.jsonPrimitive.content,
-                        Clock.System.now(),
-                        Clock.System.now(),
-                        Clock.System.now()
-                    )
+                    sampleUserObject(body["phone"]!!.jsonPrimitive.content),
+                    HttpStatusCode.OK,
+                    headersOf("Content-Type" to listOf("application/json"))
                 )
             }
 
@@ -188,7 +179,7 @@ class GoTrueMock {
         }
     }
 
-    private inline fun <reified T> MockRequestHandleScope.respond(data: T): HttpResponseData {
+    private inline fun <reified T> MockRequestHandleScope.respondJson(data: T): HttpResponseData {
         return respond(
             Json.encodeToString(data),
             HttpStatusCode.OK,
@@ -196,7 +187,7 @@ class GoTrueMock {
         )
     }
 
-    private fun MockRequestHandleScope.respondValidSession() = respond(
+    private fun MockRequestHandleScope.respondValidSession() = respondJson(
         UserSession(
             NEW_ACCESS_TOKEN,
             "refresh_token",
@@ -233,5 +224,13 @@ class GoTrueMock {
         const val VALID_VERIFY_TOKEN = "valid_verify_token"
     }
 
+    private fun sampleUserObject(email: String? = null, phone: String? = null) = """
+        {
+            "id": "id",
+            "aud": "aud",
+            "email": "$email",
+            "phone": "$phone"
+        }
+    """.trimIndent()
 
 }

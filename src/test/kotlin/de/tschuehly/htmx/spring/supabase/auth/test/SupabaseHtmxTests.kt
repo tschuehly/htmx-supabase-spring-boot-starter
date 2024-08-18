@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.PropertySource
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.context.WebApplicationContext
@@ -23,9 +24,7 @@ import org.springframework.web.context.WebApplicationContext
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["debug=org.springframework.security"],
 )
-@TestPropertySource(
-    properties = ["SUPABASE_PROJECT_ID=", "SUPABASE_ANON_KEY=", "SUPABASE_DATABASE_PW=", "SUPABASE_JWT_SECRET="]
-)
+@PropertySource(value = ["classpath:/test.properties"], ignoreResourceNotFound = true)
 @Import(GoTrueMockConfiguration::class)
 class SupabaseHtmxTests {
 

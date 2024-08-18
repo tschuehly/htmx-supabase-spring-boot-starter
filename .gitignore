@@ -37,3 +37,5 @@ out/
 .vscode/
 /src/test/resources/dev.env
 /node_modules
+/src/test/resources/test.env
+/src/test/resources/test.properties

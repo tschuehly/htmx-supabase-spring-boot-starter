@@ -28,7 +28,6 @@ class SupabaseSecurityConfig(
     val logger: Logger = LoggerFactory.getLogger(SupabaseSecurityConfig::class.java)
 
     @Bean
-    @ConditionalOnMissingBean
     fun filterChain(
         http: HttpSecurity,
         supabaseJwtFilter: SupabaseJwtFilter,
