@@ -30,7 +30,7 @@ class GoTrueMock {
         }
     }
 
-    private suspend fun MockRequestHandleScope.handleLogout(request: HttpRequestData): HttpResponseData {
+    private fun MockRequestHandleScope.handleLogout(request: HttpRequestData): HttpResponseData {
         if (request.method != HttpMethod.Post) return respondBadRequest("Invalid method")
         if (!request.headers.contains("Authorization")) return respondBadRequest("access token missing")
         return respondOk()
@@ -82,7 +82,7 @@ class GoTrueMock {
         }
     }
 
-    private suspend fun MockRequestHandleScope.handleUserRequest(request: HttpRequestData): HttpResponseData {
+    private fun MockRequestHandleScope.handleUserRequest(request: HttpRequestData): HttpResponseData {
         if (!request.headers.contains(HttpHeaders.Authorization)) return respondUnauthorized()
         val authorizationHeader = request.headers[HttpHeaders.Authorization]!!
         if (!authorizationHeader.startsWith("Bearer ")) return respondUnauthorized()

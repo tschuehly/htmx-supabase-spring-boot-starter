@@ -1,6 +1,9 @@
 package de.tschuehly.htmx.spring.supabase.auth.service
 
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
+import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserAuthenticated
+import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserEmailUpdated
+import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserRolesUpdated
 import de.tschuehly.htmx.spring.supabase.auth.exception.*
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
@@ -10,10 +13,16 @@ import de.tschuehly.htmx.spring.supabase.auth.exception.info.InvalidLoginCredent
 import de.tschuehly.htmx.spring.supabase.auth.exception.info.NewPasswordShouldBeDifferentFromOldPasswordException
 import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserAlreadyRegisteredException
 import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserNeedsToConfirmEmailBeforeLoginException
+import de.tschuehly.htmx.spring.supabase.auth.htmx.HtmxUtil
+import de.tschuehly.htmx.spring.supabase.auth.security.JwtAuthenticationToken
+import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationProvider
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtFilter.Companion.setJWTCookie
+import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityContextHolder
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.exception.AuthErrorCode
+import io.github.jan.supabase.gotrue.exception.AuthRestException
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.OTP
 import io.github.jan.supabase.gotrue.user.UserInfo
@@ -26,12 +35,23 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.putJsonArray
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
+import org.springframework.security.web.context.SecurityContextRepository
 
 class SupabaseUserServiceGoTrueImpl(
     private val supabaseProperties: SupabaseProperties,
-    private val goTrueClient: Auth
+    private val goTrueClient: Auth,
+    private val applicationEventPublisher: ApplicationEventPublisher,
+
+    private val authenticationManager: SupabaseAuthenticationProvider,
 ) : SupabaseUserService {
+
+    private val securityContextHolderStrategy = SecurityContextHolder
+        .getContextHolderStrategy()
+    private val securityContextRepository: SecurityContextRepository = RequestAttributeSecurityContextRepository()
     private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
 
 
@@ -42,12 +62,15 @@ class SupabaseUserServiceGoTrueImpl(
                 this.password = password
             }
             if (emailConfirmationEnabled(user)) {
+                logger.debug("User $email signed up, email confirmation sent")
                 throw RegistrationConfirmationEmailSent(email, user?.confirmationSentAt)
             }
+            logger.debug("User $email successfully signed up")
             loginWithEmail(email, password, response)
-            logger.debug("User with the mail $email successfully signed up")
         }
     }
+
+    private fun emailConfirmationEnabled(user: UserInfo?) = user?.email != null
 
 
     override fun loginWithEmail(email: String, password: String, response: HttpServletResponse) {
@@ -56,10 +79,8 @@ class SupabaseUserServiceGoTrueImpl(
                 this.email = email
                 this.password = password
             }
-            val token = goTrueClient.currentSessionOrNull()?.accessToken
-                ?: throw JWTTokenNullException("The JWT that $email requested from supabase is null")
-            response.setJWTCookie(token, supabaseProperties)
-            response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
+            val user = authenticateWithCurrentSession()
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
             logger.debug("User: $email successfully logged in")
         }
     }
@@ -74,17 +95,60 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
-    override fun authorizeWithJwtOrResetPassword(
+    override fun handleClientAuthentication(
         request: HttpServletRequest, response: HttpServletResponse
     ) {
         val header = request.getHeader("HX-Current-URL") ?: throw HxCurrentUrlHeaderNotFound()
-        val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
+        val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
+            ?: throw UnknownSupabaseException("No authenticated user found in SecurityContextRepository")
         if (header.contains("type=recovery")) {
             logger.debug("User: ${user.email} is trying to reset his password")
             response.setHeader("HX-Redirect", supabaseProperties.passwordRecoveryPage)
         } else {
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
             response.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
         }
+    }
+
+    override fun signInAnonymously(request: HttpServletRequest, response: HttpServletResponse) {
+        runGoTrue {
+            goTrueClient.signInAnonymously()
+            val user = authenticateWithCurrentSession()
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
+        }
+    }
+
+    override fun linkAnonToIdentity(email: String, request: HttpServletRequest, response: HttpServletResponse) {
+        runGoTrue {
+            val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
+                ?: throw UnknownSupabaseException("No authenticated user found in SecurityContext")
+            goTrueClient.importAuthToken(user.verifiedJwt)
+            goTrueClient.updateUser {
+                this.email = email
+            }
+            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdated(user.id, email))
+            throw UserNeedsToConfirmEmailBeforeLoginException(email)
+        }
+
+    }
+
+    override fun authenticateWithCurrentSession(): SupabaseUser {
+        val token = goTrueClient.currentSessionOrNull()?.accessToken
+            ?: throw JWTTokenNullException("The JWT that requested from supabase is null")
+        HtmxUtil.getResponse().setJWTCookie(token, supabaseProperties)
+        HtmxUtil.setHeader("HX-Redirect", supabaseProperties.successfulLoginRedirectPage)
+        return authenticate(token)
+
+    }
+
+    override fun authenticate(jwt: String): SupabaseUser {
+        val authResult = authenticationManager.authenticate(JwtAuthenticationToken(jwt))
+        val context: SecurityContext = securityContextHolderStrategy.createEmptyContext()
+        context.authentication = authResult
+        HtmxUtil.getResponse().setJWTCookie(jwt, supabaseProperties)
+        securityContextRepository.saveContext(context, HtmxUtil.getRequest(), HtmxUtil.getResponse())
+        SecurityContextHolder.setContext(context)
+        return authResult.principal
     }
 
     override fun logout(request: HttpServletRequest, response: HttpServletResponse) {
@@ -105,9 +169,10 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
+
     private fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?) {
         val roleArray = roles ?: listOf()
-        runGoTrue(userId = userId) {
+        runGoTrue() {
             goTrueClient.importAuthToken(serviceRoleJWT)
             goTrueClient.admin.updateUserById(uid = userId) {
                 appMetadata = buildJsonObject {
@@ -116,10 +181,10 @@ class SupabaseUserServiceGoTrueImpl(
                     }
                 }
             }
+            applicationEventPublisher.publishEvent(SupabaseUserRolesUpdated(userId, roleArray))
             logger.debug("The roles of the user with id {} were updated to {}", userId, roleArray)
         }
     }
-
 
     override fun sendPasswordRecoveryEmail(email: String) {
         runGoTrue(email) {
@@ -129,13 +194,14 @@ class SupabaseUserServiceGoTrueImpl(
     }
 
     override fun updatePassword(request: HttpServletRequest, password: String) {
-        val user = SecurityContextHolder.getContext().authentication.principal as SupabaseUser
+        val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
+            ?: throw UnknownSupabaseException("No authenticated user found in SecurityContextRepository")
         val email = user.email ?: "no-email"
         runGoTrue(email) {
             val jwt = request.cookies?.find { it.name == "JWT" }?.value
                 ?: throw JWTTokenNullException("No JWT found in request")
             goTrueClient.importAuthToken(jwt)
-            goTrueClient.modifyUser(true) {
+            goTrueClient.updateUser {
                 this.password = password
             }
             throw SuccessfulPasswordUpdate(user.email)
@@ -144,40 +210,44 @@ class SupabaseUserServiceGoTrueImpl(
 
     private fun runGoTrue(
         email: String = "no-email",
-        userId: String = "no-userid",
         block: suspend CoroutineScope.() -> Unit
     ) {
         runBlocking {
             try {
                 block()
+            } catch (exc: AuthRestException) {
+                handleAuthException(exc, email)
             } catch (e: RestException) {
-                handleGoTrueException(e, email, userId)
+                handleGoTrueException(e, email)
             } finally {
                 goTrueClient.clearSession()
             }
         }
     }
 
-    private fun handleGoTrueException(e: RestException, email: String, userId: String) {
+    private fun handleAuthException(exc: AuthRestException, email: String) {
+        when (exc.errorCode) {
+            AuthErrorCode.UserAlreadyExists -> throw UserAlreadyRegisteredException(email)
+            AuthErrorCode.SamePassword -> throw NewPasswordShouldBeDifferentFromOldPasswordException(email)
+            AuthErrorCode.WeakPassword -> throw WeakPasswordException(email)
+            AuthErrorCode.OtpExpired -> throw OtpExpiredException(email)
+            AuthErrorCode.NotAdmin -> throw MissingServiceRoleForAdminAccessException(SupabaseSecurityContextHolder.getAuthenticatedUser()?.id)
+            else -> throw SupabaseAuthException(exc)
+        }
+    }
+
+    private fun handleGoTrueException(e: RestException, email: String) {
         val message = e.message ?: let {
             logger.error(e.message)
             throw UnknownSupabaseException()
         }
         when {
-            message.contains("User already registered", true) -> throw UserAlreadyRegisteredException(email)
+            message.contains("Anonymous sign-ins are disabled", true) -> throw AnonymousSignInDisabled()
             message.contains("Invalid login credentials", true) -> throw InvalidLoginCredentialsException(email)
             message.contains("Email not confirmed", true) -> throw UserNeedsToConfirmEmailBeforeLoginException(email)
             message.contains("Signups not allowed for otp", true) -> throw OtpSignupNotAllowedExceptions(message)
-            message.contains("User not allowed", true) -> throw MissingServiceRoleForAdminAccessException(userId)
-            message.contains("New password should be different from the old password", true) -> {
-                throw NewPasswordShouldBeDifferentFromOldPasswordException(email)
-            }
         }
         logger.error(e.message)
         throw UnknownSupabaseException()
-    }
-
-    private fun emailConfirmationEnabled(user: UserInfo?): Boolean {
-        return user != null
     }
 }

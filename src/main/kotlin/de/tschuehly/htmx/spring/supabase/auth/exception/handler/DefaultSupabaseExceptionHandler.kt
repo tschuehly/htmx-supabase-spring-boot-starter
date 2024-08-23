@@ -1,6 +1,9 @@
 package de.tschuehly.htmx.spring.supabase.auth.exception.handler
 
+import de.tschuehly.htmx.spring.supabase.auth.exception.MissingServiceRoleForAdminAccessException
+import de.tschuehly.htmx.spring.supabase.auth.exception.SupabaseAuthException
 import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
+import de.tschuehly.htmx.spring.supabase.auth.exception.WeakPasswordException
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
@@ -71,10 +74,29 @@ open class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     }
 
     @ResponseBody
+    override fun handleWeakPasswordException(exception: WeakPasswordException): Any {
+        logger.debug(exception.message)
+        return "WeakPasswordException"
+    }
+
+    @ResponseBody
     override fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any {
         logger.debug(exception.message)
         return "NewPasswordShouldBeDifferentFromOldPasswordException"
     }
+
+    @ResponseBody
+    override fun handleMissingServiceRoleForAdminAccessException(exception: MissingServiceRoleForAdminAccessException): Any {
+        logger.debug(exception.message)
+        return "MissingServiceRoleForAdminAccessException"
+    }
+
+    @ResponseBody
+    override fun handleSupabaseAuthException(exception: SupabaseAuthException): Any {
+        logger.debug("${exception.message}: ${exception.errorCode}: ${exception.error}")
+        return "SupabaseAuthException"
+    }
+
     @ResponseBody
     override fun handleUnknownSupabaseException(exception: UnknownSupabaseException): Any {
         logger.debug(exception.message)

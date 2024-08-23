@@ -1,10 +1,9 @@
 package de.tschuehly.htmx.spring.supabase.auth.security
 
-import com.auth0.jwt.JWTVerifier
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
+import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -110,18 +109,15 @@ class SupabaseSecurityConfig(
     }
 
     @Bean
-    fun supabaseAuthenticationProvider(jwtVerifier: JWTVerifier): SupabaseAuthenticationProvider {
-        return SupabaseAuthenticationProvider(jwtVerifier)
+    fun supabaseAuthenticationProvider(supabaseJwtVerifier: SupabaseJwtVerifier): SupabaseAuthenticationProvider {
+        return SupabaseAuthenticationProvider(supabaseJwtVerifier)
     }
 
     @Bean
     fun supabaseJwtFilter(
-        authenticationManager: AuthenticationManager,
-        supabaseProperties: SupabaseProperties,
-        jwtVerifier: JWTVerifier,
-        authenticationEntryPoint: AuthenticationEntryPoint
+        supabaseUserService: SupabaseUserService
     ): SupabaseJwtFilter {
-        return SupabaseJwtFilter(authenticationManager, supabaseProperties)
+        return SupabaseJwtFilter(supabaseProperties, supabaseUserService)
     }
 
     @Bean

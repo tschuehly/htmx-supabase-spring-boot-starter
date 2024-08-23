@@ -43,6 +43,24 @@ class SupabaseUserController(
         }
     }
 
+    @PostMapping("/anon")
+    fun anonSignIn(request: HttpServletRequest, response: HttpServletResponse) {
+        supabaseUserService.signInAnonymously(request, response)
+    }
+
+    @PostMapping("/linkIdentity")
+    fun linkIdentity(
+        @RequestParam email: String?,
+        request: HttpServletRequest, response: HttpServletResponse
+    ) {
+        if (email != null) {
+            logger.debug("User with the email $email is linking an Anonymous User")
+            supabaseUserService.linkAnonToIdentity(email, request, response)
+        } else {
+            MissingCredentials.EMAIL_MISSING.throwExc()
+        }
+    }
+
     @PostMapping("/sendEmailOtp")
     fun sendEmailOtp(
         @RequestParam email: String?
@@ -76,7 +94,7 @@ class SupabaseUserController(
 
     @PostMapping("/jwt")
     fun authorizeWithJwtOrResetPassword(request: HttpServletRequest, response: HttpServletResponse) {
-        supabaseUserService.authorizeWithJwtOrResetPassword(request, response)
+        supabaseUserService.handleClientAuthentication(request, response)
     }
 
     @GetMapping("/logout")

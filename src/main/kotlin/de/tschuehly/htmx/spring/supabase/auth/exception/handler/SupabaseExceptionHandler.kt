@@ -1,6 +1,9 @@
 package de.tschuehly.htmx.spring.supabase.auth.exception.handler
 
+import de.tschuehly.htmx.spring.supabase.auth.exception.MissingServiceRoleForAdminAccessException
+import de.tschuehly.htmx.spring.supabase.auth.exception.SupabaseAuthException
 import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
+import de.tschuehly.htmx.spring.supabase.auth.exception.WeakPasswordException
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
@@ -33,8 +36,17 @@ interface SupabaseExceptionHandler {
     @ExceptionHandler(UserAlreadyRegisteredException::class)
     fun handleUserAlreadyRegisteredException(exception: UserAlreadyRegisteredException): Any
 
+    @ExceptionHandler(WeakPasswordException::class)
+    fun handleWeakPasswordException(exception: WeakPasswordException): Any
+
     @ExceptionHandler(NewPasswordShouldBeDifferentFromOldPasswordException::class)
     fun handlePasswordChangeError(exception: NewPasswordShouldBeDifferentFromOldPasswordException): Any
+
+    @ExceptionHandler(MissingServiceRoleForAdminAccessException::class)
+    fun handleMissingServiceRoleForAdminAccessException(exception: MissingServiceRoleForAdminAccessException): Any
+
+    @ExceptionHandler(SupabaseAuthException::class)
+    fun handleSupabaseAuthException(exception: SupabaseAuthException): Any
 
     @ExceptionHandler(UnknownSupabaseException::class)
     fun handleUnknownSupabaseException(exception: UnknownSupabaseException): Any

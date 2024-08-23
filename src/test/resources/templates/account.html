@@ -4,11 +4,13 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <th:block th:replace="scripts"></th:block>
+  <th:block th:replace="~{scripts}"></th:block>
 </head>
 <body>
 Logged user: <p th:text="${#authentication.name}"></p>
 <h1>You are authenticated</h1>
+<a href="/updatePassword">Update Password</a>
+
 <div sec:authorize="hasRole('ROLE_ADMIN')">
   <span>You are an admin:</span>
   <a href="/admin">Admin Page</a>

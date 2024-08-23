@@ -18,6 +18,10 @@ class SupabaseAuthenticationEntryPoint(
         authException: AuthenticationException
     ) {
         logger.debug("An unauthenticated User tried to access the path ${request.requestURI}")
+        if (request.getHeader("HX-Request") == "true") {
+            response.setHeader("HX-Redirect", supabaseProperties.unauthenticatedPage)
+            return
+        }
         response.sendRedirect(supabaseProperties.unauthenticatedPage)
     }
 

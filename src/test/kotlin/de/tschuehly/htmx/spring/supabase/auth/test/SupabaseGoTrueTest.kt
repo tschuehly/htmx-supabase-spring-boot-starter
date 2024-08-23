@@ -1,15 +1,19 @@
 package de.tschuehly.htmx.spring.supabase.auth.test
 
-import com.auth0.jwt.JWTVerifier
 import de.tschuehly.htmx.spring.supabase.auth.application.TestApplication
+import de.tschuehly.htmx.spring.supabase.auth.security.JwtAuthenticationToken
+import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationProvider
+import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationToken
 import de.tschuehly.htmx.spring.supabase.auth.test.mock.GoTrueMock
 import de.tschuehly.htmx.spring.supabase.auth.test.mock.GoTrueMockConfiguration
+import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import org.assertj.core.api.BDDAssertions.assertThatExceptionOfType
 import org.assertj.core.api.BDDAssertions.then
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -28,6 +32,7 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.toEntity
 import org.springframework.web.util.DefaultUriBuilderFactory
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(
@@ -46,6 +51,9 @@ class SupabaseGoTrueTest {
     @LocalServerPort
     var port: Int? = null
 
+    @MockBean
+    lateinit var authProvider: SupabaseAuthenticationProvider
+
     @BeforeEach
     fun setup() {
         restClient = RestClient.builder().baseUrl("http://localhost:$port").build()
@@ -53,14 +61,28 @@ class SupabaseGoTrueTest {
         restTemplate.setUriTemplateHandler(DefaultUriBuilderFactory("http://localhost:$port"))
     }
 
-    @MockBean
-    lateinit var jwtVerifier: JWTVerifier
-
     @Test
     fun `User should be able to login`() {
+        Mockito.`when`(authProvider.authenticate(JwtAuthenticationToken(GoTrueMock.NEW_ACCESS_TOKEN)))
+            .thenReturn(
+                SupabaseAuthenticationToken(
+                    SupabaseUser(
+                        UUID.randomUUID(),
+                        "email@example.com",
+                        null,
+                        false,
+                        mutableMapOf(),
+                        listOf("user"),
+                        "email",
+                        GoTrueMock.NEW_ACCESS_TOKEN
+
+                    )
+                )
+            )
         restClient.post().uri("/api/user/login")
             .form("email" to "email@example.com", "password" to GoTrueMock.VALID_PASSWORD)
-            .retrieve().toBodilessEntity()
+            .retrieve()
+            .toBodilessEntity()
             .let {
                 then(it.statusCode).isEqualTo(HttpStatus.OK)
                 then(it.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Max-Age=6000; Expires=")
@@ -117,7 +139,22 @@ class SupabaseGoTrueTest {
     @Disabled
     fun `User can login and access the account page`() {
 //        TODO: how to mock
-        Mockito.`when`(jwtVerifier.verify("new_access_token").claims).thenReturn(mapOf())
+        Mockito.`when`(authProvider.authenticate(any()))
+            .thenReturn(
+                SupabaseAuthenticationToken(
+                    SupabaseUser(
+                        UUID.randomUUID(),
+                        "email@example.com",
+                        null,
+                        false,
+                        mutableMapOf(),
+                        listOf("user"),
+                        "email",
+                        GoTrueMock.NEW_ACCESS_TOKEN
+
+                    )
+                )
+            )
         restClient.post().uri("/api/user/login")
             .form("email" to "email@example.com", "password" to GoTrueMock.VALID_PASSWORD)
             .retrieve().toBodilessEntity()

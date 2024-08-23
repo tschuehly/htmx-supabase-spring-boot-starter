@@ -1,13 +1,13 @@
 package de.tschuehly.htmx.spring.supabase.auth
 
 import com.auth0.jwt.JWT
-import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.zaxxer.hikari.HikariDataSource
 import de.tschuehly.htmx.spring.supabase.auth.config.DefaultExceptionHandlerConfig
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
 import de.tschuehly.htmx.spring.supabase.auth.controller.SupabaseUserController
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationProvider
+import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtVerifier
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityConfig
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserServiceGoTrueImpl
@@ -23,10 +23,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.jdbc.DataSourceBuilder
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import javax.sql.DataSource
 
 @Configuration
 @ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
@@ -43,10 +43,16 @@ class SupabaseAutoConfiguration(
     @ConditionalOnMissingBean
     fun supabaseService(
         goTrueClient: Auth,
-        supabaseAuthenticationProvider: SupabaseAuthenticationProvider
+        supabaseAuthenticationProvider: SupabaseAuthenticationProvider,
+        applicationEventPublisher: ApplicationEventPublisher
     ): SupabaseUserService {
         logger.debug("Registering the SupabaseUserService")
-        return SupabaseUserServiceGoTrueImpl(supabaseProperties, goTrueClient)
+        return SupabaseUserServiceGoTrueImpl(
+            supabaseProperties,
+            goTrueClient,
+            applicationEventPublisher,
+            supabaseAuthenticationProvider
+        )
     }
 
     @Bean
@@ -73,8 +79,9 @@ class SupabaseAutoConfiguration(
     }
 
     @Bean
-    fun supabaseJwtVerifier(supabaseProperties: SupabaseProperties): JWTVerifier {
-        return JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build()
+    fun supabaseJwtVerifier(supabaseProperties: SupabaseProperties): SupabaseJwtVerifier {
+        val jwtVerifier = JWT.require(Algorithm.HMAC256(supabaseProperties.jwtSecret)).build()
+        return SupabaseJwtVerifier(jwtVerifier)
     }
 
     @Bean

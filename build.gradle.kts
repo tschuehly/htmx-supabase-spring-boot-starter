@@ -1,24 +1,26 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.2.2"
-    id("io.spring.dependency-management") version "1.1.4"
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.spring") version "1.9.22"
-    kotlin("plugin.jpa") version "1.9.22"
+    id("org.springframework.boot") version "3.3.1"
+    id("io.spring.dependency-management") version "1.1.5"
+    kotlin("jvm") version "2.0.0"
+    kotlin("plugin.spring") version "2.0.0"
+
     id("maven-publish")
     id("org.jreleaser") version "1.14.0"
     id("signing")
 }
 
 group = "de.tschuehly"
-version = "0.3.5-RC1"
-java.sourceCompatibility = JavaVersion.VERSION_17
+version = "0.3.6-SNAPSHOT"
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(22)
+    }
+}
 
 repositories {
     mavenCentral()
-    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -32,8 +34,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context-support")
 
-    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
-    implementation("com.auth0:java-jwt:4.3.0")
+    implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
+    implementation("com.auth0:java-jwt:4.4.0")
 
     implementation("io.github.jan-tennert.supabase:gotrue-kt:2.6.0")
     runtimeOnly("io.ktor:ktor-client-java:2.3.12")
@@ -45,14 +47,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
-
+    implementation("io.github.wimdeblauwe:htmx-spring-boot:3.4.1")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation("org.htmlunit:htmlunit:3.9.0")
+    testImplementation("org.htmlunit:htmlunit:4.2.0")
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -62,16 +63,16 @@ dependencies {
 
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
-
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
 
 tasks {
     bootJar {

@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "supabase start",
+    "stop": "supabase stop",
+    "db reset": "supabase db reset"
+  },
+  "dependencies": {
+    "supabase": "^1.178.2"
+  }
+}
