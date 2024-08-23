@@ -13,8 +13,8 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'adopt'
+          java-version: '22'
+          distribution: 'liberica'
       - name: Run chmod to make gradlew executable
         run: chmod +x ./gradlew
       - name: Publish package to local staging directory
