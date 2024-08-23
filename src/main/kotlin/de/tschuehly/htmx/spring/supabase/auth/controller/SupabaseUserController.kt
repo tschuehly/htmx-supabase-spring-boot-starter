@@ -47,8 +47,13 @@ class SupabaseUserController(
     }
 
     @PostMapping("/loginAnonWithEmail")
-    fun anonSignInWithEmail() {
-
+    @ResponseBody
+    fun anonSignInWithEmail(@RequestParam email: String?) {
+        if (email != null) {
+            supabaseUserService.signInAnonymouslyWithEmail(email)
+        } else {
+            MissingCredentials.EMAIL_MISSING.throwExc()
+        }
     }
 
 
@@ -97,11 +102,13 @@ class SupabaseUserController(
     }
 
     @PostMapping("/jwt")
+    @ResponseBody
     fun authorizeWithJwtOrResetPassword() {
         supabaseUserService.handleClientAuthentication()
     }
 
     @GetMapping("/logout")
+    @ResponseBody
     fun logout() {
         supabaseUserService.logout()
     }

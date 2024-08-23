@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity(debug = false)
 class SupabaseSecurityConfig(
+    @Suppress("SpringJavaInjectionPointsAutowiringInspection")
     val supabaseProperties: SupabaseProperties
 ) {
     val logger: Logger = LoggerFactory.getLogger(SupabaseSecurityConfig::class.java)

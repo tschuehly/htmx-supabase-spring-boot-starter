@@ -95,17 +95,23 @@ class SupabaseUserService(
 
     fun handleClientAuthentication(
     ) {
-
-        val header = HtmxUtil.getCurrentUrl()
+        val url = HtmxUtil.getCurrentUrl()
         val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
             ?: throw UnknownSupabaseException("No authenticated user found in SecurityContextRepository")
-        if (header.contains("type=recovery")) {
+        if (url.contains("type=recovery")) {
             logger.debug("User: ${user.email} is trying to reset his password")
             HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.passwordRecoveryPage)
-        } else {
-            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
-            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
+            return
         }
+        if (url.contains("type=email_change")) {
+            logger.debug("User: ${user.email} has set email")
+            val email = user.email ?: throw IllegalStateException("Email shouldn't be null")
+            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdated(user.id, email))
+            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
+            return
+        }
+        applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
+        HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
     }
 
     fun signInAnonymously() {
@@ -128,6 +134,18 @@ class SupabaseUserService(
             throw UserNeedsToConfirmEmailBeforeLoginException(email)
         }
 
+    }
+
+    fun signInAnonymouslyWithEmail(email: String) {
+        runGoTrue {
+            goTrueClient.signInAnonymously()
+            goTrueClient.updateUser {
+                this.email = email
+            }
+            goTrueClient.currentAccessTokenOrNull()
+            val user = authenticateWithCurrentSession()
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
+        }
     }
 
     private fun authenticateWithCurrentSession(): SupabaseUser {
@@ -225,6 +243,7 @@ class SupabaseUserService(
 
     private fun handleAuthException(exc: AuthRestException, email: String) {
         when (exc.errorCode) {
+            AuthErrorCode.EmailExists -> throw UserAlreadyRegisteredException(email)
             AuthErrorCode.UserAlreadyExists -> throw UserAlreadyRegisteredException(email)
             AuthErrorCode.SamePassword -> throw NewPasswordShouldBeDifferentFromOldPasswordException(email)
             AuthErrorCode.WeakPassword -> throw WeakPasswordException(email)
@@ -248,4 +267,5 @@ class SupabaseUserService(
         logger.error(e.message)
         throw UnknownSupabaseException()
     }
+
 }
