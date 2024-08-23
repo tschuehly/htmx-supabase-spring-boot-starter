@@ -10,7 +10,6 @@ import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationPro
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtVerifier
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityConfig
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
-import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserServiceGoTrueImpl
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
@@ -47,7 +46,7 @@ class SupabaseAutoConfiguration(
         applicationEventPublisher: ApplicationEventPublisher
     ): SupabaseUserService {
         logger.debug("Registering the SupabaseUserService")
-        return SupabaseUserServiceGoTrueImpl(
+        return SupabaseUserService(
             supabaseProperties,
             goTrueClient,
             applicationEventPublisher,

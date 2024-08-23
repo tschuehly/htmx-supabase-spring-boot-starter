@@ -15,6 +15,7 @@ class SupabaseProperties(
     val passwordRecoveryPage: String?,
     val unauthenticatedPage: String?,
     val unauthorizedPage: String?,
+    val postLogoutPage: String?,
     val sslOnly: Boolean = true,
     val public: Public = Public(),
     val roles: MutableMap<String, Role> = mutableMapOf(),

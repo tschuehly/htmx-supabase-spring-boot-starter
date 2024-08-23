@@ -2,7 +2,6 @@ package de.tschuehly.htmx.spring.supabase.auth.controller
 
 import de.tschuehly.htmx.spring.supabase.auth.exception.info.MissingCredentialsException.Companion.MissingCredentials
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
-import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -27,35 +26,39 @@ class SupabaseUserController(
     ) {
         checkCredentialsAndExecute(email, password) { checkedEmail, checkedPassword ->
             logger.debug("User with the email $checkedEmail is trying to login")
-            supabaseUserService.loginWithEmail(checkedEmail, checkedPassword, response)
+            supabaseUserService.loginWithEmail(checkedEmail, checkedPassword)
         }
     }
 
     @PostMapping("/signup")
     fun signUp(
         @RequestParam email: String?,
-        @RequestParam password: String?,
-        response: HttpServletResponse
+        @RequestParam password: String?
     ) {
         checkCredentialsAndExecute(email, password) { checkedEmail, checkedPassword ->
             logger.debug("User with the email $checkedEmail is trying to signup")
-            supabaseUserService.signUpWithEmail(checkedEmail, checkedPassword, response)
+            supabaseUserService.signUpWithEmail(checkedEmail, checkedPassword)
         }
     }
 
-    @PostMapping("/anon")
-    fun anonSignIn(request: HttpServletRequest, response: HttpServletResponse) {
-        supabaseUserService.signInAnonymously(request, response)
+    @PostMapping("/loginAnon")
+    fun anonSignIn() {
+        supabaseUserService.signInAnonymously()
     }
+
+    @PostMapping("/loginAnonWithEmail")
+    fun anonSignInWithEmail() {
+
+    }
+
 
     @PostMapping("/linkIdentity")
     fun linkIdentity(
-        @RequestParam email: String?,
-        request: HttpServletRequest, response: HttpServletResponse
+        @RequestParam email: String?
     ) {
         if (email != null) {
             logger.debug("User with the email $email is linking an Anonymous User")
-            supabaseUserService.linkAnonToIdentity(email, request, response)
+            supabaseUserService.linkAnonToIdentity(email)
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
         }
@@ -87,19 +90,20 @@ class SupabaseUserController(
 
             password.isNullOrBlank() ->
                 MissingCredentials.PASSWORD_MISSING.throwExc()
+
             else ->
                 function(email.trim(), password.trim())
         }
     }
 
     @PostMapping("/jwt")
-    fun authorizeWithJwtOrResetPassword(request: HttpServletRequest, response: HttpServletResponse) {
-        supabaseUserService.handleClientAuthentication(request, response)
+    fun authorizeWithJwtOrResetPassword() {
+        supabaseUserService.handleClientAuthentication()
     }
 
     @GetMapping("/logout")
-    fun logout(request: HttpServletRequest, response: HttpServletResponse) {
-        supabaseUserService.logout(request, response)
+    fun logout() {
+        supabaseUserService.logout()
     }
 
     @PutMapping("/setRoles")
@@ -107,14 +111,13 @@ class SupabaseUserController(
     fun setRoles(
         @RequestParam
         roles: List<String>?,
-        request: HttpServletRequest,
         @RequestParam
         userId: String,
     ) {
         if (userId == "") {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "UserId required")
         }
-        supabaseUserService.setRolesWithRequest(request, userId, roles)
+        supabaseUserService.setRolesWithRequest(userId, roles)
     }
 
     @PostMapping("/sendPasswordResetEmail")
@@ -129,11 +132,7 @@ class SupabaseUserController(
 
     @PostMapping("/updatePassword")
     @ResponseBody
-    fun updatePassword(
-        request: HttpServletRequest,
-        @RequestParam
-        password: String
-    ) {
-        supabaseUserService.updatePassword(request, password)
+    fun updatePassword(@RequestParam password: String) {
+        supabaseUserService.updatePassword( password)
     }
 }
