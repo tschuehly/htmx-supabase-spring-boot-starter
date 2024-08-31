@@ -103,7 +103,7 @@ publishing {
                 packaging = "jar"
                 name.set("htmx-supabase-spring-boot-starter")
                 description.set("Spring Security with htmx and supabase with ease")
-                url.set("https://github.com/tschuehly/htmx-supabase-spring-boot-starter/")
+                url.set("https://github.com/tschuehly/htmx-supabase-spring-boot-starter")
                 inceptionYear.set("2023")
                 licenses {
                     license {
@@ -149,7 +149,7 @@ jreleaser {
                     active.set(Active.ALWAYS)
                     snapshotSupported.set(true)
                     url.set("https://s01.oss.sonatype.org/service/local")
-                    snapshotUrl.set("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    snapshotUrl.set("https://s01.oss.sonatype.org/content/repositories/snapshots")
                     closeRepository.set(true)
                     releaseRepository.set(true)
                     stagingRepositories.add("build/staging-deploy")
