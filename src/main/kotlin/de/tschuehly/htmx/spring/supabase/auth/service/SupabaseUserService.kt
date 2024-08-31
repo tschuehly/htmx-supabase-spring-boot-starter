@@ -137,7 +137,7 @@ class SupabaseUserService(
     }
 
     fun signInAnonymouslyWithEmail(email: String) {
-        runGoTrue {
+        runGoTrue(email) {
             goTrueClient.signInAnonymously()
             goTrueClient.updateUser {
                 this.email = email
