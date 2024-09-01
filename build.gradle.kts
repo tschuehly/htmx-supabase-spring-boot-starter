@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.22"
     kotlin("plugin.jpa") version "1.9.22"
     id("maven-publish")
-    id("org.jreleaser") version "1.13.0"
+    id("org.jreleaser") version "1.14.0"
     id("signing")
 }
 
@@ -146,6 +146,7 @@ jreleaser {
             nexus2 {
                 create("maven-central") {
                     active.set(Active.ALWAYS)
+                    snapshotSupported.set(true)
                     url.set("https://s01.oss.sonatype.org/service/local")
                     snapshotUrl.set("https://s01.oss.sonatype.org/content/repositories/snapshots/")
                     closeRepository.set(true)
