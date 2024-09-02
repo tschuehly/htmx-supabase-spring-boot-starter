@@ -12,18 +12,23 @@ import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserAlreadyRegister
 import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserNeedsToConfirmEmailBeforeLoginException
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtFilter.Companion.setJWTCookie
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
+import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.admin.AdminUserBuilder
+import io.github.jan.supabase.gotrue.mfa.FactorType
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.OTP
 import io.github.jan.supabase.gotrue.user.UserInfo
+import io.github.jan.supabase.gotrue.user.UserMfaFactor
+import io.github.jan.supabase.gotrue.user.UserSession
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.add
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.context.SecurityContextHolder
@@ -33,7 +38,6 @@ class SupabaseUserServiceGoTrueImpl(
     private val goTrueClient: Auth
 ) : SupabaseUserService {
     private val logger: Logger = LoggerFactory.getLogger(SupabaseUserServiceGoTrueImpl::class.java)
-
 
     override fun signUpWithEmail(email: String, password: String, response: HttpServletResponse) {
         runGoTrue(email) {
@@ -46,6 +50,86 @@ class SupabaseUserServiceGoTrueImpl(
             }
             loginWithEmail(email, password, response)
             logger.debug("User with the mail $email successfully signed up")
+        }
+    }
+
+    override fun signUpWithEmailAndMeta(
+        request: HttpServletRequest,
+        email: String,
+        password: String,
+        meta: Map<String, String>,
+        response: HttpServletResponse
+    ): UserInfo? {
+        return runBlocking {
+            val deferredUserInfo: Deferred<UserInfo?> = async {
+                runGoTrueWithResult(email = email) {
+                    request.cookies?.find { it.name == "JWT" }?.let {
+                        val jsonMap = meta.mapValues { v -> JsonPrimitive(v.value) }
+
+                        goTrueClient.importAuthToken(it.value)
+                        goTrueClient.admin.createUserWithEmail {
+                            val ub = AdminUserBuilder.Email()
+                            ub.email = email
+                            ub.password = password
+                            ub.userMetadata = JsonObject(jsonMap)
+                        }
+                    }
+                }
+            }
+
+            val userInfo = deferredUserInfo.await()
+            if (userInfo != null) {
+                loginWithEmail(email, password, response)
+                logger.debug("User with the mail $email successfully signed up")
+            } else {
+                logger.error("Failed to sign up user with the mail $email")
+            }
+            userInfo
+        }
+    }
+
+    override fun signUpWithEmailAndMeta(
+        serviceJwt: String,
+        email: String,
+        password: String,
+        meta: Map<String, String>,
+        response: HttpServletResponse
+    ): UserInfo? {
+        return runBlocking {
+            val deferredUserInfo: Deferred<UserInfo?> = async {
+                runGoTrueWithResult(email = email) {
+                    val jsonMap = meta.mapValues { v -> JsonPrimitive(v.value) }
+                    goTrueClient.importAuthToken(serviceJwt)
+                    goTrueClient.admin.createUserWithEmail {
+                        this@createUserWithEmail.password = password
+                        this@createUserWithEmail.email = email
+                        this@createUserWithEmail.userMetadata = JsonObject(jsonMap)
+                    }
+                }
+            }
+
+            val userInfo = deferredUserInfo.await()
+            if (userInfo != null) {
+                loginWithEmail(email, password, response)
+                logger.debug("User with the mail $email successfully signed up")
+            } else {
+                logger.error("Failed to sign up user with the mail $email")
+            }
+            userInfo
+        }
+    }
+
+    override fun inviteUserByEmail(
+        serviceJwt: String,
+        email: String,
+        redirectUrl: String,
+        meta: Map<String, String>,
+        response: HttpServletResponse
+    ) {
+        runGoTrue {
+            val jsonMap = meta.mapValues { v -> JsonPrimitive(v.value) }
+            goTrueClient.importAuthToken(serviceJwt)
+            goTrueClient.admin.inviteUserByEmail(email, redirectUrl, JsonObject(jsonMap))
         }
     }
 
@@ -66,7 +150,7 @@ class SupabaseUserServiceGoTrueImpl(
 
     override fun sendOtp(email: String) {
         runGoTrue(email) {
-            goTrueClient.signInWith(OTP){
+            goTrueClient.signInWith(OTP) {
                 this.email = email
                 this.createUser = supabaseProperties.otpCreateUser
             }
@@ -142,6 +226,134 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
+    override fun enrollSecondFactor(
+        request: HttpServletRequest,
+        issuer: String,
+        deviceName: String
+    ): Map<String, String>? {
+        return runBlocking {
+            val deferredResult = async {
+                runGoTrueWithResult {
+                    val jwt = request.cookies?.find { it.name == "JWT" }?.value
+                        ?: throw JWTTokenNullException("No JWT found in request")
+                    goTrueClient.importAuthToken(jwt)
+
+                    try {
+                        // Enroll the second factor using TOTP
+                        val factorResponse = goTrueClient.mfa.enroll(FactorType.TOTP, deviceName) {
+                            this.issuer = issuer
+                        }
+                        val factor = factorResponse.data ?: throw Exception("Failed to enroll second factor")
+
+                        // Extract the necessary details
+                        val id = factor.uri
+                        val qrCode = factor.qrCode // SVG as a string
+                        val secret = factor.secret
+
+                        // Return the necessary information as a map
+                        mapOf(
+                            "id" to id,
+                            "qrCode" to qrCode,
+                            "secret" to secret
+                        )
+                    } catch (e: RestException) {
+                        // TODO: handle exceptions
+                        null
+                    } finally {
+                        goTrueClient.clearSession()
+                    }
+                }
+            }
+
+            val result = deferredResult.await()
+            // TODO: error handling
+            result
+        }
+    }
+
+    override fun retrieveMFAFactorsForCurrentUser(request: HttpServletRequest): List<UserMfaFactor>? {
+        return runBlocking {
+            val deferredResult = async {
+                runGoTrueWithResult {
+                    val jwt = request.cookies?.find { it.name == "JWT" }?.value
+                        ?: throw JWTTokenNullException("No JWT found in request")
+                    goTrueClient.importAuthToken(jwt)
+                    try {
+                        val factors = goTrueClient.mfa.retrieveFactorsForCurrentUser()
+                        factors
+                    } catch (e: RestException) {
+                        // Handle the exception if needed
+                        null
+                    } finally {
+                        goTrueClient.clearSession()
+                    }
+                }
+            }
+
+            val result = deferredResult.await()
+            // TODO: error handling
+            result
+        }
+    }
+
+    override fun createAndVerifyMFAChallenge(request: HttpServletRequest, factorId: String, code: String): UserSession? {
+        return runBlocking {
+            val deferredResult = async {
+                runGoTrueWithResult {
+                    val jwt = request.cookies?.find { it.name == "JWT" }?.value
+                        ?: throw JWTTokenNullException("No JWT found in request")
+                    goTrueClient.importAuthToken(jwt)
+                    try {
+                        val challenge = goTrueClient.mfa.createChallenge(factorId)
+                        val userSession = goTrueClient.mfa.verifyChallenge(factorId, challenge.id, code, true)
+                        userSession
+                    } catch (e: RestException) {
+                        // TODO: handle exceptions
+                        null
+                    }
+                }
+            }
+
+            val result = deferredResult.await()
+            result
+        }
+    }
+
+    override fun unenrollMfaFactor(request: HttpServletRequest, factorId: String) {
+        return runBlocking {
+            val deferredResult = async {
+                runGoTrue {
+                    val jwt = request.cookies?.find { it.name == "JWT" }?.value
+                        ?: throw JWTTokenNullException("No JWT found in request")
+                    goTrueClient.importAuthToken(jwt)
+                    try {
+                        goTrueClient.mfa.unenroll(factorId)
+                    } catch (e: RestException) {
+                        // TODO: Handle exceptions
+                    } finally {
+                        goTrueClient.clearSession()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun loggedInUsingMfa(request: HttpServletRequest): Boolean {
+        return runBlocking {
+            val deferredResult = async {
+                runGoTrueWithResult {
+                    val jwt = request.cookies?.find { it.name == "JWT" }?.value
+                        ?: throw JWTTokenNullException("No JWT found in request")
+                    goTrueClient.importAuthToken(jwt)
+                    goTrueClient.mfa.status.active
+                }
+            }
+
+            val result = deferredResult.await()
+            result ?: false
+        }
+    }
+
     private fun runGoTrue(
         email: String = "no-email",
         userId: String = "no-userid",
@@ -158,6 +370,21 @@ class SupabaseUserServiceGoTrueImpl(
         }
     }
 
+    private suspend fun <T> runGoTrueWithResult(
+        email: String = "no-email",
+        userId: String = "no-userid",
+        block: suspend () -> T?
+    ): T? {
+        return try {
+            block()
+        } catch (e: RestException) {
+            handleGoTrueException(e, email, userId)
+            null
+        } finally {
+            goTrueClient.clearSession()
+        }
+    }
+
     private fun handleGoTrueException(e: RestException, email: String, userId: String) {
         val message = e.message ?: let {
             logger.error(e.message)
@@ -165,6 +392,7 @@ class SupabaseUserServiceGoTrueImpl(
         }
         when {
             message.contains("User already registered", true) -> throw UserAlreadyRegisteredException(email)
+            message.contains("already been registered", true) -> throw UserAlreadyRegisteredException(email)
             message.contains("Invalid login credentials", true) -> throw InvalidLoginCredentialsException(email)
             message.contains("Email not confirmed", true) -> throw UserNeedsToConfirmEmailBeforeLoginException(email)
             message.contains("Signups not allowed for otp", true) -> throw OtpSignupNotAllowedExceptions(message)
