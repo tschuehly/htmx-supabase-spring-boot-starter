@@ -310,8 +310,6 @@ class SupabaseUserServiceGoTrueImpl(
                     } catch (e: RestException) {
                         // TODO: handle exceptions
                         null
-                    } finally {
-                        goTrueClient.clearSession()
                     }
                 }
             }
