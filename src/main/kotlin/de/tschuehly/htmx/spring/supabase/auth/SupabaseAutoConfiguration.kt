@@ -2,7 +2,6 @@ package de.tschuehly.htmx.spring.supabase.auth
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import com.zaxxer.hikari.HikariDataSource
 import de.tschuehly.htmx.spring.supabase.auth.config.DefaultExceptionHandlerConfig
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
 import de.tschuehly.htmx.spring.supabase.auth.controller.SupabaseUserController
@@ -26,9 +25,9 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import javax.sql.DataSource
 
 @Configuration
-@ConditionalOnProperty(prefix = "supabase", name = ["projectId"])
 @EnableConfigurationProperties(SupabaseProperties::class)
 @Import(SupabaseSecurityConfig::class, DefaultExceptionHandlerConfig::class)
 @AutoConfigureBefore(DataSourceAutoConfiguration::class)
@@ -66,7 +65,7 @@ class SupabaseAutoConfiguration(
     fun supabaseClient(supabaseProperties: SupabaseProperties): Auth {
         val supabase = createSupabaseClient(
             supabaseUrl = supabaseProperties.url?: "https://${supabaseProperties.projectId}.supabase.co",
-            supabaseKey = supabaseProperties.anonKey
+            supabaseKey = supabaseProperties.anonKey ?: throw IllegalStateException()
         ) {
             install(Auth) {
                 autoSaveToStorage = false
@@ -83,13 +82,14 @@ class SupabaseAutoConfiguration(
         return SupabaseJwtVerifier(jwtVerifier)
     }
 
+
     @Bean
     @ConfigurationProperties("supabase.datasource")
     @ConditionalOnProperty(prefix = "supabase.database", name = ["host"])
     fun dataSource(
         supabaseProperties: SupabaseProperties
-    ): HikariDataSource {
-        val dataSourceBuilder = DataSourceBuilder.create().type(HikariDataSource::class.java)
+    ): DataSource {
+        val dataSourceBuilder = DataSourceBuilder.create()
         dataSourceBuilder.driverClassName("org.postgresql.Driver")
         supabaseProperties.database?.let { db ->
             dataSourceBuilder.url("jdbc:postgresql://${db.host}:${db.port}/${db.name}")

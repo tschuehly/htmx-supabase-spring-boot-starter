@@ -2,17 +2,15 @@ package de.tschuehly.htmx.spring.supabase.auth.service
 
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
 import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserAuthenticated
-import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserEmailUpdated
+import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserEmailUpdateConfirmed
+import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserEmailUpdateRequested
 import de.tschuehly.htmx.spring.supabase.auth.events.SupabaseUserRolesUpdated
 import de.tschuehly.htmx.spring.supabase.auth.exception.*
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.SuccessfulPasswordUpdate
-import de.tschuehly.htmx.spring.supabase.auth.exception.info.InvalidLoginCredentialsException
-import de.tschuehly.htmx.spring.supabase.auth.exception.info.NewPasswordShouldBeDifferentFromOldPasswordException
-import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserAlreadyRegisteredException
-import de.tschuehly.htmx.spring.supabase.auth.exception.info.UserNeedsToConfirmEmailBeforeLoginException
+import de.tschuehly.htmx.spring.supabase.auth.exception.info.*
 import de.tschuehly.htmx.spring.supabase.auth.htmx.HtmxUtil
 import de.tschuehly.htmx.spring.supabase.auth.security.JwtAuthenticationToken
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationProvider
@@ -106,7 +104,7 @@ class SupabaseUserService(
         if (url.contains("type=email_change")) {
             logger.debug("User: ${user.email} has set email")
             val email = user.email ?: throw IllegalStateException("Email shouldn't be null")
-            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdated(user.id, email))
+            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateConfirmed(user.id, email))
             HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
             return
         }
@@ -122,7 +120,7 @@ class SupabaseUserService(
         }
     }
 
-    fun linkAnonToIdentity(email: String) {
+    fun requestEmailChange(email: String) {
         runGoTrue {
             val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
                 ?: throw UnknownSupabaseException("No authenticated user found in SecurityContext")
@@ -130,8 +128,8 @@ class SupabaseUserService(
             goTrueClient.updateUser {
                 this.email = email
             }
-            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdated(user.id, email))
-            throw UserNeedsToConfirmEmailBeforeLoginException(email)
+            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
+            throw UserNeedsToConfirmEmailForEmailChangeException(email)
         }
 
     }
@@ -145,6 +143,7 @@ class SupabaseUserService(
             goTrueClient.currentAccessTokenOrNull()
             val user = authenticateWithCurrentSession()
             applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
+            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
         }
     }
 

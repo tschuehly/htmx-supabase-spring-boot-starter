@@ -19,7 +19,10 @@ interface SupabaseExceptionHandler {
     fun handleInvalidLoginCredentialsException(exception: InvalidLoginCredentialsException): Any
 
     @ExceptionHandler(UserNeedsToConfirmEmailBeforeLoginException::class)
-    fun handleUserNeedsToConfirmEmail(exception: UserNeedsToConfirmEmailBeforeLoginException): Any
+    fun handleUserNeedsToConfirmEmailBeforeLogin(exception: UserNeedsToConfirmEmailBeforeLoginException): Any
+
+    @ExceptionHandler(UserNeedsToConfirmEmailForEmailChangeException::class)
+    fun handleUserNeedsToConfirmEmailForEmailChange(exception: UserNeedsToConfirmEmailForEmailChangeException): Any
 
     @ExceptionHandler(RegistrationConfirmationEmailSent::class)
     fun handleSuccessfulRegistration(exception: RegistrationConfirmationEmailSent): Any

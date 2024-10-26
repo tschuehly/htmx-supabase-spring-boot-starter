@@ -38,9 +38,15 @@ open class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
     }
 
     @ResponseBody
-    override fun handleUserNeedsToConfirmEmail(exception: UserNeedsToConfirmEmailBeforeLoginException): Any {
+    override fun handleUserNeedsToConfirmEmailBeforeLogin(exception: UserNeedsToConfirmEmailBeforeLoginException): Any {
         logger.debug(exception.message)
         return "UserNeedsToConfirmEmailBeforeLoginException"
+    }
+
+    @ResponseBody
+    override fun handleUserNeedsToConfirmEmailForEmailChange(exception: UserNeedsToConfirmEmailForEmailChangeException): Any {
+        logger.debug(exception.message)
+        return "UserNeedsToConfirmEmailForEmailChangeException"
     }
 
     @ResponseBody

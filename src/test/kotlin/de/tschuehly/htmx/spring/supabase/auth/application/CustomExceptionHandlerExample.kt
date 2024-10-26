@@ -33,7 +33,12 @@ class CustomExceptionHandlerExample : SupabaseExceptionHandler {
     }
 
     @ResponseBody
-    override fun handleUserNeedsToConfirmEmail(exception: UserNeedsToConfirmEmailBeforeLoginException): Any {
+    override fun handleUserNeedsToConfirmEmailForEmailChange(exception: UserNeedsToConfirmEmailForEmailChangeException): Any {
+        return "UserNeedsToConfirmEmailForEmailChangeException"
+    }
+
+    @ResponseBody
+    override fun handleUserNeedsToConfirmEmailBeforeLogin(exception: UserNeedsToConfirmEmailBeforeLoginException): Any {
         return "UserNeedsToConfirmEmailBeforeLoginException"
     }
 

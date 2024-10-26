@@ -63,7 +63,7 @@ class SupabaseUserController(
     ) {
         if (email != null) {
             logger.debug("User with the email $email is linking an Anonymous User")
-            supabaseUserService.linkAnonToIdentity(email)
+            supabaseUserService.requestEmailChange(email)
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
         }

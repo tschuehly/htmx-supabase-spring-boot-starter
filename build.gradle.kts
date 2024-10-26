@@ -28,7 +28,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
-    implementation("com.zaxxer:HikariCP")
     implementation("org.springframework:spring-jdbc")
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")

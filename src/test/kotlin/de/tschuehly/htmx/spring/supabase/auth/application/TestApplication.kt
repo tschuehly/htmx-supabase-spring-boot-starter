@@ -1,14 +1,11 @@
 package de.tschuehly.htmx.spring.supabase.auth.application
 
-import de.tschuehly.htmx.spring.supabase.auth.SupabaseAutoConfiguration
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
 import org.springframework.boot.runApplication
+import org.springframework.context.annotation.PropertySource
 
 @SpringBootApplication
+@PropertySource(value = ["classpath:/test.properties"], ignoreResourceNotFound = true)
 class TestApplication {
 
 }

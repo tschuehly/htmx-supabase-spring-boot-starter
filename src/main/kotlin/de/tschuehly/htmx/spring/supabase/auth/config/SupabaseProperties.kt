@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 class SupabaseProperties(
     val projectId: String,
     val url: String?,
-    val anonKey: String,
+    val anonKey: String?,
     val jwtSecret: String?,
     val database: Database? = null,
     val otpCreateUser: Boolean = true,
@@ -23,13 +23,31 @@ class SupabaseProperties(
 ) {
 
     init {
-        require(projectId != null) { "You need to specify the property: projectId in your application.yaml" }
-        require(anonKey != null) { "You need to specify the property: anonKey in your application.yaml" }
-        require(jwtSecret != null) { "You need to specify the property: jwtSecret in your application.yaml" }
-        require(successfulLoginRedirectPage != null) { "You need to specify the property: successfulLoginRedirectPage in your application.yaml" }
-        require(passwordRecoveryPage != null) { "You need to specify the property: passwordRecoveryPage in your application.yaml" }
-        require(unauthenticatedPage != null) { "You need to specify the property: unauthenticatedPage in your application.yaml" }
-        require(unauthorizedPage != null) { "You need to specify the property: unauthorizedPage in your application.yaml" }
+        val errorMessage = mutableListOf<String>()
+        if (projectId == null) {
+            errorMessage.add("You need to specify the property: supabase.projectId in your application.yaml")
+        }
+        if (anonKey == null) {
+            errorMessage.add("You need to specify the property: supabase.anonKey in your application.yaml")
+        }
+        if (jwtSecret == null) {
+            errorMessage.add("You need to specify the property: supabase.jwtSecret in your application.yaml")
+        }
+        if (successfulLoginRedirectPage == null) {
+            errorMessage.add("You need to specify the property: supabase.successfulLoginRedirectPage in your application.yaml")
+        }
+        if (passwordRecoveryPage == null) {
+            errorMessage.add("You need to specify the property: supabase.passwordRecoveryPage in your application.yaml")
+        }
+        if (unauthenticatedPage == null) {
+            errorMessage.add("You need to specify the property: supabase.unauthenticatedPage in your application.yaml")
+        }
+        if (unauthorizedPage == null) {
+            errorMessage.add("You need to specify the property: supabase.unauthorizedPage in your application.yaml")
+        }
+        if (errorMessage.isNotEmpty()) {
+            throw IllegalArgumentException(errorMessage.joinToString("\n"))
+        }
     }
 
     class Database(
