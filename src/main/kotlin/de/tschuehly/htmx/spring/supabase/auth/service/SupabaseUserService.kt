@@ -19,6 +19,7 @@ import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityContextHo
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.exception.AuthErrorCode
 import io.github.jan.supabase.gotrue.exception.AuthRestException
 import io.github.jan.supabase.gotrue.providers.builtin.Email
@@ -127,6 +128,10 @@ class SupabaseUserService(
             goTrueClient.importAuthToken(user.verifiedJwt)
             goTrueClient.updateUser {
                 this.email = email
+            }
+            // TODO:
+            if (user.email == email) {
+                goTrueClient.resendEmail(OtpType.Email.EMAIL_CHANGE, email)
             }
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
             throw UserNeedsToConfirmEmailForEmailChangeException(email)
