@@ -106,7 +106,6 @@ class SupabaseUserService(
             logger.debug("User: ${user.email} has set email")
             val email = user.email ?: throw IllegalStateException("Email shouldn't be null")
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateConfirmed(user.id, email))
-            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
             return
         }
         applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
