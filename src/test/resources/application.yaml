@@ -28,7 +28,7 @@ supabase:
       - "/api/user/logout"
     post:
       - "/api/user/signup"
-      - "/api/user/sendEmailOtp"
+      - "/api/user/signInWithMagicLink"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"

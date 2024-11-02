@@ -82,7 +82,8 @@ class SupabaseUserService(
         }
     }
 
-    fun sendOtp(email: String) {
+
+    fun signInWithMagicLink(email: String) {
         runGoTrue(email) {
             goTrueClient.signInWith(OTP) {
                 this.email = email
@@ -135,12 +136,28 @@ class SupabaseUserService(
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
             throw UserNeedsToConfirmEmailForEmailChangeException(email)
         }
+    }
 
+    fun confirmEmailOtp(email: String, otp: String) {
+        runGoTrue(email) {
+            val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
+                ?: throw UnknownSupabaseException("No authenticated user found in SecurityContext")
+            goTrueClient.importAuthToken(user.verifiedJwt)
+            goTrueClient.verifyEmailOtp(type = OtpType.Email.EMAIL_CHANGE, email = email, token = otp)
+            applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateConfirmed(user.id, email))
+        }
+    }
+
+    fun resendEmailChangeConfirmation(email: String) {
+        runGoTrue(email) {
+            goTrueClient.resendEmail(OtpType.Email.EMAIL_CHANGE, email)
+        }
     }
 
     fun signInAnonymouslyWithEmail(email: String) {
         runGoTrue(email) {
             goTrueClient.signInAnonymously()
+
             goTrueClient.updateUser {
                 this.email = email
             }
@@ -182,12 +199,12 @@ class SupabaseUserService(
         }
     }
 
+
     fun setRolesWithRequest(userId: String, roles: List<String>?) {
         HtmxUtil.getCookie("JWT")?.let {
             setRoles(it.value, userId, roles)
         }
     }
-
 
     private fun setRoles(serviceRoleJWT: String, userId: String, roles: List<String>?) {
         val roleArray = roles ?: listOf()

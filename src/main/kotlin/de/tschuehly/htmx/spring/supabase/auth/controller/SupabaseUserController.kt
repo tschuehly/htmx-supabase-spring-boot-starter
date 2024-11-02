@@ -69,16 +69,32 @@ class SupabaseUserController(
         }
     }
 
-    @PostMapping("/sendEmailOtp")
+    @PostMapping("/signInWithMagicLink")
     fun sendEmailOtp(
         @RequestParam email: String?
     ) {
         if (email != null) {
-            logger.debug("User with the email $email is requesting an OTP")
-            supabaseUserService.sendOtp(email)
+            logger.debug("User with the email $email is trying to sign in with a Magic Link")
+            supabaseUserService.signInWithMagicLink(email)
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
         }
+    }
+
+    @PostMapping("/confirmEmailOtp")
+    @ResponseBody
+    fun confirmEmailOtp(
+        @RequestParam email: String?,
+        @RequestParam otp: String?
+    ) {
+        if (email.isNullOrBlank()) {
+            MissingCredentials.EMAIL_MISSING.throwExc()
+        }
+        if (otp.isNullOrBlank()) {
+            MissingCredentials.OTP_MISSING.throwExc()
+        }
+        logger.debug("User with the email $email is confirming an OTP")
+        supabaseUserService.confirmEmailOtp(email!!, otp!!)
     }
 
 
@@ -140,6 +156,6 @@ class SupabaseUserController(
     @PostMapping("/updatePassword")
     @ResponseBody
     fun updatePassword(@RequestParam password: String) {
-        supabaseUserService.updatePassword( password)
+        supabaseUserService.updatePassword(password)
     }
 }

@@ -1,9 +1,6 @@
 package de.tschuehly.htmx.spring.supabase.auth.exception.handler
 
-import de.tschuehly.htmx.spring.supabase.auth.exception.MissingServiceRoleForAdminAccessException
-import de.tschuehly.htmx.spring.supabase.auth.exception.SupabaseAuthException
-import de.tschuehly.htmx.spring.supabase.auth.exception.UnknownSupabaseException
-import de.tschuehly.htmx.spring.supabase.auth.exception.WeakPasswordException
+import de.tschuehly.htmx.spring.supabase.auth.exception.*
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.OtpEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.PasswordRecoveryEmailSent
 import de.tschuehly.htmx.spring.supabase.auth.exception.email.RegistrationConfirmationEmailSent
@@ -53,5 +50,8 @@ interface SupabaseExceptionHandler {
 
     @ExceptionHandler(UnknownSupabaseException::class)
     fun handleUnknownSupabaseException(exception: UnknownSupabaseException): Any
+
+    @ExceptionHandler(OtpExpiredException::class)
+    fun handleOtpExpiredException(exception: OtpExpiredException): Any
 
 }

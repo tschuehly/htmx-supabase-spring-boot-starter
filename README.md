@@ -69,7 +69,7 @@ configure access for get,post,put,delete. This is the minimal configuration for 
       - "/api/user/logout"
     post:
       - "/api/user/signup"
-      - "/api/user/sendEmailOtp"
+      - "/api/user/signInWithMagicLink"
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
