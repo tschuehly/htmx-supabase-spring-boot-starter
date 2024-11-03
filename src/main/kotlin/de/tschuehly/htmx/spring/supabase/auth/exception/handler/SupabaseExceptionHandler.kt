@@ -54,4 +54,6 @@ interface SupabaseExceptionHandler {
     @ExceptionHandler(OtpExpiredException::class)
     fun handleOtpExpiredException(exception: OtpExpiredException): Any
 
+    @ExceptionHandler(ValidationFailedException::class)
+    fun handleValidationFailedException(exception: ValidationFailedException): Any
 }

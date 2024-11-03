@@ -160,7 +160,6 @@ class SupabaseUserService(
             goTrueClient.updateUser {
                 this.email = email
             }
-            goTrueClient.currentAccessTokenOrNull()
             val user = authenticateWithCurrentSession()
             applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user, email))
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
@@ -267,6 +266,7 @@ class SupabaseUserService(
             AuthErrorCode.SamePassword -> throw NewPasswordShouldBeDifferentFromOldPasswordException(email)
             AuthErrorCode.WeakPassword -> throw WeakPasswordException(email)
             AuthErrorCode.OtpExpired -> throw OtpExpiredException(email)
+            AuthErrorCode.ValidationFailed -> throw ValidationFailedException(email)
             AuthErrorCode.NotAdmin -> throw MissingServiceRoleForAdminAccessException(SupabaseSecurityContextHolder.getAuthenticatedUser()?.id)
             else -> throw SupabaseAuthException(exc)
         }

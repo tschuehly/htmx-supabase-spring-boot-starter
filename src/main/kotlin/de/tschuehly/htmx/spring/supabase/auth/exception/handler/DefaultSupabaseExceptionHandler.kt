@@ -111,5 +111,10 @@ open class DefaultSupabaseExceptionHandler : SupabaseExceptionHandler {
         return "OtpExpiredException"
     }
 
+    override fun handleValidationFailedException(exception: ValidationFailedException): Any {
+        logger.debug("${exception.message}")
+        return "ValidationFailedException"
+    }
+
 
 }

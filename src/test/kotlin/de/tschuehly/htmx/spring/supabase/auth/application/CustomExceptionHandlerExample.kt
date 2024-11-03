@@ -93,5 +93,9 @@ class CustomExceptionHandlerExample : SupabaseExceptionHandler {
         return "OtpExpiredException"
     }
 
+    override fun handleValidationFailedException(exception: ValidationFailedException): Any {
+        return "ValidationFailedException"
+    }
+
 
 }
