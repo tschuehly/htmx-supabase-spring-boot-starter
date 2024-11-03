@@ -17,14 +17,14 @@ import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationPro
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtFilter.Companion.setJWTCookie
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityContextHolder
 import de.tschuehly.htmx.spring.supabase.auth.types.SupabaseUser
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.exception.AuthRestException
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.builtin.OTP
+import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.OtpType
-import io.github.jan.supabase.gotrue.exception.AuthErrorCode
-import io.github.jan.supabase.gotrue.exception.AuthRestException
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.providers.builtin.OTP
-import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponseHeader.HX_REDIRECT
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
@@ -77,7 +77,7 @@ class SupabaseUserService(
                 this.password = password
             }
             val user = authenticateWithCurrentSession()
-            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user, email))
             logger.debug("User: $email successfully logged in")
         }
     }
@@ -157,13 +157,12 @@ class SupabaseUserService(
     fun signInAnonymouslyWithEmail(email: String) {
         runGoTrue(email) {
             goTrueClient.signInAnonymously()
-
             goTrueClient.updateUser {
                 this.email = email
             }
             goTrueClient.currentAccessTokenOrNull()
             val user = authenticateWithCurrentSession()
-            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
+            applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user, email))
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
         }
     }

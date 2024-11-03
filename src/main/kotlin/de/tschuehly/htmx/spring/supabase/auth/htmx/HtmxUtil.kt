@@ -68,4 +68,11 @@ object HtmxUtil {
             ?: throw RuntimeException("No response found in RequestContextHolder")
     }
 
+    fun redirect(path: String?) {
+        if (path != null) {
+            setHeader(HtmxResponseHeader.HX_REDIRECT, path)
+            setHeader(HtmxResponseHeader.HX_RESWAP, HxSwapType.NONE.value)
+        }
+    }
+
 }

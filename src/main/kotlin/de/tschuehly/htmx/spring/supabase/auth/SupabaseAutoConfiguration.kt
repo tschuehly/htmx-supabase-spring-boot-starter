@@ -9,9 +9,9 @@ import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationPro
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseJwtVerifier
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseSecurityConfig
 import de.tschuehly.htmx.spring.supabase.auth.service.SupabaseUserService
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.auth
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.AutoConfigureBefore
