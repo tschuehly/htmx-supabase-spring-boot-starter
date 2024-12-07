@@ -15,7 +15,7 @@ group = "de.tschuehly"
 version = "0.3.6-SNAPSHOT"
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(22)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 

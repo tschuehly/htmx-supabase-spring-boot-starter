@@ -2,7 +2,6 @@ package de.tschuehly.htmx.spring.supabase.auth
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import de.tschuehly.htmx.spring.supabase.auth.config.DefaultExceptionHandlerConfig
 import de.tschuehly.htmx.spring.supabase.auth.config.SupabaseProperties
 import de.tschuehly.htmx.spring.supabase.auth.controller.SupabaseUserController
 import de.tschuehly.htmx.spring.supabase.auth.security.SupabaseAuthenticationProvider
@@ -29,7 +28,7 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableConfigurationProperties(SupabaseProperties::class)
-@Import(SupabaseSecurityConfig::class, DefaultExceptionHandlerConfig::class)
+@Import(SupabaseSecurityConfig::class)
 @AutoConfigureBefore(DataSourceAutoConfiguration::class)
 class SupabaseAutoConfiguration(
     val supabaseProperties: SupabaseProperties,
@@ -64,7 +63,7 @@ class SupabaseAutoConfiguration(
     @ConditionalOnMissingBean
     fun supabaseClient(supabaseProperties: SupabaseProperties): Auth {
         val supabase = createSupabaseClient(
-            supabaseUrl = supabaseProperties.url?: "https://${supabaseProperties.projectId}.supabase.co",
+            supabaseUrl = supabaseProperties.url ?: "https://${supabaseProperties.projectId}.supabase.co",
             supabaseKey = supabaseProperties.anonKey ?: throw IllegalStateException()
         ) {
             install(Auth) {
