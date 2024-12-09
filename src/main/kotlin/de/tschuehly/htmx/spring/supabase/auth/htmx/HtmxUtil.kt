@@ -24,7 +24,7 @@ object HtmxUtil {
 
     fun retargetToId(id: String) {
         val request: HttpServletRequest = getRequest()
-        if (request.getHeader(HtmxRequestHeader.HX_REQUEST.getValue()) != null) {
+        if (request.getHeader(HtmxRequestHeader.HX_REQUEST.value) != null) {
             setHeader(
                 headerName = HtmxResponseHeader.HX_RETARGET.value,
                 headerValue = if (id.startsWith("#")) id else "#$id"

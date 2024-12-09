@@ -187,12 +187,9 @@ class SupabaseUserService(
 
     fun logout() {
         SecurityContextHolder.getContext().authentication = null
-        HtmxUtil.getCookie("JWT")?.let {
-            var cookieString = "JWT=${it.value}; HttpOnly; Path=/;Max-Age=0;"
-            if (supabaseProperties.sslOnly) {
-                cookieString += "Secure;"
-            }
-            HtmxUtil.setHeader("Set-Cookie", cookieString)
+        val jwt = HtmxUtil.getCookie("JWT")?.value
+        if (jwt != null) {
+            HtmxUtil.getResponse().setJWTCookie(jwt, supabaseProperties, 0)
             HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.postLogoutPage ?: "/")
         }
     }
