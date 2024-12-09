@@ -9,6 +9,7 @@ class SupabaseProperties(
     val url: String?,
     val anonKey: String?,
     val jwtSecret: String?,
+    val cookieDomain: String?,
     val database: Database? = null,
     val otpCreateUser: Boolean = true,
     val successfulLoginRedirectPage: String?,
@@ -24,9 +25,6 @@ class SupabaseProperties(
 
     init {
         val errorMessage = mutableListOf<String>()
-        if (projectId == null) {
-            errorMessage.add("You need to specify the property: supabase.projectId in your application.yaml")
-        }
         if (anonKey == null) {
             errorMessage.add("You need to specify the property: supabase.anonKey in your application.yaml")
         }

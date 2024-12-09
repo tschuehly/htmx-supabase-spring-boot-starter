@@ -60,6 +60,9 @@ class SupabaseJwtFilter(
             this.addCookie(Cookie("JWT", accessToken).also {
                 it.secure = supabaseProperties.sslOnly
                 it.isHttpOnly = true
+                if (supabaseProperties.cookieDomain != null) {
+                    it.domain = supabaseProperties.cookieDomain
+                }
                 it.path = "/"
                 it.maxAge = maxAge
             })

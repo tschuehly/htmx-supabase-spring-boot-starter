@@ -35,4 +35,4 @@ jobs:
           name: jreleaser-release
           path: |
             build/jreleaser/trace.log 
-            build/jreleaser/output.properties 
+            build/jreleaser/output.properties
