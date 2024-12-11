@@ -33,12 +33,13 @@ object HtmxUtil {
     }
 
     fun swap(hxSwapType: HxSwapType) {
-        setHeader(HtmxResponseHeader.HX_RESWAP.getValue(), hxSwapType.getValue())
+        setHeader(HtmxResponseHeader.HX_RESWAP.value, hxSwapType.value)
     }
 
 
     fun trigger(event: String?) {
-        setHeader(HtmxResponseHeader.HX_TRIGGER.getValue(), event)
+        val header: String? = getResponse().getHeader(HtmxResponseHeader.HX_TRIGGER.value)
+        setHeader(HtmxResponseHeader.HX_TRIGGER.value, listOfNotNull(header, event).joinToString(", "))
     }
 
 
