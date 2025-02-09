@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.3.6-SNAPSHOT"
+version = "0.3.6"
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
