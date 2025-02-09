@@ -265,7 +265,7 @@ class SupabaseUserService(
             AuthErrorCode.OtpExpired -> throw OtpExpiredException(email)
             AuthErrorCode.ValidationFailed -> throw ValidationFailedException(email)
             AuthErrorCode.NotAdmin -> throw MissingServiceRoleForAdminAccessException(SupabaseSecurityContextHolder.getAuthenticatedUser()?.id)
-            else -> throw SupabaseAuthException(exc)
+            else -> throw SupabaseAuthException(exc, email)
         }
     }
 
