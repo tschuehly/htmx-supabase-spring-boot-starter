@@ -97,5 +97,9 @@ class CustomExceptionHandlerExample : SupabaseExceptionHandler {
         return "ValidationFailedException"
     }
 
+    override fun handleOverEmailSendRateException(exception: OverEmailSendRateException): Any {
+        return "OverEmailSendRateException"
+    }
+
 
 }

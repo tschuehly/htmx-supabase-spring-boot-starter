@@ -36,7 +36,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
     implementation("com.auth0:java-jwt:4.4.0")
 
-    implementation("io.github.jan-tennert.supabase:auth-kt:3.0.1")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.1.1")
     runtimeOnly("io.ktor:ktor-client-java:3.0.0")
     testRuntimeOnly("io.ktor:ktor-client-java:3.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
