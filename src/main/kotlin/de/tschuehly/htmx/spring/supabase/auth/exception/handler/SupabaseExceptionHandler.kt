@@ -56,4 +56,7 @@ interface SupabaseExceptionHandler {
 
     @ExceptionHandler(ValidationFailedException::class)
     fun handleValidationFailedException(exception: ValidationFailedException): Any
+
+    @ExceptionHandler(OverEmailSendRateException::class)
+    fun handleOverEmailSendRateException(exception: OverEmailSendRateException): Any
 }
