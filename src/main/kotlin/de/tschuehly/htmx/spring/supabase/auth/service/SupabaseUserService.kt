@@ -264,6 +264,7 @@ class SupabaseUserService(
             AuthErrorCode.WeakPassword -> throw WeakPasswordException(email)
             AuthErrorCode.OtpExpired -> throw OtpExpiredException(email)
             AuthErrorCode.ValidationFailed -> throw ValidationFailedException(email)
+            AuthErrorCode.InvalidCredentials -> throw InvalidLoginCredentialsException(email)
             AuthErrorCode.OverEmailSendRateLimit -> throw OverEmailSendRateException(email)
             AuthErrorCode.NotAdmin -> throw MissingServiceRoleForAdminAccessException(SupabaseSecurityContextHolder.getAuthenticatedUser()?.id)
             else -> throw SupabaseAuthException(exc, email)
