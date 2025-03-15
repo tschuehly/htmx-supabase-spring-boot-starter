@@ -50,7 +50,7 @@ class SupabaseUserController(
     @ResponseBody
     fun anonSignInWithEmail(@RequestParam email: String?) {
         if (email != null) {
-            supabaseUserService.signInAnonymouslyWithEmail(email)
+            supabaseUserService.signInAnonymouslyWithEmail(email.trim().lowercase())
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
         }
@@ -63,7 +63,7 @@ class SupabaseUserController(
     ) {
         if (email != null) {
             logger.debug("User with the email $email is linking an Anonymous User")
-            supabaseUserService.requestEmailChange(email)
+            supabaseUserService.requestEmailChange(email.trim().lowercase())
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
         }
@@ -75,7 +75,7 @@ class SupabaseUserController(
     ) {
         if (email != null) {
             logger.debug("User with the email $email is trying to sign in with a Magic Link")
-            supabaseUserService.signInWithMagicLink(email)
+            supabaseUserService.signInWithMagicLink(email.trim().lowercase())
         } else {
             MissingCredentials.EMAIL_MISSING.throwExc()
         }
@@ -94,7 +94,7 @@ class SupabaseUserController(
             MissingCredentials.OTP_MISSING.throwExc()
         }
         logger.debug("User with the email $email is confirming an OTP")
-        supabaseUserService.confirmEmailOtp(email!!, otp!!)
+        supabaseUserService.confirmEmailOtp(email!!.trim().lowercase(), otp!!)
     }
 
 
@@ -113,7 +113,7 @@ class SupabaseUserController(
                 MissingCredentials.PASSWORD_MISSING.throwExc()
 
             else ->
-                function(email.trim(), password.trim())
+                function(email.trim().lowercase(), password.trim())
         }
     }
 
@@ -150,12 +150,12 @@ class SupabaseUserController(
         email: String
     ) {
         logger.debug("User with the email $email requested a password reset")
-        supabaseUserService.sendPasswordRecoveryEmail(email)
+        supabaseUserService.sendPasswordRecoveryEmail(email.trim().lowercase())
     }
 
     @PostMapping("/updatePassword")
     @ResponseBody
     fun updatePassword(@RequestParam password: String) {
-        supabaseUserService.updatePassword(password)
+        supabaseUserService.updatePassword(password.trim())
     }
 }
