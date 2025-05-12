@@ -12,12 +12,7 @@ plugins {
 }
 
 group = "de.tschuehly"
-version = "0.3.7-RC2"
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
-    }
-}
+version = "0.3.7-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -36,7 +31,7 @@ dependencies {
     implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
     implementation("com.auth0:java-jwt:4.5.0")
 
-    implementation("io.github.jan-tennert.supabase:auth-kt:3.1.4")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.0.3")
     runtimeOnly("io.ktor:ktor-client-java:3.1.3")
     testRuntimeOnly("io.ktor:ktor-client-java:3.1.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
