@@ -1,8 +1,8 @@
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.3.3"
-    id("io.spring.dependency-management") version "1.1.6"
+    id("org.springframework.boot") version "3.4.5"
+    id("io.spring.dependency-management") version "1.1.7"
     kotlin("jvm") version "2.0.0"
     kotlin("plugin.spring") version "2.0.0"
 
@@ -15,7 +15,7 @@ group = "de.tschuehly"
 version = "0.3.6"
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(24)
     }
 }
 
@@ -34,13 +34,13 @@ dependencies {
     implementation("org.springframework:spring-context-support")
 
     implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
-    implementation("com.auth0:java-jwt:4.4.0")
+    implementation("com.auth0:java-jwt:4.5.0")
 
-    implementation("io.github.jan-tennert.supabase:auth-kt:3.0.1")
-    runtimeOnly("io.ktor:ktor-client-java:3.0.0")
-    testRuntimeOnly("io.ktor:ktor-client-java:3.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
-    testImplementation("io.ktor:ktor-client-mock:3.0.0")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.1.4")
+    runtimeOnly("io.ktor:ktor-client-java:3.1.3")
+    testRuntimeOnly("io.ktor:ktor-client-java:3.1.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("io.ktor:ktor-client-mock:3.1.3")
 
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -52,13 +52,13 @@ dependencies {
 
     runtimeOnly("org.postgresql:postgresql")
 
-    testImplementation("org.htmlunit:htmlunit:4.2.0")
+    testImplementation("org.htmlunit:htmlunit:4.11.1")
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.github.tomakehurst:wiremock:3.0.1")
+    implementation("org.wiremock:wiremock:3.13.0")
     testImplementation("org.springframework.boot:spring-boot-devtools")
-    testImplementation("com.russhwolf:multiplatform-settings-test:1.1.1")
+    testImplementation("com.russhwolf:multiplatform-settings-test:1.3.0")
 
 }
 
