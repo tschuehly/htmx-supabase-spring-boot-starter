@@ -42,6 +42,7 @@ class SupabaseUserController(
     }
 
     @PostMapping("/loginAnon")
+    @ResponseBody
     fun anonSignIn() {
         supabaseUserService.signInAnonymously()
     }
