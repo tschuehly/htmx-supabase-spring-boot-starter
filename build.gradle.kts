@@ -7,12 +7,12 @@ plugins {
     kotlin("plugin.spring") version "2.0.0"
 
     id("maven-publish")
-    id("org.jreleaser") version "1.14.0"
+    id("org.jreleaser") version "1.18.0"
     id("signing")
 }
 
 group = "de.tschuehly"
-version = "0.3.7-RC3"
+version = "0.3.7-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -138,15 +138,23 @@ jreleaser {
     }
     deploy {
         maven {
-            nexus2 {
-                create("maven-central") {
+            mavenCentral {
+
+                create("release-deploy") {
                     active.set(Active.ALWAYS)
+                    url.set("https://central.sonatype.com/api/v1/publisher")
+                    stagingRepositories.add("build/staging-deploy")
+                }
+            }
+            nexus2 {
+                create("snapshot-deploy") {
+                    active.set(Active.SNAPSHOT)
                     snapshotSupported.set(true)
-                    url.set("https://s01.oss.sonatype.org/service/local")
-                    snapshotUrl.set("https://s01.oss.sonatype.org/content/repositories/snapshots")
+                    snapshotUrl.set("https://central.sonatype.com/repository/maven-snapshots")
                     closeRepository.set(true)
                     releaseRepository.set(true)
                     stagingRepositories.add("build/staging-deploy")
+                    applyMavenCentralRules = true
                 }
             }
         }
