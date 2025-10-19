@@ -21,7 +21,7 @@ jobs:
         run: ./gradlew :publish
       - name: Publish package to maven central
         env:
-          JRELEASER_NEXUS2_USERNAME: TMnfE9
+          JRELEASER_NEXUS2_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME }}
           JRELEASER_NEXUS2_TOKEN: ${{ secrets.JRELEASER_MAVENCENTRAL_SONATYPE_TOKEN }}
 
           JRELEASER_MAVENCENTRAL_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME }}
