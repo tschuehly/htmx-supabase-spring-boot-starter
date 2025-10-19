@@ -1,13 +1,13 @@
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.4.5"
+    id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("jvm") version "2.0.0"
-    kotlin("plugin.spring") version "2.0.0"
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.spring") version "2.2.20"
 
     id("maven-publish")
-    id("org.jreleaser") version "1.18.0"
+    id("org.jreleaser") version "1.20.0"
     id("signing")
 }
 
