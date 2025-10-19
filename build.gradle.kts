@@ -149,14 +149,12 @@ jreleaser {
             nexus2 {
                 create("snapshot-deploy") {
                     active.set(Active.SNAPSHOT)
+                    snapshotUrl.set("https://central.sonatype.com/repository/maven-snapshots/")
+                    applyMavenCentralRules = true
                     snapshotSupported.set(true)
-                    url.set("https://central.sonatype.com/api/v1/publisher")
-                    snapshotUrl.set("https://central.sonatype.com/repository/maven-snapshots")
-
                     closeRepository.set(true)
                     releaseRepository.set(true)
                     stagingRepositories.add("build/staging-deploy")
-                    applyMavenCentralRules = true
                 }
             }
         }
