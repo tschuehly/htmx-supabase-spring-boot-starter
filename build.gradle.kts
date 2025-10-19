@@ -151,7 +151,7 @@ jreleaser {
                     active.set(Active.SNAPSHOT)
                     snapshotSupported.set(true)
                     url.set("https://central.sonatype.com/api/v1/publisher")
- snapshotUrl.set("https://central.sonatype.com/repository/maven-snapshots")
+                    snapshotUrl.set("https://central.sonatype.com/repository/maven-snapshots")
 
                     closeRepository.set(true)
                     releaseRepository.set(true)
