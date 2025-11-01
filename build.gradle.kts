@@ -1,3 +1,5 @@
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jreleaser.model.Active
 
 plugins {
@@ -60,6 +62,7 @@ dependencies {
 
 kotlin {
     compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_24)
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
 }
@@ -75,6 +78,9 @@ tasks {
 }
 
 java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(24))
+    }
     withJavadocJar()
     withSourcesJar()
 }
