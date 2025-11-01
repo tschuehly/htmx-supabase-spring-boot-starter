@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -25,6 +24,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.StringUtils
@@ -38,10 +38,7 @@ import java.util.*
 @SpringBootTest(
     classes = [TestApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["debug=org.springframework.security"],
-)
-@TestPropertySource(
-    properties = ["SUPABASE_PROJECT_ID=", "SUPABASE_ANON_KEY=", "SUPABASE_DATABASE_PW=", "SUPABASE_JWT_SECRET="]
+    properties = ["debug=org.springframework.security","spring.profiles.active=test"],
 )
 @Import(GoTrueMockConfiguration::class)
 class SupabaseGoTrueTest {
@@ -51,7 +48,7 @@ class SupabaseGoTrueTest {
     @LocalServerPort
     var port: Int? = null
 
-    @MockBean
+    @MockitoBean
     lateinit var authProvider: SupabaseAuthenticationProvider
 
     @BeforeEach
@@ -113,17 +110,16 @@ class SupabaseGoTrueTest {
     @Test
     fun `Unauthorized User will be redirect to unauthenticated`() {
         restTemplate.getForEntity<String>("/account").let {
-            then(it.statusCode).isEqualTo(HttpStatus.FOUND)
-            then(it.headers["Location"]?.get(0)).endsWith("/unauthenticated")
-
+            then(it.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+            then(it.body).isEqualTo("You need to sign in to access this side.")
         }
     }
 
     @Test
     fun `User will be redirect to unauthenticated`() {
         restTemplate.getForEntity<String>("/account").let {
-            then(it.statusCode).isEqualTo(HttpStatus.FOUND)
-            then(it.headers["Location"]?.get(0)).endsWith("/unauthenticated")
+            then(it.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
+            then(it.body).isEqualTo("You need to sign in to access this side.")
 
         }
     }

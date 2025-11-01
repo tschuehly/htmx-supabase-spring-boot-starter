@@ -19,6 +19,7 @@ class SupabaseProperties(
     val postLogoutPage: String?,
     val sslOnly: Boolean = true,
     val public: Public = Public(),
+    val redirectUrl: String? = null,
     val roles: MutableMap<String, Role> = mutableMapOf(),
     val basicAuth: BasicAuth = BasicAuth()
 ) {

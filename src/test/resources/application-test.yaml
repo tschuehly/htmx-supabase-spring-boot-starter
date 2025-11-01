@@ -32,6 +32,10 @@ supabase:
       - "/api/user/login"
       - "/api/user/jwt"
       - "/api/user/sendPasswordResetEmail"
+  project-id: test
+  anon-key: test
+  jwt-secret: test
+
 
 logging:
   level:

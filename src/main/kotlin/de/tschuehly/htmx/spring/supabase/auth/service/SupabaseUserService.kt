@@ -54,7 +54,7 @@ class SupabaseUserService(
 
     fun signUpWithEmail(email: String, password: String) {
         runGoTrue(email) {
-            val user = goTrueClient.signUpWith(Email) {
+            val user = goTrueClient.signUpWith(Email, redirectUrl = supabaseProperties.redirectUrl) {
                 this.email = email
                 this.password = password
             }
@@ -72,7 +72,7 @@ class SupabaseUserService(
 
     fun loginWithEmail(email: String, password: String) {
         runGoTrue(email) {
-            goTrueClient.signInWith(Email) {
+            goTrueClient.signInWith(Email, redirectUrl = supabaseProperties.redirectUrl) {
                 this.email = email
                 this.password = password
             }
@@ -85,7 +85,7 @@ class SupabaseUserService(
 
     fun signInWithMagicLink(email: String) {
         runGoTrue(email) {
-            goTrueClient.signInWith(OTP) {
+            goTrueClient.signInWith(OTP,redirectUrl = supabaseProperties.redirectUrl) {
                 this.email = email
                 this.createUser = supabaseProperties.otpCreateUser
             }

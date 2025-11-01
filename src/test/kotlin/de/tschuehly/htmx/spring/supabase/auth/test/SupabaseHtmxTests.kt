@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext
 @SpringBootTest(
     classes = [TestApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = ["debug=org.springframework.security"],
+    properties = ["debug=org.springframework.security","spring.profiles.active=test"],
 )
 @PropertySource(value = ["classpath:/test.properties"], ignoreResourceNotFound = true)
 @Import(GoTrueMockConfiguration::class)
