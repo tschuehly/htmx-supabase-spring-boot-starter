@@ -32,9 +32,6 @@ class SupabaseProperties(
         if (jwtSecret == null) {
             errorMessage.add("You need to specify the property: supabase.jwtSecret in your application.yaml")
         }
-        if (successfulLoginRedirectPage == null) {
-            errorMessage.add("You need to specify the property: supabase.successfulLoginRedirectPage in your application.yaml")
-        }
         if (passwordRecoveryPage == null) {
             errorMessage.add("You need to specify the property: supabase.passwordRecoveryPage in your application.yaml")
         }

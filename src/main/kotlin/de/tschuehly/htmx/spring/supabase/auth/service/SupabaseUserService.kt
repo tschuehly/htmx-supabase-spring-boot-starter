@@ -110,7 +110,9 @@ class SupabaseUserService(
             return
         }
         applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
-        HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
+        if(supabaseProperties.successfulLoginRedirectPage != null) {
+            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
+        }
     }
 
     fun signInAnonymously() {
