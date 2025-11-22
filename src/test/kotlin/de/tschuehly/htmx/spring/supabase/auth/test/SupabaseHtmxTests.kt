@@ -10,6 +10,9 @@ import org.htmlunit.javascript.SilentJavaScriptErrorListener
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+import org.springframework.boot.jdbc.autoconfigure.health.DataSourceHealthContributorAutoConfiguration
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
@@ -23,9 +26,11 @@ import org.springframework.web.context.WebApplicationContext
     classes = [TestApplication::class],
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["debug=org.springframework.security","spring.profiles.active=test"],
+
 )
 @PropertySource(value = ["classpath:/test.properties"], ignoreResourceNotFound = true)
 @Import(GoTrueMockConfiguration::class)
+@AutoConfigureTestRestTemplate
 class SupabaseHtmxTests {
 
     @LocalServerPort

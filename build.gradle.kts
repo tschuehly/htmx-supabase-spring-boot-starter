@@ -3,10 +3,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jreleaser.model.Active
 
 plugins {
-    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
-    kotlin("jvm") version "2.2.20"
-    kotlin("plugin.spring") version "2.2.20"
+    kotlin("jvm") version "2.2.21"
+    kotlin("plugin.spring") version "2.2.21"
 
     id("maven-publish")
     id("org.jreleaser") version "1.20.0"
@@ -21,10 +21,10 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-security")
-
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework:spring-jdbc")
 
     implementation("org.springframework.boot:spring-boot-autoconfigure")
@@ -36,14 +36,15 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:auth-kt:3.0.3")
     runtimeOnly("io.ktor:ktor-client-java:3.1.3")
     testRuntimeOnly("io.ktor:ktor-client-java:3.1.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+
     testImplementation("io.ktor:ktor-client-mock:3.1.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("io.github.wimdeblauwe:htmx-spring-boot:3.4.1")
+    implementation("io.github.wimdeblauwe:htmx-spring-boot:5.0.0-rc.1")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
@@ -53,7 +54,15 @@ dependencies {
     testImplementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
     testImplementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("org.wiremock:wiremock:3.13.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-jdbc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
+
+    testImplementation("org.springframework.boot:spring-boot-resttestclient")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+
+    implementation("org.wiremock:wiremock:3.13.2")
     testImplementation("org.springframework.boot:spring-boot-devtools")
     testImplementation("com.russhwolf:multiplatform-settings-test:1.3.0")
 

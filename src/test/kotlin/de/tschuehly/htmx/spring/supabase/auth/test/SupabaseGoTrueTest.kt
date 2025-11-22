@@ -15,9 +15,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
+import org.springframework.boot.resttestclient.TestRestTemplate
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate
+import org.springframework.boot.resttestclient.getForEntity
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.boot.test.web.client.getForEntity
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpStatus
@@ -40,6 +41,7 @@ import java.util.*
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = ["debug=org.springframework.security","spring.profiles.active=test"],
 )
+@AutoConfigureTestRestTemplate
 @Import(GoTrueMockConfiguration::class)
 class SupabaseGoTrueTest {
     lateinit var restClient: RestClient
@@ -82,8 +84,8 @@ class SupabaseGoTrueTest {
             .toBodilessEntity()
             .let {
                 then(it.statusCode).isEqualTo(HttpStatus.OK)
-                then(it.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Max-Age=6000; Expires=")
-                    .endsWith(" GMT; Path=/; HttpOnly")
+                then(it.headers["Set-Cookie"]?.get(0)).startsWith("JWT=new_access_token; Expires=")
+                    .endsWith(" GMT; Max-Age=6000; Path=/; HttpOnly")
             }
     }
 
@@ -109,7 +111,7 @@ class SupabaseGoTrueTest {
 
     @Test
     fun `Unauthorized User will be redirect to unauthenticated`() {
-        restTemplate.getForEntity<String>("/account").let {
+        restTemplate.getForEntity("/account", String::class.java).let {
             then(it.statusCode).isEqualTo(HttpStatus.FORBIDDEN)
             then(it.body).isEqualTo("You need to sign in to access this side.")
         }
