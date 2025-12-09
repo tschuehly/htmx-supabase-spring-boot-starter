@@ -21,8 +21,11 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.OTP
+import io.github.jan.supabase.auth.providers.invoke
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.exceptions.RestException
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponseHeader.HX_REDIRECT
@@ -172,7 +175,9 @@ class SupabaseUserService(
         val token = goTrueClient.currentSessionOrNull()?.accessToken
             ?: throw JWTTokenNullException("The JWT that requested from supabase is null")
         HtmxUtil.getResponse().setJWTCookie(token, supabaseProperties)
-        HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
+        if(supabaseProperties.successfulLoginRedirectPage != null) {
+            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
+        }
         return authenticate(token)
 
     }
@@ -231,8 +236,7 @@ class SupabaseUserService(
             ?: throw UnknownSupabaseException("No authenticated user found in SecurityContextRepository")
         val email = user.email ?: "no-email"
         runGoTrue(email) {
-            val jwt = HtmxUtil.getCookie("JWT")?.value
-                ?: throw JWTTokenNullException("No JWT found in request")
+            val jwt = HtmxUtil.getCookie("JWT")?.value ?: throw JWTTokenNullException("No JWT found in request")
             goTrueClient.importAuthToken(jwt)
             goTrueClient.updateUser {
                 this.password = password
@@ -241,11 +245,28 @@ class SupabaseUserService(
         }
     }
 
-    private fun runGoTrue(
+
+    fun linkIdentity(oAuthProvider: String, redirectUrl: String): RedirectUrl {
+        val redirectUrl: String? = runGoTrue {
+            val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
+                ?: throw UnknownSupabaseException("No authenticated user found in SecurityContext")
+            goTrueClient.importAuthToken(user.verifiedJwt)
+            goTrueClient.linkIdentity(
+                OAuthProvider.invoke(oAuthProvider),
+                redirectUrl
+            ) {
+                automaticallyOpenUrl = false
+            }
+        }
+        return RedirectUrl(redirectUrl)
+    }
+
+
+    private fun <T> runGoTrue(
         email: String = "no-email",
-        block: suspend CoroutineScope.() -> Unit
-    ) {
-        runBlocking {
+        block: suspend CoroutineScope.() -> T
+    ): T {
+        return runBlocking {
             try {
                 block()
             } catch (exc: AuthRestException) {
@@ -258,7 +279,7 @@ class SupabaseUserService(
         }
     }
 
-    private fun handleAuthException(exc: AuthRestException, email: String) {
+    private fun handleAuthException(exc: AuthRestException, email: String): Nothing {
         when (exc.errorCode) {
             AuthErrorCode.EmailExists -> throw UserAlreadyRegisteredException(email)
             AuthErrorCode.UserAlreadyExists -> throw UserAlreadyRegisteredException(email)
@@ -273,7 +294,7 @@ class SupabaseUserService(
         }
     }
 
-    private fun handleGoTrueException(e: RestException, email: String) {
+    private fun handleGoTrueException(e: RestException, email: String): Nothing {
         val message = e.message ?: let {
             logger.error(e.message)
             throw UnknownSupabaseException()
@@ -287,5 +308,7 @@ class SupabaseUserService(
         logger.error(e.message)
         throw UnknownSupabaseException()
     }
+
+    data class RedirectUrl(val url: String?)
 
 }
