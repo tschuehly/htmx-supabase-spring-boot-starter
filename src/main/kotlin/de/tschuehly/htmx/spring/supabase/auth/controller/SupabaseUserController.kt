@@ -11,14 +11,29 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @Controller
-@RequestMapping("api/user")
 class SupabaseUserController(
     val supabaseUserService: SupabaseUserService,
 ) {
+    companion object {
+        const val BASE_PATH = "/api/user"
+        const val LOGIN = "$BASE_PATH/login"
+        const val SIGNUP = "$BASE_PATH/signup"
+        const val LOGIN_ANON = "$BASE_PATH/loginAnon"
+        const val LOGIN_ANON_WITH_EMAIL = "$BASE_PATH/loginAnonWithEmail"
+        const val LINK_IDENTITY = "$BASE_PATH/linkIdentity"
+        const val SIGN_IN_WITH_MAGIC_LINK = "$BASE_PATH/signInWithMagicLink"
+        const val CONFIRM_EMAIL_OTP = "$BASE_PATH/confirmEmailOtp"
+        const val JWT = "$BASE_PATH/jwt"
+        const val LOGOUT = "$BASE_PATH/logout"
+        const val SET_ROLES = "$BASE_PATH/setRoles"
+        const val SEND_PASSWORD_RESET_EMAIL = "$BASE_PATH/sendPasswordResetEmail"
+        const val UPDATE_PASSWORD = "$BASE_PATH/updatePassword"
+    }
+
     val logger: Logger = LoggerFactory.getLogger(SupabaseUserController::class.java)
 
 
-    @PostMapping("/login")
+    @PostMapping(LOGIN)
     fun login(
         @RequestParam email: String?,
         @RequestParam password: String?,
@@ -30,7 +45,7 @@ class SupabaseUserController(
         }
     }
 
-    @PostMapping("/signup")
+    @PostMapping(SIGNUP)
     fun signUp(
         @RequestParam email: String?,
         @RequestParam password: String?
@@ -41,13 +56,13 @@ class SupabaseUserController(
         }
     }
 
-    @PostMapping("/loginAnon")
+    @PostMapping(LOGIN_ANON)
     @ResponseBody
     fun anonSignIn() {
         supabaseUserService.signInAnonymously()
     }
 
-    @PostMapping("/loginAnonWithEmail")
+    @PostMapping(LOGIN_ANON_WITH_EMAIL)
     @ResponseBody
     fun anonSignInWithEmail(@RequestParam email: String?) {
         if (email != null) {
@@ -58,7 +73,7 @@ class SupabaseUserController(
     }
 
 
-    @PostMapping("/linkIdentity")
+    @PostMapping(LINK_IDENTITY)
     fun linkIdentity(
         @RequestParam email: String?
     ) {
@@ -70,7 +85,7 @@ class SupabaseUserController(
         }
     }
 
-    @PostMapping("/signInWithMagicLink")
+    @PostMapping(SIGN_IN_WITH_MAGIC_LINK)
     fun sendEmailOtp(
         @RequestParam email: String?
     ) {
@@ -82,7 +97,7 @@ class SupabaseUserController(
         }
     }
 
-    @PostMapping("/confirmEmailOtp")
+    @PostMapping(CONFIRM_EMAIL_OTP)
     @ResponseBody
     fun confirmEmailOtp(
         @RequestParam email: String?,
@@ -118,19 +133,19 @@ class SupabaseUserController(
         }
     }
 
-    @PostMapping("/jwt")
+    @PostMapping(JWT)
     @ResponseBody
     fun authorizeWithJwtOrResetPassword() {
         supabaseUserService.handleClientAuthentication()
     }
 
-    @GetMapping("/logout")
+    @GetMapping(LOGOUT)
     @ResponseBody
     fun logout() {
         supabaseUserService.logout()
     }
 
-    @PutMapping("/setRoles")
+    @PutMapping(SET_ROLES)
     @ResponseBody
     fun setRoles(
         @RequestParam
@@ -144,7 +159,7 @@ class SupabaseUserController(
         supabaseUserService.setRolesWithRequest(userId, roles)
     }
 
-    @PostMapping("/sendPasswordResetEmail")
+    @PostMapping(SEND_PASSWORD_RESET_EMAIL)
     @ResponseBody
     fun sendPasswordResetEmail(
         @RequestParam
@@ -154,7 +169,7 @@ class SupabaseUserController(
         supabaseUserService.sendPasswordRecoveryEmail(email.trim().lowercase())
     }
 
-    @PostMapping("/updatePassword")
+    @PostMapping(UPDATE_PASSWORD)
     @ResponseBody
     fun updatePassword(@RequestParam password: String) {
         supabaseUserService.updatePassword(password.trim())

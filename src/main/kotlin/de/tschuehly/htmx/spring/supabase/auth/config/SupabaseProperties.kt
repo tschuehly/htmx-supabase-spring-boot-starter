@@ -12,7 +12,6 @@ class SupabaseProperties(
     val cookieDomain: String?,
     val database: Database? = null,
     val otpCreateUser: Boolean = true,
-    val successfulLoginRedirectPage: String?,
     val passwordRecoveryPage: String?,
     val unauthenticatedPage: String?,
     val unauthorizedPage: String?,

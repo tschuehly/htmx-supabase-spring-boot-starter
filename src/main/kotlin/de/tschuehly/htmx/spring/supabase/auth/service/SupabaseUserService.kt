@@ -113,9 +113,6 @@ class SupabaseUserService(
             return
         }
         applicationEventPublisher.publishEvent(SupabaseUserAuthenticated(user))
-        if(supabaseProperties.successfulLoginRedirectPage != null) {
-            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
-        }
     }
 
     fun signInAnonymously() {
@@ -149,6 +146,7 @@ class SupabaseUserService(
                 ?: throw UnknownSupabaseException("No authenticated user found in SecurityContext")
             goTrueClient.importAuthToken(user.verifiedJwt)
             goTrueClient.verifyEmailOtp(type = OtpType.Email.EMAIL_CHANGE, email = email, token = otp)
+            authenticateWithCurrentSession()
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateConfirmed(user.id, email))
         }
     }
@@ -175,9 +173,6 @@ class SupabaseUserService(
         val token = goTrueClient.currentSessionOrNull()?.accessToken
             ?: throw JWTTokenNullException("The JWT that requested from supabase is null")
         HtmxUtil.getResponse().setJWTCookie(token, supabaseProperties)
-        if(supabaseProperties.successfulLoginRedirectPage != null) {
-            HtmxUtil.setHeader(HX_REDIRECT, supabaseProperties.successfulLoginRedirectPage)
-        }
         return authenticate(token)
 
     }

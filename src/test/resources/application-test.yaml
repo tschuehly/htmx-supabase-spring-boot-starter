@@ -1,5 +1,4 @@
 supabase:
-  successfulLoginRedirectPage: "/"
   passwordRecoveryPage: "/requestPasswordReset"
   unauthenticatedPage: "/unauthenticated"
   unauthorizedPage: "/unauthorized"
