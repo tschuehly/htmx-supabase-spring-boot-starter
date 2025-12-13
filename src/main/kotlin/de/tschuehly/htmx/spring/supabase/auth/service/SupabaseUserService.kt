@@ -21,7 +21,6 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
-import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.OTP
@@ -128,15 +127,16 @@ class SupabaseUserService(
             val user = SupabaseSecurityContextHolder.getAuthenticatedUser()
                 ?: throw UnknownSupabaseException("No authenticated user found in SecurityContext")
             goTrueClient.importAuthToken(user.verifiedJwt)
-            goTrueClient.updateUser {
+            val userInfo = goTrueClient.updateUser {
                 this.email = email
             }
-            // TODO:
-            if (user.email == email) {
+            var newEmailSent = false
+            if (userInfo.newEmail == email) {
                 goTrueClient.resendEmail(OtpType.Email.EMAIL_CHANGE, email)
+                newEmailSent = true
             }
             applicationEventPublisher.publishEvent(SupabaseUserEmailUpdateRequested(user.id, email))
-            throw UserNeedsToConfirmEmailForEmailChangeException(email)
+            throw UserNeedsToConfirmEmailForEmailChangeException(email, newEmailSent)
         }
     }
 
